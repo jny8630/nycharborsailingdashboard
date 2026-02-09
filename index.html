@@ -18,7 +18,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .hdr-label{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .hdr-title{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
 .hdr-meta{font-size:10px;color:var(--fnt);margin-top:6px}
-.btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600}
+.btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;font-family:inherit}
 .btn:active{opacity:.7}
 .cnt{padding:10px 10px 30px}
 .glance{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
@@ -48,7 +48,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .upcoming{margin-top:6px;padding:8px 12px;background:rgba(12,21,32,.5);border-radius:8px}
 .upcoming-l{font-size:10px;color:var(--fnt);margin-bottom:5px;font-weight:600;letter-spacing:.05em}
 .upcoming-r{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);padding:2px 0}
-.tbtn{width:100%;margin-top:8px;padding:9px;background:transparent;border:1px solid var(--bdr);border-radius:8px;color:var(--accent);font-size:12px;cursor:pointer;font-weight:500}
+.tbtn{width:100%;margin-top:8px;padding:9px;background:transparent;border:1px solid var(--bdr);border-radius:8px;color:var(--accent);font-size:12px;cursor:pointer;font-weight:500;font-family:inherit}
 .tbtn:active{opacity:.7}
 .tbtn.active{background:var(--bdr)}
 .wx-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
@@ -65,11 +65,15 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .footer{text-align:center;padding:14px 0;font-size:10px;color:var(--fnt);border-top:1px solid var(--bdr);margin-top:6px}
 .radar-links{display:flex;gap:6px;margin-top:8px}
 .radar-links a{flex:1;text-align:center;padding:8px;background:var(--bdr);border:1px solid var(--bdr2);border-radius:6px;color:var(--accent);font-size:11px;text-decoration:none;font-weight:600}
-canvas{display:block;width:100%;border-radius:8px}
+canvas{display:block;border-radius:8px}
 .chart-wrap{margin-top:10px;background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:10px 8px 6px;overflow:hidden}
 .chart-title{font-size:10px;color:var(--fnt);font-weight:600;letter-spacing:.06em;margin-bottom:6px}
 .chart-legend{display:flex;gap:14px;justify-content:center;margin-top:5px;font-size:10px;color:var(--fnt)}
 .hidden{display:none}
+.baro-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.baro-stat{background:var(--card2);border:1px solid var(--bdr);border-radius:8px;padding:10px;text-align:center}
+.baro-val{font-size:18px;font-weight:800;font-family:var(--mono)}
+.baro-lbl{font-size:9px;color:var(--fnt);margin-top:2px;font-weight:600}
 @media(max-width:360px){.fc-hdr,.fc-row{grid-template-columns:48px 46px 38px 30px 30px 40px 32px;font-size:11px}}
 </style>
 </head>
@@ -99,16 +103,15 @@ canvas{display:block;width:100%;border-radius:8px}
         <div><div class="bv" id="wg">—</div><div class="bv-l">kt gusts</div></div>
         <div><div class="bv" id="wdir" style="font-size:24px;margin-top:4px">—</div><div class="bv-l" id="wdeg"></div></div>
       </div>
-      <!-- B&G Style Wind Plots -->
       <div class="chart-wrap">
-        <div class="chart-title">WIND SPEED — LAST 2 HOURS (B&G Style)</div>
-        <canvas id="cvSpeed" height="120"></canvas>
-        <div class="chart-legend"><span><span style="color:var(--green)">━</span> Sustained</span><span><span style="color:var(--orange)">━</span> Gusts</span><span style="color:var(--yellow);opacity:.5">┈ Avg</span></div>
+        <div class="chart-title">WIND SPEED — LAST 2 HOURS</div>
+        <canvas id="cvSpeed" style="width:100%;height:140px"></canvas>
+        <div class="chart-legend"><span style="color:#48bb78">━</span> Sustained &nbsp;<span style="color:#ed893680">━</span> Gusts &nbsp;<span style="color:#ecc94b60">┈</span> Avg</div>
       </div>
       <div class="chart-wrap">
         <div class="chart-title">WIND DIRECTION — LAST 2 HOURS</div>
-        <canvas id="cvDir" height="100"></canvas>
-        <div class="chart-legend"><span><span style="color:var(--blue)">━</span> TWD</span><span style="color:var(--yellow);opacity:.5">┈ Avg</span></div>
+        <canvas id="cvDir" style="width:100%;height:110px"></canvas>
+        <div class="chart-legend"><span style="color:#63b3ed">━</span> TWD &nbsp;<span style="color:#ecc94b60">┈</span> Avg</div>
       </div>
       <div style="font-size:10px;color:var(--fnt);text-align:right;margin-top:6px" id="wtime"></div>
       <button class="tbtn" onclick="toggleEl('noaa-wrap');this.classList.toggle('active')" id="noaa-btn">View Full NOAA Station ↗</button>
@@ -118,11 +121,47 @@ canvas{display:block;width:100%;border-radius:8px}
     </div>
   </div>
 
+  <!-- B&G VERTICAL WIND PLOT -->
+  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,#8bc34a,transparent)"></div>
+    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>📟</span> B&G WindPlot — 30 min</div><span class="caret">▼</span></div>
+    <div class="card-body">
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em">TWD</div><div style="font-size:13px;font-weight:800;color:#63b3ed;font-family:var(--mono)" id="bgd-val">—</div></div>
+        <div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em">TWS / GUST</div><div style="font-size:13px;font-weight:800;color:#48bb78;font-family:var(--mono)" id="bgs-val">—</div></div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <div style="flex:1"><canvas id="cvBGdir" style="width:100%;height:340px"></canvas></div>
+        <div style="flex:1"><canvas id="cvBGspd" style="width:100%;height:340px"></canvas></div>
+      </div>
+      <div style="font-size:9px;color:var(--fnt);text-align:center;margin-top:6px">
+        Top = now · Bottom = 30 min ago · <span style="color:#ecc94b;opacity:.5">┈</span> rolling avg · <span style="color:#ed893680">━</span> gusts (TWS)
+      </div>
+    </div>
+  </div>
+
+  <!-- BAROMETRIC PRESSURE -->
+  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,#78909c,transparent)"></div>
+    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>🔵</span> Barometric Pressure</div><span class="caret">▼</span></div>
+    <div class="card-body">
+      <div style="font-size:22px;font-weight:800;font-family:var(--mono);margin-bottom:4px" id="baro-now">—</div>
+      <div style="font-size:11px;color:var(--mut);margin-bottom:10px" id="baro-sub">Loading…</div>
+      <div class="baro-stats">
+        <div class="baro-stat"><div class="baro-val" id="baro-3h">—</div><div class="baro-lbl">3-HOUR CHANGE</div></div>
+        <div class="baro-stat"><div class="baro-val" id="baro-6h">—</div><div class="baro-lbl">6-HOUR CHANGE</div></div>
+      </div>
+      <div class="chart-wrap" style="margin-top:0">
+        <div class="chart-title">PRESSURE — LAST 6 HOURS (mbar)</div>
+        <canvas id="cvBaro" style="width:100%;height:130px"></canvas>
+      </div>
+      <div style="font-size:9px;color:var(--fnt);text-align:right;margin-top:4px">NOAA Robbins Reef · 6-min data</div>
+    </div>
+  </div>
+
   <!-- TIDES -->
   <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>🌊</span> Tides — The Battery</div><span class="caret">▼</span></div>
     <div class="card-body">
-      <div id="tide-pill" class="status-pill" style="background:rgba(99,179,237,.08);border:1px solid rgba(99,179,237,.15)">
+      <div class="status-pill" style="background:rgba(99,179,237,.08);border:1px solid rgba(99,179,237,.15)">
         <span class="dot" id="tdot" style="background:var(--blue);box-shadow:0 0 8px rgba(99,179,237,.5)"></span>
         <span id="tstat" style="font-size:14px;font-weight:700;color:var(--blue)">Loading…</span>
       </div>
@@ -131,17 +170,17 @@ canvas{display:block;width:100%;border-radius:8px}
       <div id="tupcoming" class="upcoming hidden"><div class="upcoming-l">UPCOMING</div><div id="tulist"></div></div>
       <button class="tbtn" onclick="toggleEl('tchart');this.classList.toggle('active')">Show Tide Chart (Brooklyn)</button>
       <div id="tchart" class="hidden" style="margin-top:8px;border:1px solid var(--bdr);border-radius:8px;overflow:hidden">
-        <img src="https://www.tide-forecast.com/system/charts-png/Brooklyn-New-York/tides.png" style="width:100%;display:block;background:#fff" alt="Tide chart" onerror="this.outerHTML='<div style=padding:12px;font-size:12px;color:var(--mut);text-align:center>Chart unavailable — <a href=https://www.tide-forecast.com/locations/Brooklyn-New-York/tides/latest target=_blank style=color:var(--accent)>view online</a></div>'">
+        <img src="https://www.tide-forecast.com/system/charts-png/Brooklyn-New-York/tides.png" style="width:100%;display:block;background:#fff" alt="Tide chart" onerror="this.outerHTML='<div style=padding:12px;font-size:12px;color:var(--mut);text-align:center>Chart unavailable</div>'">
       </div>
     </div>
   </div>
 
   <!-- WEATHER -->
   <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--yellow),transparent)"></div>
-    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>🌡️</span> Weather & Temperature</div><span class="caret">▼</span></div>
+    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>☀️</span> Weather & Temperature</div><span class="caret">▼</span></div>
     <div class="card-body">
       <div class="wx-row"><span class="wx-icon" id="wxi">🌤️</span><div><div style="font-size:22px;font-weight:800" id="wxt">—</div><div style="font-size:12px;color:var(--mut)" id="wxd">Loading…</div></div></div>
-      <div id="stormbar" class="storm-bar" style="border:1px solid rgba(72,187,120,.2)"><span style="color:var(--mut)">⛈ Thunderstorm Risk</span><span id="stormv" style="font-weight:700;color:var(--green)">—</span></div>
+      <div class="storm-bar" style="border:1px solid rgba(72,187,120,.2)"><span style="color:var(--mut)">⛈ Thunderstorm Risk</span><span id="stormv" style="font-weight:700;color:var(--green)">—</span></div>
       <div id="wtemp" style="font-size:12px;color:var(--mut)"></div>
     </div>
   </div>
@@ -152,7 +191,7 @@ canvas{display:block;width:100%;border-radius:8px}
     <div class="card-body">
       <div class="fc-hdr"><span>Time</span><span>Wind</span><span>Gust</span><span>Dir</span><span>Deg</span><span>Temp</span><span>Rain</span></div>
       <div id="fcrows"></div>
-      <div style="font-size:9px;color:var(--fnt);margin-top:8px;text-align:right">Open-Meteo HRRR (3km) · Updated hourly · 18h range</div>
+      <div style="font-size:9px;color:var(--fnt);margin-top:8px;text-align:right">Open-Meteo HRRR (3km) · Updated hourly</div>
     </div>
   </div>
 
@@ -163,7 +202,7 @@ canvas{display:block;width:100%;border-radius:8px}
       <button id="radar-btn" class="tbtn" style="font-size:13px;font-weight:600" onclick="toggleRadar()">Show Live Radar Map (Windy)</button>
       <div id="radar-wrap" class="hidden" style="margin-top:10px">
         <div id="radar-ct"></div>
-        <div style="font-size:10px;color:var(--fnt);margin-top:4px;text-align:center">Windy.com interactive radar · pinch to zoom · tap play</div>
+        <div style="font-size:10px;color:var(--fnt);margin-top:4px;text-align:center">Windy.com interactive radar</div>
         <div class="radar-links">
           <a href="https://www.windy.com/40.689/-74.045?radar,40.689,-74.045,10" target="_blank">Windy ↗</a>
           <a href="https://www.accuweather.com/en/us/new-york/10007/weather-radar/349727" target="_blank">AccuWeather ↗</a>
@@ -191,84 +230,69 @@ canvas{display:block;width:100%;border-radius:8px}
 </div>
 
 <script>
-// ═══════════════════════════════════════
-// NYC HARBOR SAILING CONDITIONS
-// ═══════════════════════════════════════
-
 const ST={BAT:'8518750',ROB:'8530973'};
 const NYC={lat:40.6892,lon:-74.0445};
-
-// ── Helpers ──
 const $=id=>document.getElementById(id);
 const cardinal=d=>{if(d==null||isNaN(d))return'—';return['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16]};
 const fmtT=d=>d?d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/New_York'}):'—';
-const fmtShort=d=>d?d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:false,timeZone:'America/New_York'}):'—';
+const fmtHM=d=>d?d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/New_York'}):'—';
 const c2f=c=>(c*9/5+32).toFixed(0);
 const mUntil=(f,n)=>{const m=(f-n)/6e4;if(m<1)return'now';if(m<60)return Math.round(m)+'m';const h=Math.floor(m/60),r=Math.round(m%60);return r>0?h+'h '+r+'m':h+'h'};
-const wColor=k=>k>=25?'var(--red)':k>=18?'var(--orange)':k>=12?'var(--yellow)':k>=6?'var(--green)':'var(--dim)';
+const wColor=k=>k>=25?'#f56565':k>=18?'#ed8936':k>=12?'#ecc94b':k>=6?'#48bb78':'#8a9bb5';
+const wCSS=k=>k>=25?'var(--red)':k>=18?'var(--orange)':k>=12?'var(--yellow)':k>=6?'var(--green)':'var(--dim)';
 const fColor=f=>f==='flooding'?'var(--blue)':f==='ebbing'?'var(--orange)':'var(--dim)';
 const wxI=c=>{if(c<=1)return'☀️';if(c<=3)return'⛅';if(c<=48)return'🌫️';if(c<=67)return'🌧️';if(c>=95)return'⛈️';return'🌤️'};
-const wxD=c=>({0:'Clear',1:'Mostly Clear',2:'Partly Cloudy',3:'Overcast',45:'Fog',51:'Lt Drizzle',61:'Lt Rain',63:'Rain',65:'Heavy Rain',80:'Showers',81:'Mod Showers',82:'Hvy Showers',95:'Thunderstorm',96:'T-Storm+Hail'})[c]||'—';
+const wxD=c=>({0:'Clear',1:'Mostly Clear',2:'Partly Cloudy',3:'Overcast',45:'Fog',51:'Lt Drizzle',61:'Lt Rain',63:'Rain',65:'Heavy Rain',80:'Showers',95:'Thunderstorm',96:'T-Storm+Hail'})[c]||'—';
 const fmt2=d=>`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
 
 function parseNOAA(ts){
   if(!ts)return null;
   const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',timeZoneName:'shortOffset'}).formatToParts(new Date());
-  const tz=p.find(x=>x.type==='timeZoneName');
-  let off='-05:00';
+  const tz=p.find(x=>x.type==='timeZoneName');let off='-05:00';
   if(tz){const m=tz.value.match(/GMT([+-]?\d+)/);if(m){const h=parseInt(m[1]);off=(h>=0?'+':'-')+String(Math.abs(h)).padStart(2,'0')+':00'}}
-  const d=new Date(ts.replace(' ','T')+off);
-  return isNaN(d)?null:d;
+  const d=new Date(ts.replace(' ','T')+off);return isNaN(d)?null:d;
 }
 
-// ── UI Toggles ──
+function setupCanvas(cv){
+  const dpr=window.devicePixelRatio||1;
+  const r=cv.getBoundingClientRect();
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,r.width,r.height);
+  return{ctx,w:r.width,h:r.height};
+}
+
 function toggle(hdr){const b=hdr.nextElementSibling;b.classList.toggle('collapsed');hdr.querySelector('.caret').textContent=b.classList.contains('collapsed')?'▲':'▼'}
 function toggleEl(id){$(id).classList.toggle('hidden')}
 let radarOn=false;
-function toggleRadar(){
-  radarOn=!radarOn;
-  $('radar-wrap').classList.toggle('hidden',!radarOn);
-  $('radar-btn').textContent=radarOn?'Hide Radar Map':'Show Live Radar Map (Windy)';
-  if(radarOn&&!$('radar-ct').innerHTML){
-    $('radar-ct').innerHTML='<iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=kt&metricTemp=°C&zoom=10&overlay=radar&product=radar&level=surface&lat=40.67&lon=-74.04" style="width:100%;height:340px;border:1px solid var(--bdr);border-radius:8px" frameborder="0" title="Radar"></iframe>';
-  }
+function toggleRadar(){radarOn=!radarOn;$('radar-wrap').classList.toggle('hidden',!radarOn);$('radar-btn').textContent=radarOn?'Hide Radar Map':'Show Live Radar Map (Windy)';if(radarOn&&!$('radar-ct').innerHTML)$('radar-ct').innerHTML='<iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=kt&metricTemp=°C&zoom=10&overlay=radar&product=radar&level=surface&lat=40.67&lon=-74.04" style="width:100%;height:340px;border:1px solid var(--bdr);border-radius:8px" frameborder="0"></iframe>'}
+$('noaa-btn').addEventListener('click',function(){const f=$('noaa-iframe');if(!f.src||f.src==='')f.src='https://tidesandcurrents.noaa.gov/stationhome.html?id=8530973'});
+
+// ── FETCHERS ──
+async function getJ(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
+
+async function fetchWindHistory(){
+  const now=new Date(),start=new Date(now.getTime()-2*3600000);
+  const bd=fmt2(start)+' '+String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
+  const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(bd)}&range=3&station=${ST.ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`);
+  if(!d.data?.length)return null;
+  return d.data.map(w=>({time:parseNOAA(w.t),speed:parseFloat(w.s),gusts:parseFloat(w.g),dir:parseFloat(w.d)})).filter(w=>w.time);
 }
 
-// ── NOAA iframe lazy load ──
-document.getElementById('noaa-btn').addEventListener('click',function(){
-  const iframe=$('noaa-iframe');
-  if(!iframe.src||iframe.src==='')iframe.src='https://tidesandcurrents.noaa.gov/stationhome.html?id=8530973';
-});
-
-// ── Fetchers ──
-async function getJ(u){const r=await fetch(u);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
-
-// Wind: get last 2 hours of 6-min data
-async function fetchWindHistory(){
-  const now=new Date();
-  const start=new Date(now.getTime()-2*3600000);
-  // NOAA wants date in YYYYMMDD HH:MM format
+async function fetchPressure(){
+  const now=new Date(),start=new Date(now.getTime()-6.5*3600000);
   const bd=fmt2(start)+' '+String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
-  const u=`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(bd)}&range=3&station=${ST.ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`;
-  const d=await getJ(u);
+  const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(bd)}&range=7&station=${ST.ROB}&product=air_pressure&units=metric&time_zone=lst_ldt&format=json`);
   if(!d.data?.length)return null;
-  return d.data.map(w=>({
-    time:parseNOAA(w.t),
-    speed:parseFloat(w.s),
-    gusts:parseFloat(w.g),
-    dir:parseFloat(w.d)
-  })).filter(w=>w.time);
+  return d.data.map(p=>({time:parseNOAA(p.t),val:parseFloat(p.v)})).filter(p=>p.time&&!isNaN(p.val));
 }
 
 async function fetchWaterTemp(){
   const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=${ST.BAT}&product=water_temperature&datum=MLLW&units=english&time_zone=lst_ldt&format=json`);
-  if(!d.data?.[0])return null;
-  const f=parseFloat(d.data[0].v);return{f:f.toFixed(1),c:((f-32)*5/9).toFixed(1)};
+  if(!d.data?.[0])return null;const f=parseFloat(d.data[0].v);return{f:f.toFixed(1),c:((f-32)*5/9).toFixed(1)};
 }
 
 async function fetchTides(){
-  const now=new Date(),s=new Date(now),e=new Date(now);
-  s.setDate(s.getDate()-1);e.setDate(e.getDate()+2);
+  const now=new Date(),s=new Date(now),e=new Date(now);s.setDate(s.getDate()-1);e.setDate(e.getDate()+2);
   const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${fmt2(s)}&end_date=${fmt2(e)}&station=${ST.BAT}&product=predictions&datum=MLLW&units=english&time_zone=lst_ldt&format=json&interval=hilo`);
   if(!d.predictions?.length)return null;
   const tides=d.predictions.filter(p=>p.type).map(p=>({time:parseNOAA(p.t),type:p.type.toUpperCase(),height:parseFloat(p.v).toFixed(1)})).filter(t=>t.time).sort((a,b)=>a.time-b.time);
@@ -276,318 +300,198 @@ async function fetchTides(){
   const prev=past.length?past[past.length-1]:null,next=future[0]||null,following=future[1]||null;
   let status='Unknown',flow='unknown';
   if(prev&&next){const mn=(next.time-now)/6e4,mp=(now-prev.time)/6e4;
-    if(mn<=30){status=`Slack → ${next.type==='H'?'High':'Low'}`;flow='slack'}
-    else if(mp<=30){status=`Slack after ${prev.type==='H'?'High':'Low'}`;flow='slack'}
+    if(mn<=30){status='Slack → '+(next.type==='H'?'High':'Low');flow='slack'}
+    else if(mp<=30){status='Slack after '+(prev.type==='H'?'High':'Low');flow='slack'}
     else if(next.type==='H'){status='Flooding (Rising)';flow='flooding'}
     else{status='Ebbing (Falling)';flow='ebbing'}}
   return{prev,next,following,status,flow,allFuture:future.slice(0,6)};
 }
 
-async function fetchWeather(){
-  // Current conditions + hourly (blended, for current wx code & temp)
-  return await getJ(`https://api.open-meteo.com/v1/gfs?latitude=${NYC.lat}&longitude=${NYC.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=cape&wind_speed_unit=kn&temperature_unit=celsius&timezone=America/New_York&forecast_hours=3&past_hours=0`);
+async function fetchWeather(){return await getJ(`https://api.open-meteo.com/v1/gfs?latitude=${NYC.lat}&longitude=${NYC.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=cape&wind_speed_unit=kn&temperature_unit=celsius&timezone=America/New_York&forecast_hours=3&past_hours=0`)}
+async function fetchHRRR(){return await getJ(`https://api.open-meteo.com/v1/gfs?latitude=${NYC.lat}&longitude=${NYC.lon}&minutely_15=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&temperature_unit=celsius&timezone=America/New_York&forecast_minutely_15=72&past_minutely_15=4`)}
+
+// ── HORIZONTAL CHARTS ──
+
+function drawSpeedH(cv,data){
+  if(!data||data.length<2)return;const{ctx,w:W,h:H}=setupCanvas(cv);
+  const aW=10,avgs=data.map((_,i)=>{const s=Math.max(0,i-aW+1);return data.slice(s,i+1).reduce((a,d)=>a+d.speed,0)/(i-s+1)});
+  const all=[...data.map(d=>d.speed),...data.map(d=>d.gusts),...avgs];
+  const mn=Math.max(0,Math.min(...all)-2),mx=Math.max(...all)+2;
+  const P={t:10,b:22,l:36,r:10},cw=W-P.l-P.r,ch=H-P.t-P.b;
+  const xS=i=>(i/(data.length-1))*cw+P.l,yS=v=>P.t+ch-((v-mn)/(mx-mn))*ch;
+  ctx.strokeStyle='#1a2d42';ctx.lineWidth=.5;
+  for(let i=0;i<=4;i++){const v=mn+(mx-mn)*(i/4),y=yS(v);ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillStyle='#4a6078';ctx.font='10px system-ui';ctx.textAlign='right';ctx.fillText(v.toFixed(0),P.l-5,y+4)}
+  ctx.fillStyle='#4a6078';ctx.font='10px system-ui';ctx.textAlign='center';
+  const le=Math.max(1,Math.floor(data.length/5));for(let i=0;i<data.length;i+=le)ctx.fillText(fmtHM(data[i].time),xS(i),H-4);
+  if(mn<12&&mx>12){ctx.strokeStyle='#ecc94b30';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(P.l,yS(12));ctx.lineTo(W-P.r,yS(12));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ecc94b50';ctx.font='9px system-ui';ctx.textAlign='right';ctx.fillText('12kt',W-P.r,yS(12)-4)}
+  ctx.beginPath();for(let i=0;i<data.length;i++){let x=xS(i),y=yS(data[i].gusts);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}for(let i=data.length-1;i>=0;i--)ctx.lineTo(xS(i),yS(data[i].speed));ctx.closePath();ctx.fillStyle='rgba(237,137,54,.12)';ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='rgba(237,137,54,.45)';ctx.lineWidth=1.5;for(let i=0;i<data.length;i++){let x=xS(i),y=yS(data[i].gusts);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
+  ctx.beginPath();ctx.moveTo(xS(0),yS(mn));for(let i=0;i<data.length;i++)ctx.lineTo(xS(i),yS(data[i].speed));ctx.lineTo(xS(data.length-1),yS(mn));ctx.closePath();const g=ctx.createLinearGradient(0,P.t,0,H-P.b);g.addColorStop(0,'rgba(72,187,120,.3)');g.addColorStop(1,'rgba(72,187,120,.02)');ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='#48bb78';ctx.lineWidth=2;for(let i=0;i<data.length;i++){let x=xS(i),y=yS(data[i].speed);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
+  ctx.beginPath();ctx.strokeStyle='#ecc94b55';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);for(let i=0;i<avgs.length;i++){let x=xS(i),y=yS(avgs[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();ctx.setLineDash([]);
+  const li=data.length-1;ctx.beginPath();ctx.arc(xS(li),yS(data[li].speed),5,0,Math.PI*2);ctx.fillStyle='#48bb78';ctx.fill();ctx.strokeStyle='#0c1520';ctx.lineWidth=2;ctx.stroke();
 }
 
-async function fetchHRRR(){
-  // HRRR-only via minutely_15 (15-min resolution, HRRR source)
-  return await getJ(`https://api.open-meteo.com/v1/gfs?latitude=${NYC.lat}&longitude=${NYC.lon}&minutely_15=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&temperature_unit=celsius&timezone=America/New_York&forecast_minutely_15=72&past_minutely_15=4`);
+function drawDirH(cv,data){
+  if(!data||data.length<2)return;const{ctx,w:W,h:H}=setupCanvas(cv);
+  const dirs=[data[0].dir];for(let i=1;i<data.length;i++){let d=data[i].dir,p=dirs[i-1];while(d-p>180)d-=360;while(p-d>180)d+=360;dirs.push(d)}
+  const aW=10,avgs=dirs.map((_,i)=>{const s=Math.max(0,i-aW+1);return dirs.slice(s,i+1).reduce((a,v)=>a+v,0)/(i-s+1)});
+  const allD=[...dirs,...avgs];const mn=Math.min(...allD)-5,mx=Math.max(...allD)+5;
+  const P={t:10,b:22,l:36,r:10},cw=W-P.l-P.r,ch=H-P.t-P.b;
+  const xS=i=>(i/(data.length-1))*cw+P.l,yS=v=>P.t+ch-((v-mn)/(mx-mn))*ch;
+  const rng=mx-mn,step=rng>60?20:rng>30?10:5;
+  ctx.strokeStyle='#1a2d42';ctx.lineWidth=.5;
+  for(let v=Math.ceil(mn/step)*step;v<=mx;v+=step){const y=yS(v);ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillStyle='#4a6078';ctx.font='10px system-ui';ctx.textAlign='right';ctx.fillText((((v%360)+360)%360).toFixed(0)+'°',P.l-5,y+4)}
+  ctx.fillStyle='#4a6078';ctx.font='10px system-ui';ctx.textAlign='center';const le=Math.max(1,Math.floor(data.length/5));for(let i=0;i<data.length;i+=le)ctx.fillText(fmtHM(data[i].time),xS(i),H-4);
+  ctx.beginPath();for(let i=0;i<dirs.length;i++){let x=xS(i),y=yS(dirs[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}for(let i=dirs.length-1;i>=0;i--)ctx.lineTo(xS(i),yS(avgs[i]));ctx.closePath();ctx.fillStyle='rgba(99,179,237,.1)';ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='#ecc94b55';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);for(let i=0;i<avgs.length;i++){let x=xS(i),y=yS(avgs[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.strokeStyle='#63b3ed';ctx.lineWidth=2;for(let i=0;i<dirs.length;i++){let x=xS(i),y=yS(dirs[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
+  const li=dirs.length-1;ctx.beginPath();ctx.arc(xS(li),yS(dirs[li]),5,0,Math.PI*2);ctx.fillStyle='#63b3ed';ctx.fill();ctx.strokeStyle='#0c1520';ctx.lineWidth=2;ctx.stroke();
 }
 
-// ═══════════════════════════════════════
-// B&G STYLE CANVAS CHARTS
-// ═══════════════════════════════════════
+// ── B&G VERTICAL WIND PLOTS ──
 
-function drawWindSpeedChart(canvas, data){
-  if(!data||data.length<2)return;
-  const ctx=canvas.getContext('2d');
-  const dpr=window.devicePixelRatio||1;
-  const W=canvas.clientWidth, H=canvas.clientHeight;
-  canvas.width=W*dpr; canvas.height=H*dpr;
-  ctx.scale(dpr,dpr);
+function drawBGV(cv,data,opt){
+  if(!data||data.length<2)return;const{ctx,w:W,h:H}=setupCanvas(cv);
+  const now=data[data.length-1].time.getTime(),winMs=30*60000,cut=now-winMs;
+  const pts=data.filter(d=>d.time.getTime()>=cut);if(pts.length<2)return;
+  let vals=pts.map(d=>d[opt.key]);
+  if(opt.unwrap){const uw=[vals[0]];for(let i=1;i<vals.length;i++){let v=vals[i],p=uw[i-1];while(v-p>180)v-=360;while(p-v>180)v+=360;uw.push(v)}vals=uw}
+  const aW=5,avgs=vals.map((_,i)=>{const s=Math.max(0,i-aW+1);return vals.slice(s,i+1).reduce((a,v)=>a+v,0)/(i-s+1)});
+  const avg=vals.reduce((a,v)=>a+v,0)/vals.length;
+  let gVals=opt.gustKey?pts.map(d=>d[opt.gustKey]):null;
+  const allV=[...vals,...avgs];if(gVals)allV.push(...gVals);
+  const spread=Math.max(...allV)-Math.min(...allV);const margin=Math.max(spread*.15,opt.minM||2);
+  const mn=Math.min(...allV)-margin,mx=Math.max(...allV)+margin;
+  const P={t:16,b:16,l:8,r:8},cw=W-P.l-P.r,ch=H-P.t-P.b;
+  const xS=v=>P.l+((v-mn)/(mx-mn))*cw;
+  const yS=t=>P.t+((now-t)/winMs)*ch;
 
-  // Compute rolling average (10-point ~1hr)
-  const avgWindow=10;
-  const avgs=data.map((_,i)=>{
-    const start=Math.max(0,i-avgWindow+1);
-    const slice=data.slice(start,i+1);
-    return slice.reduce((s,d)=>s+d.speed,0)/slice.length;
-  });
+  // Dark BG
+  ctx.fillStyle='#060b12';ctx.beginPath();ctx.roundRect(0,0,W,H,8);ctx.fill();
 
-  const allVals=[...data.map(d=>d.speed),...data.map(d=>d.gusts),...avgs];
-  const minV=Math.max(0,Math.min(...allVals)-2);
-  const maxV=Math.max(...allVals)+2;
-  const pad={t:8,b:20,l:32,r:8};
-  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
-  const xScale=i=>(i/(data.length-1))*cw+pad.l;
-  const yScale=v=>pad.t+ch-(((v-minV)/(maxV-minV))*ch);
+  // Value grid (vertical lines)
+  const rng=mx-mn;const step=opt.unwrap?(rng>40?10:rng>15?5:2):(rng>15?5:rng>6?2:1);
+  ctx.strokeStyle='#1a2d4260';ctx.lineWidth=.5;ctx.fillStyle='#4a607890';ctx.font='9px system-ui';ctx.textAlign='center';
+  for(let v=Math.ceil(mn/step)*step;v<=mx;v+=step){const x=xS(v);ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();const lbl=opt.unwrap?(((v%360)+360)%360).toFixed(0):v.toFixed(0);ctx.fillText(lbl,x,P.t-4)}
 
-  // Grid
-  ctx.strokeStyle='#1a2d42';ctx.lineWidth=0.5;
-  const ySteps=4;
-  for(let i=0;i<=ySteps;i++){
-    const v=minV+(maxV-minV)*(i/ySteps);
-    const y=yScale(v);
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
-    ctx.fillStyle='#3a5068';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='right';
-    ctx.fillText(v.toFixed(0),pad.l-4,y+3);
-  }
+  // Time grid (horizontal lines)
+  ctx.strokeStyle='#1a2d4240';ctx.fillStyle='#4a607880';ctx.font='9px system-ui';ctx.textAlign='left';
+  [0,10,20,30].forEach(m=>{const y=yS(now-m*60000);if(y>=P.t&&y<=H-P.b){ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillText(m===0?'NOW':'-'+m+'m',P.l+2,m===0?y+11:y-3)}});
 
-  // Time labels
-  ctx.fillStyle='#3a5068';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';
-  const labelEvery=Math.max(1,Math.floor(data.length/5));
-  for(let i=0;i<data.length;i+=labelEvery){
-    ctx.fillText(fmtShort(data[i].time),xScale(i),H-2);
-  }
+  // Avg center line
+  ctx.strokeStyle='#ecc94b40';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(xS(avg),P.t);ctx.lineTo(xS(avg),H-P.b);ctx.stroke();ctx.setLineDash([]);
 
-  // 12kt reference
-  if(minV<12&&maxV>12){
-    ctx.strokeStyle='#ecc94b35';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-    ctx.beginPath();ctx.moveTo(pad.l,yScale(12));ctx.lineTo(W-pad.r,yScale(12));ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#ecc94b50';ctx.font='8px -apple-system,sans-serif';ctx.textAlign='right';
-    ctx.fillText('12kt',W-pad.r,yScale(12)-3);
-  }
+  // Shaded area between data and rolling avg
+  ctx.beginPath();for(let i=0;i<pts.length;i++){const x=xS(vals[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}
+  for(let i=pts.length-1;i>=0;i--)ctx.lineTo(xS(avgs[i]),yS(pts[i].time.getTime()));ctx.closePath();ctx.fillStyle=opt.fill;ctx.fill();
 
-  // Gust area fill
-  ctx.beginPath();ctx.moveTo(xScale(0),yScale(data[0].gusts));
-  for(let i=1;i<data.length;i++)ctx.lineTo(xScale(i),yScale(data[i].gusts));
-  ctx.lineTo(xScale(data.length-1),yScale(data[data.length-1].speed));
-  for(let i=data.length-1;i>=0;i--)ctx.lineTo(xScale(i),yScale(data[i].speed));
-  ctx.closePath();
-  ctx.fillStyle='rgba(237,137,54,0.12)';ctx.fill();
+  // Rolling avg line
+  ctx.beginPath();ctx.strokeStyle='#ecc94b45';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  for(let i=0;i<pts.length;i++){const x=xS(avgs[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();ctx.setLineDash([]);
 
-  // Gust line
-  ctx.beginPath();ctx.strokeStyle='#ed893660';ctx.lineWidth=1;
-  for(let i=0;i<data.length;i++){const x=xScale(i),y=yScale(data[i].gusts);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
-  ctx.stroke();
+  // Gust line if applicable
+  if(gVals){ctx.beginPath();ctx.strokeStyle='rgba(237,137,54,.4)';ctx.lineWidth=1;for(let i=0;i<pts.length;i++){const x=xS(gVals[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()}
 
-  // Speed filled area
-  ctx.beginPath();ctx.moveTo(xScale(0),yScale(minV));
-  for(let i=0;i<data.length;i++)ctx.lineTo(xScale(i),yScale(data[i].speed));
-  ctx.lineTo(xScale(data.length-1),yScale(minV));ctx.closePath();
-  const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
-  grad.addColorStop(0,'rgba(72,187,120,0.3)');grad.addColorStop(1,'rgba(72,187,120,0.02)');
-  ctx.fillStyle=grad;ctx.fill();
+  // Main data line
+  ctx.beginPath();ctx.strokeStyle=opt.color;ctx.lineWidth=2.5;
+  for(let i=0;i<pts.length;i++){const x=xS(vals[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
 
-  // Speed line
-  ctx.beginPath();ctx.strokeStyle='#48bb78';ctx.lineWidth=2;
-  for(let i=0;i<data.length;i++){const x=xScale(i),y=yScale(data[i].speed);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
-  ctx.stroke();
-
-  // Average line (dashed yellow)
-  ctx.beginPath();ctx.strokeStyle='#ecc94b60';ctx.lineWidth=1.5;ctx.setLineDash([6,3]);
-  for(let i=0;i<avgs.length;i++){const x=xScale(i),y=yScale(avgs[i]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
-  ctx.stroke();ctx.setLineDash([]);
-
-  // Current value marker
-  const lastI=data.length-1;
-  ctx.beginPath();ctx.arc(xScale(lastI),yScale(data[lastI].speed),4,0,Math.PI*2);
-  ctx.fillStyle='#48bb78';ctx.fill();
-  ctx.strokeStyle='#0c1520';ctx.lineWidth=2;ctx.stroke();
+  // Current value dot
+  const lx=xS(vals[vals.length-1]),ly=yS(pts[pts.length-1].time.getTime());
+  ctx.beginPath();ctx.arc(lx,ly,5,0,Math.PI*2);ctx.fillStyle=opt.color;ctx.fill();ctx.strokeStyle='#060b12';ctx.lineWidth=2;ctx.stroke();
 }
 
-function drawWindDirChart(canvas, data){
-  if(!data||data.length<2)return;
-  const ctx=canvas.getContext('2d');
-  const dpr=window.devicePixelRatio||1;
-  const W=canvas.clientWidth, H=canvas.clientHeight;
-  canvas.width=W*dpr; canvas.height=H*dpr;
-  ctx.scale(dpr,dpr);
+// ── BAROMETRIC PRESSURE ──
 
-  // Unwrap direction to handle 360/0 crossings
-  const dirs=[data[0].dir];
-  for(let i=1;i<data.length;i++){
-    let d=data[i].dir,prev=dirs[i-1];
-    while(d-prev>180)d-=360;
-    while(prev-d>180)d+=360;
-    dirs.push(d);
-  }
-
-  // Rolling average
-  const avgW=10;
-  const avgs=dirs.map((_,i)=>{
-    const start=Math.max(0,i-avgW+1);
-    const sl=dirs.slice(start,i+1);
-    return sl.reduce((s,v)=>s+v,0)/sl.length;
-  });
-
-  const allD=[...dirs,...avgs];
-  const minD=Math.min(...allD)-5, maxD=Math.max(...allD)+5;
-  const pad={t:8,b:20,l:32,r:8};
-  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
-  const xScale=i=>(i/(data.length-1))*cw+pad.l;
-  const yScale=v=>pad.t+ch-(((v-minD)/(maxD-minD))*ch);
-
-  // Grid
-  ctx.strokeStyle='#1a2d42';ctx.lineWidth=0.5;
-  const range=maxD-minD;
-  const step=range>60?20:range>30?10:5;
-  for(let v=Math.ceil(minD/step)*step;v<=maxD;v+=step){
-    const y=yScale(v);
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
-    // Normalize label to 0-360
-    let label=((v%360)+360)%360;
-    ctx.fillStyle='#3a5068';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='right';
-    ctx.fillText(label.toFixed(0)+'°',pad.l-4,y+3);
-  }
-
-  // Time labels
-  ctx.fillStyle='#3a5068';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';
-  const le=Math.max(1,Math.floor(data.length/5));
-  for(let i=0;i<data.length;i+=le)ctx.fillText(fmtShort(data[i].time),xScale(i),H-2);
-
-  // Average line
-  ctx.beginPath();ctx.strokeStyle='#ecc94b60';ctx.lineWidth=1.5;ctx.setLineDash([6,3]);
-  for(let i=0;i<avgs.length;i++){const x=xScale(i),y=yScale(avgs[i]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
-  ctx.stroke();ctx.setLineDash([]);
-
-  // Direction shaded area between actual and average
-  ctx.beginPath();
-  for(let i=0;i<dirs.length;i++){const x=xScale(i),y=yScale(dirs[i]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
-  for(let i=dirs.length-1;i>=0;i--){const x=xScale(i),y=yScale(avgs[i]);ctx.lineTo(x,y)}
-  ctx.closePath();ctx.fillStyle='rgba(99,179,237,0.1)';ctx.fill();
-
-  // Direction line
-  ctx.beginPath();ctx.strokeStyle='#63b3ed';ctx.lineWidth=2;
-  for(let i=0;i<dirs.length;i++){const x=xScale(i),y=yScale(dirs[i]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
-  ctx.stroke();
-
-  // Current value marker
-  const li=dirs.length-1;
-  ctx.beginPath();ctx.arc(xScale(li),yScale(dirs[li]),4,0,Math.PI*2);
-  ctx.fillStyle='#63b3ed';ctx.fill();
-  ctx.strokeStyle='#0c1520';ctx.lineWidth=2;ctx.stroke();
+function drawBaroChart(cv,data){
+  if(!data||data.length<2)return;const{ctx,w:W,h:H}=setupCanvas(cv);
+  const all=data.map(d=>d.val),mn=Math.min(...all)-.5,mx=Math.max(...all)+.5;
+  const P={t:10,b:22,l:40,r:10},cw=W-P.l-P.r,ch=H-P.t-P.b;
+  const xS=i=>(i/(data.length-1))*cw+P.l,yS=v=>P.t+ch-((v-mn)/(mx-mn))*ch;
+  const rng=mx-mn,step=rng>10?5:rng>4?2:1;
+  ctx.strokeStyle='#1a2d42';ctx.lineWidth=.5;
+  for(let v=Math.ceil(mn/step)*step;v<=mx;v+=step){const y=yS(v);ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillStyle='#4a6078';ctx.font='10px system-ui';ctx.textAlign='right';ctx.fillText(v.toFixed(0),P.l-5,y+4)}
+  ctx.fillStyle='#4a6078';ctx.font='10px system-ui';ctx.textAlign='center';const le=Math.max(1,Math.floor(data.length/5));for(let i=0;i<data.length;i+=le)ctx.fillText(fmtHM(data[i].time),xS(i),H-4);
+  ctx.beginPath();ctx.moveTo(xS(0),yS(mn));for(let i=0;i<data.length;i++)ctx.lineTo(xS(i),yS(data[i].val));ctx.lineTo(xS(data.length-1),yS(mn));ctx.closePath();const g=ctx.createLinearGradient(0,P.t,0,H-P.b);g.addColorStop(0,'rgba(120,144,156,.25)');g.addColorStop(1,'rgba(120,144,156,.02)');ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='#78909c';ctx.lineWidth=2;for(let i=0;i<data.length;i++){let x=xS(i),y=yS(data[i].val);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
+  const li=data.length-1;ctx.beginPath();ctx.arc(xS(li),yS(data[li].val),5,0,Math.PI*2);ctx.fillStyle='#78909c';ctx.fill();ctx.strokeStyle='#0c1520';ctx.lineWidth=2;ctx.stroke();
 }
 
-// ═══════════════════════════════════════
-// RENDERERS
-// ═══════════════════════════════════════
+// ── RENDERERS ──
 
-function renderWind(history){
-  if(!history?.length)return;
-  const last=history[history.length-1];
-  const s=last.speed.toFixed(1),g=last.gusts.toFixed(1);
-  $('ws').textContent=s;$('ws').style.color=wColor(last.speed);
-  $('wg').textContent=g<0.1?'—':g;
-  $('wdir').innerHTML=`<span style="display:inline-block;transform:rotate(${last.dir}deg);margin-right:4px">↓</span>${cardinal(last.dir)}`;
-  $('wdeg').textContent=isNaN(last.dir)?'':'('+last.dir.toFixed(0)+'°)';
-  $('wtime').textContent=last.time?'NOAA 6-min data · Latest: '+fmtT(last.time):'';
-  $('gw').textContent=s;$('gw').style.color=wColor(last.speed);
-  $('gwd').textContent='kt '+cardinal(last.dir);
+function renderWind(h){
+  if(!h?.length)return;const l=h[h.length-1],s=l.speed.toFixed(1),g=l.gusts.toFixed(1);
+  $('ws').textContent=s;$('ws').style.color=wCSS(l.speed);$('wg').textContent=g<.1?'—':g;
+  $('wdir').innerHTML='<span style="display:inline-block;transform:rotate('+l.dir+'deg);margin-right:4px">↓</span>'+cardinal(l.dir);
+  $('wdeg').textContent=isNaN(l.dir)?'':'('+l.dir.toFixed(0)+'°)';
+  $('wtime').textContent=l.time?'NOAA 6-min data · Latest: '+fmtT(l.time):'';
+  $('gw').textContent=s;$('gw').style.color=wCSS(l.speed);$('gwd').textContent='kt '+cardinal(l.dir);
+  $('bgd-val').textContent=cardinal(l.dir)+' ('+l.dir.toFixed(0)+'°)';
+  $('bgs-val').textContent=s+' kt  G'+g;
+  drawSpeedH($('cvSpeed'),h);drawDirH($('cvDir'),h);
+  drawBGV($('cvBGdir'),h,{key:'dir',unwrap:true,color:'#63b3ed',fill:'rgba(99,179,237,.12)',minM:5});
+  drawBGV($('cvBGspd'),h,{key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2});
+}
 
-  // Draw B&G charts
-  drawWindSpeedChart($('cvSpeed'),history);
-  drawWindDirChart($('cvDir'),history);
+function renderPressure(p){
+  if(!p?.length)return;const l=p[p.length-1],nv=l.val,nt=l.time.getTime();
+  $('baro-now').textContent=nv.toFixed(1)+' mbar';
+  function vAt(ms){let c=p[0];for(const x of p)if(Math.abs(x.time.getTime()-(nt-ms))<Math.abs(c.time.getTime()-(nt-ms)))c=x;return c.val}
+  const d3=nv-vAt(3*36e5),d6=nv-vAt(6*36e5);
+  function fc(v){const s=v>=0?'+':'',c=Math.abs(v)<1?'#78909c':v>0?'#48bb78':'#ed8936';return'<span style="color:'+c+'">'+s+v.toFixed(1)+'</span>'}
+  $('baro-3h').innerHTML=fc(d3)+' <span style="font-size:11px;color:var(--fnt)">mbar</span>';
+  $('baro-6h').innerHTML=fc(d6)+' <span style="font-size:11px;color:var(--fnt)">mbar</span>';
+  let t='Steady';if(d3>1.5)t='Rising rapidly ↑';else if(d3>.5)t='Rising ↑';else if(d3<-1.5)t='Falling rapidly ↓';else if(d3<-.5)t='Falling ↓';
+  $('baro-sub').textContent=t+' · Robbins Reef';drawBaroChart($('cvBaro'),p);
 }
 
 function renderTides(t){
-  if(!t)return;
-  const fc=fColor(t.flow),now=new Date();
-  $('tstat').textContent=t.status;$('tstat').style.color=fc;
-  $('tdot').style.background=fc;$('tdot').style.boxShadow=`0 0 8px ${fc}`;
-  $('gtd').textContent=t.status;$('gtd').style.color=fc;
-  $('gtn').textContent=t.next?'Next: '+fmtT(t.next.time):'';
-
-  // Progress bar
-  if(t.prev&&t.next){
-    const pct=Math.max(0,Math.min(100,((now-t.prev.time)/(t.next.time-t.prev.time))*100));
-    $('tbar').innerHTML=`<div class="tide-bar-wrap"><div class="tide-bar-labels"><span>${t.prev.type==='H'?'▲ HIGH':'▼ LOW'} ${fmtT(t.prev.time)}</span><span>${t.next.type==='H'?'▲ HIGH':'▼ LOW'} ${fmtT(t.next.time)}</span></div><div class="tide-bar"><div class="tide-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${fc}70,${fc})"></div><div class="tide-bar-dot" style="left:${pct}%;background:${fc};box-shadow:0 0 10px ${fc}80"></div></div><div style="text-align:center;font-size:10px;color:var(--fnt);margin-top:5px">${mUntil(t.next.time,now)} until ${t.next.type==='H'?'high':'low'} tide</div></div>`;
-  }
-
-  // Events
-  let h='';
-  [{l:'Previous',t:t.prev,hl:0},{l:'Next',t:t.next,hl:1},{l:'Following',t:t.following,hl:0}].forEach(({l,t:td,hl})=>{
-    if(!td){h+=`<div class="tide-ev" style="opacity:.4;font-size:13px">${l}: —</div>`;return}
-    const isH=td.type==='H',c=isH?'var(--blue)':'var(--orange)';
-    h+=`<div class="tide-ev${hl?' hl':''}" ${hl?`style="border-color:${c}30"`:''}><div style="display:flex;align-items:center;gap:10px"><div class="tide-icon" style="background:${c}18">${isH?'⬆':'⬇'}</div><div><div style="font-size:13px;font-weight:700;color:${c}">${isH?'High':'Low'} Tide</div><div style="font-size:10px;color:var(--fnt)">${l}</div></div></div><div style="text-align:right"><div style="font-size:16px;font-weight:800;color:var(--txt);font-family:var(--mono)">${fmtT(td.time)}</div><div style="font-size:10px;color:var(--fnt)">${td.height} ft${hl&&td.time>now?' · in '+mUntil(td.time,now):''}</div></div></div>`;
-  });
-  $('tevents').innerHTML=h;
-
-  if(t.allFuture?.length>2){
-    $('tupcoming').classList.remove('hidden');
-    $('tulist').innerHTML=t.allFuture.slice(2).map(u=>`<div class="upcoming-r"><span>${u.type==='H'?'↑ High':'↓ Low'}</span><span style="font-family:var(--mono)">${fmtT(u.time)} (${u.height} ft)</span></div>`).join('');
-  }
+  if(!t)return;const fc=fColor(t.flow),now=new Date();
+  $('tstat').textContent=t.status;$('tstat').style.color=fc;$('tdot').style.background=fc;$('tdot').style.boxShadow='0 0 8px '+fc;
+  $('gtd').textContent=t.status;$('gtd').style.color=fc;$('gtn').textContent=t.next?'Next: '+fmtT(t.next.time):'';
+  if(t.prev&&t.next){const pct=Math.max(0,Math.min(100,((now-t.prev.time)/(t.next.time-t.prev.time))*100));$('tbar').innerHTML='<div class="tide-bar-wrap"><div class="tide-bar-labels"><span>'+(t.prev.type==='H'?'▲ HIGH':'▼ LOW')+' '+fmtT(t.prev.time)+'</span><span>'+(t.next.type==='H'?'▲ HIGH':'▼ LOW')+' '+fmtT(t.next.time)+'</span></div><div class="tide-bar"><div class="tide-bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+fc+'70,'+fc+')"></div><div class="tide-bar-dot" style="left:'+pct+'%;background:'+fc+';box-shadow:0 0 10px '+fc+'80"></div></div><div style="text-align:center;font-size:10px;color:var(--fnt);margin-top:5px">'+mUntil(t.next.time,now)+' until '+(t.next.type==='H'?'high':'low')+' tide</div></div>'}
+  let html='';[{l:'Previous',t:t.prev,hl:0},{l:'Next',t:t.next,hl:1},{l:'Following',t:t.following,hl:0}].forEach(({l,t:td,hl})=>{if(!td)return;const isH=td.type==='H',c=isH?'var(--blue)':'var(--orange)';html+='<div class="tide-ev'+(hl?' hl':'')+'" '+(hl?'style="border-color:'+c+'30"':'')+'><div style="display:flex;align-items:center;gap:10px"><div class="tide-icon" style="background:'+c+'18">'+(isH?'⬆':'⬇')+'</div><div><div style="font-size:13px;font-weight:700;color:'+c+'">'+(isH?'High':'Low')+' Tide</div><div style="font-size:10px;color:var(--fnt)">'+l+'</div></div></div><div style="text-align:right"><div style="font-size:16px;font-weight:800;font-family:var(--mono)">'+fmtT(td.time)+'</div><div style="font-size:10px;color:var(--fnt)">'+td.height+' ft'+(hl&&td.time>now?' · in '+mUntil(td.time,now):'')+'</div></div></div>'});
+  $('tevents').innerHTML=html;
+  if(t.allFuture?.length>2){$('tupcoming').classList.remove('hidden');$('tulist').innerHTML=t.allFuture.slice(2).map(u=>'<div class="upcoming-r"><span>'+(u.type==='H'?'↑ High':'↓ Low')+'</span><span style="font-family:var(--mono)">'+fmtT(u.time)+' ('+u.height+' ft)</span></div>').join('')}
 }
 
 function renderWeather(wx,wt){
-  if(!wx?.current)return;
-  const c=wx.current,tc=c.temperature_2m,tf=c2f(tc),code=c.weather_code;
-  $('wxi').textContent=wxI(code);
-  $('wxt').textContent=tc.toFixed(1)+'°C / '+tf+'°F';
-  $('wxd').textContent=wxD(code)+' · Feels '+c.apparent_temperature.toFixed(0)+'°C';
+  if(!wx?.current)return;const c=wx.current,tc=c.temperature_2m,tf=c2f(tc),code=c.weather_code;
+  $('wxi').textContent=wxI(code);$('wxt').textContent=tc.toFixed(1)+'°C / '+tf+'°F';$('wxd').textContent=wxD(code)+' · Feels '+c.apparent_temperature.toFixed(0)+'°C';
   $('gt').textContent=tc.toFixed(0)+'°';$('gts').textContent=tf+'°F '+wxI(code);
-
-  const cape=wx.hourly?.cape?.[0]||0;
-  let risk='None',sc='var(--green)';
+  const cape=wx.hourly?.cape?.[0]||0;let risk='None',sc='var(--green)';
   if(cape>2000){risk='HIGH';sc='var(--red)'}else if(cape>1000){risk='Moderate';sc='var(--orange)'}else if(cape>500){risk='Low';sc='var(--yellow)'}
   $('stormv').textContent=risk+(cape?' (CAPE: '+cape.toFixed(0)+')':'');$('stormv').style.color=sc;
-
   if(wt)$('wtemp').textContent='🌊 Water: '+wt.f+'°F / '+wt.c+'°C';
 }
 
-function renderForecast(hrrr){
-  if(!hrrr?.minutely_15?.time)return;
-  const m=hrrr.minutely_15,now=Date.now();
-  let rows='',count=0;
-  // Show every 4th entry (= hourly from 15-min data)
-  for(let i=0;i<m.time.length;i+=4){
-    const t=new Date(m.time[i]),diff=(t-now)/36e5;
-    if(diff<-0.5)continue;
-    if(count>=10)break;
-    const isNow=diff>=-0.25&&diff<0.75;
-    const wind=m.wind_speed_10m?.[i],gust=m.wind_gusts_10m?.[i],dir=m.wind_direction_10m?.[i],temp=m.temperature_2m?.[i];
-    const wk=wind!=null?wind.toFixed(0):'—';
-    const gk=gust!=null?gust.toFixed(0):'—';
-    const dk=dir!=null?dir.toFixed(0):'—';
-    const tk=temp!=null?temp.toFixed(0):'—';
-    const pr=m.precipitation?.[i];
-    const precip=pr!=null&&pr>0?'💧':'·';
-    rows+=`<div class="fc-row${isNow?' now':''}"><span style="font-weight:${isNow?700:400};color:${isNow?'var(--accent)':'var(--fnt)'}; font-size:11px">${fmtT(t)}</span><span style="color:${wColor(wind)};font-weight:700">${wk} kt</span><span style="color:var(--mut)">G${gk}</span><span>${cardinal(dir)}</span><span style="color:var(--mut)">${dk}°</span><span>${tk}°</span><span style="text-align:center">${precip}</span></div>`;
-    count++;
-  }
-  $('fcrows').innerHTML=rows||'<div style="padding:8px;color:var(--mut)">No HRRR data available</div>';
+function renderForecast(hr){
+  if(!hr?.minutely_15?.time)return;const m=hr.minutely_15,now=Date.now();let rows='',cnt=0;
+  for(let i=0;i<m.time.length;i+=4){const t=new Date(m.time[i]),diff=(t-now)/36e5;if(diff<-.5)continue;if(cnt>=10)break;
+    const isN=diff>=-.25&&diff<.75,w=m.wind_speed_10m?.[i],g=m.wind_gusts_10m?.[i],d=m.wind_direction_10m?.[i],tp=m.temperature_2m?.[i],pr=m.precipitation?.[i];
+    rows+='<div class="fc-row'+(isN?' now':'')+'"><span style="font-weight:'+(isN?700:400)+';color:'+(isN?'var(--accent)':'var(--fnt)')+';font-size:11px">'+fmtT(t)+'</span><span style="color:'+(w!=null?wCSS(w):'var(--mut)')+';font-weight:700">'+(w!=null?w.toFixed(0):'—')+' kt</span><span style="color:var(--mut)">G'+(g!=null?g.toFixed(0):'—')+'</span><span>'+cardinal(d)+'</span><span style="color:var(--mut)">'+(d!=null?d.toFixed(0):'—')+'°</span><span>'+(tp!=null?tp.toFixed(0):'—')+'°</span><span style="text-align:center">'+(pr>0?'💧':'·')+'</span></div>';cnt++}
+  $('fcrows').innerHTML=rows||'<div style="padding:8px;color:var(--mut)">No HRRR data</div>';
 }
 
-// ═══════════════════════════════════════
-// MAIN LOADER
-// ═══════════════════════════════════════
+// ── MAIN ──
 
 async function loadAll(){
   $('ri').textContent='⟳';
-  try{
-    const[wh,wt,td,wx,hr]=await Promise.allSettled([
-      fetchWindHistory(),fetchWaterTemp(),fetchTides(),fetchWeather(),fetchHRRR()
-    ]);
+  try{const[wh,wt,td,wx,hr,pr]=await Promise.allSettled([fetchWindHistory(),fetchWaterTemp(),fetchTides(),fetchWeather(),fetchHRRR(),fetchPressure()]);
     if(wh.status==='fulfilled')renderWind(wh.value);
     if(td.status==='fulfilled')renderTides(td.value);
     if(wx.status==='fulfilled')renderWeather(wx.value,wt.status==='fulfilled'?wt.value:null);
     if(hr.status==='fulfilled')renderForecast(hr.value);
-
-    const now=new Date();
-    $('meta').textContent='Updated '+fmtT(now)+' · '+now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/New_York'});
-  }catch(e){console.error(e)}
-  $('ri').textContent='↻';
+    if(pr.status==='fulfilled')renderPressure(pr.value);
+    const now=new Date();$('meta').textContent='Updated '+fmtT(now)+' · '+now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/New_York'});
+  }catch(e){console.error(e)}$('ri').textContent='↻';
 }
 
-// Handle canvas resize
-window.addEventListener('resize',()=>{
-  // Redraw charts if we have data cached
-  if(window._windHistory){
-    drawWindSpeedChart($('cvSpeed'),window._windHistory);
-    drawWindDirChart($('cvDir'),window._windHistory);
-  }
-});
-
-// Patch fetchWindHistory to cache data for resize
-const _origFetchWind=fetchWindHistory;
-fetchWindHistory=async function(){
-  const d=await _origFetchWind();
-  window._windHistory=d;
-  return d;
-};
-
-loadAll();
-setInterval(loadAll,600000);
+window.addEventListener('resize',()=>{if(window._wh)renderWind(window._wh);if(window._pr)renderPressure(window._pr)});
+const _fw=fetchWindHistory;fetchWindHistory=async()=>{const d=await _fw();window._wh=d;return d};
+const _fp=fetchPressure;fetchPressure=async()=>{const d=await _fp();window._pr=d;return d};
+loadAll();setInterval(loadAll,600000);
 </script>
 </body>
 </html>
