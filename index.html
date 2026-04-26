@@ -108,11 +108,6 @@ canvas{display:block;border-radius:8px}
         <canvas id="cvSpeed" style="width:100%;height:140px"></canvas>
         <div class="chart-legend"><span style="color:#48bb78">━</span> Sustained &nbsp;<span style="color:#ed893680">━</span> Gusts &nbsp;<span style="color:#ecc94b60">┈</span> Avg</div>
       </div>
-      <div class="chart-wrap">
-        <div class="chart-title">WIND DIRECTION — LAST 2 HOURS</div>
-        <canvas id="cvDir" style="width:100%;height:110px"></canvas>
-        <div class="chart-legend"><span style="color:#63b3ed">━</span> TWD &nbsp;<span style="color:#ecc94b60">┈</span> Avg</div>
-      </div>
       <div style="font-size:10px;color:var(--fnt);text-align:right;margin-top:6px" id="wtime"></div>
       <button class="tbtn" onclick="toggleEl('noaa-wrap');this.classList.toggle('active')" id="noaa-btn">View Full NOAA Station ↗</button>
       <div id="noaa-wrap" class="hidden" style="margin-top:8px;border:1px solid var(--bdr);border-radius:8px;overflow:hidden">
@@ -123,7 +118,7 @@ canvas{display:block;border-radius:8px}
 
   <!-- B&G VERTICAL WIND PLOT -->
   <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,#8bc34a,transparent)"></div>
-    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>📟</span> B&G WindPlot — 30 min</div><span class="caret">▼</span></div>
+    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>📟</span> B&G WindPlot — 2 hr</div><span class="caret">▼</span></div>
     <div class="card-body">
       <div style="display:flex;gap:8px;margin-bottom:6px">
         <div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em">TWD</div><div style="font-size:13px;font-weight:800;color:#63b3ed;font-family:var(--mono)" id="bgd-val">—</div></div>
@@ -134,7 +129,7 @@ canvas{display:block;border-radius:8px}
         <div style="flex:1"><canvas id="cvBGspd" style="width:100%;height:340px"></canvas></div>
       </div>
       <div style="font-size:9px;color:var(--fnt);text-align:center;margin-top:6px">
-        Top = now · Bottom = 30 min ago · <span style="color:#ecc94b;opacity:.5">┈</span> rolling avg · <span style="color:#ed893680">━</span> gusts (TWS)
+        Top = now · Bottom = 2 hr ago · <span style="color:#ecc94b;opacity:.5">┈</span> rolling avg · <span style="color:#ed893680">━</span> gusts (TWS)
       </div>
     </div>
   </div>
@@ -383,7 +378,7 @@ function drawDirH(cv,data){
 
 function drawBGV(cv,data,opt){
   if(!data||data.length<2)return;const{ctx,w:W,h:H}=setupCanvas(cv);
-  const now=data[data.length-1].time.getTime(),winMs=30*60000,cut=now-winMs;
+  const now=data[data.length-1].time.getTime(),winMs=120*60000,cut=now-winMs;
   const pts=data.filter(d=>d.time.getTime()>=cut);if(pts.length<2)return;
   let vals=pts.map(d=>d[opt.key]);
   if(opt.unwrap){const uw=[vals[0]];for(let i=1;i<vals.length;i++){let v=vals[i],p=uw[i-1];while(v-p>180)v-=360;while(p-v>180)v+=360;uw.push(v)}vals=uw}
@@ -400,7 +395,7 @@ function drawBGV(cv,data,opt){
   ctx.strokeStyle='#1a2d4260';ctx.lineWidth=.5;ctx.fillStyle='#6b829990';ctx.font='9px system-ui';ctx.textAlign='center';
   for(let v=Math.ceil(mn/step)*step;v<=mx;v+=step){const x=xS(v);ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();const lbl=opt.unwrap?(((v%360)+360)%360).toFixed(0):v.toFixed(0);ctx.fillText(lbl,x,P.t-4)}
   ctx.strokeStyle='#1a2d4240';ctx.fillStyle='#6b829980';ctx.font='9px system-ui';ctx.textAlign='left';
-  [0,10,20,30].forEach(m=>{const y=yS(now-m*60000);if(y>=P.t&&y<=H-P.b){ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillText(m===0?'NOW':'-'+m+'m',P.l+2,m===0?y+11:y-3)}});
+  [0,30,60,90,120].forEach(m=>{const y=yS(now-m*60000);if(y>=P.t&&y<=H-P.b){ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillText(m===0?'NOW':'-'+m+'m',P.l+2,m===0?y+11:y-3)}});
   ctx.strokeStyle='#ecc94b40';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(xS(avg),P.t);ctx.lineTo(xS(avg),H-P.b);ctx.stroke();ctx.setLineDash([]);
   ctx.beginPath();for(let i=0;i<pts.length;i++){const x=xS(vals[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}
   for(let i=pts.length-1;i>=0;i--)ctx.lineTo(xS(avgs[i]),yS(pts[i].time.getTime()));ctx.closePath();ctx.fillStyle=opt.fill;ctx.fill();
@@ -444,7 +439,7 @@ function renderWind(h){
   $('gw').textContent=s;$('gw').style.color=wCSS(l.speed);$('gwd').textContent='kt '+cardinal(l.dir);
   $('bgd-val').textContent=cardinal(l.dir)+' ('+l.dir.toFixed(0)+'°)';
   $('bgs-val').textContent=s+' kt  G'+g;
-  drawSpeedH($('cvSpeed'),h);drawDirH($('cvDir'),h);
+  drawSpeedH($('cvSpeed'),h);
   drawBGV($('cvBGdir'),h,{key:'dir',unwrap:true,color:'#63b3ed',fill:'rgba(99,179,237,.12)',minM:5});
   drawBGV($('cvBGspd'),h,{key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2});
 }
