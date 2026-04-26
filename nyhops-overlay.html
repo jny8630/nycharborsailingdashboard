@@ -13,13 +13,13 @@
 :root{--bg:#080e18;--card:#131f2e;--card2:#0c1520;--bdr:#1a2d42;--bdr2:#2a4060;--txt:#f0f4f8;--dim:#c4d0de;--mut:#8fa3b8;--fnt:#6b8299;--accent:#4fd1c5;--blue:#63b3ed;--mono:'SF Mono','Cascadia Code','JetBrains Mono','Fira Code',monospace}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);max-width:440px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
-.hdr{background:linear-gradient(135deg,#0e1f30,#162d46);padding:14px 16px 12px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.hdr{background:linear-gradient(135deg,#0e1f30,#162d46);padding:18px 16px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0}
 .hdr-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .hdr-label{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.hdr-title{font-size:18px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
-.hdr-meta{font-size:10px;color:var(--fnt);margin-top:5px}
+.hdr-title{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
+.hdr-meta{font-size:10px;color:var(--fnt);margin-top:6px}
 .hdr-links{display:flex;gap:6px;flex-shrink:0}
-.back-btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
+.back-btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;font-weight:600;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
 .slots{display:flex;gap:5px;padding:10px 10px 6px;flex-shrink:0;overflow-x:auto}
 .slot-btn{flex:1;min-width:0;padding:7px 4px;background:var(--card);border:1px solid var(--bdr);border-radius:8px;color:var(--mut);font-size:10px;font-weight:600;font-family:var(--mono);cursor:pointer;text-align:center;line-height:1.3;white-space:nowrap}
 .slot-btn.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
@@ -45,12 +45,13 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 <div class="hdr">
   <div class="hdr-row">
     <div>
-      <div class="hdr-label">🗺️ NYHOPS · Chart Overlay</div>
+      <div class="hdr-label">🌊 NYHOPS · Stevens Institute</div>
       <div class="hdr-title">Manhattan Currents</div>
+      <div style="font-size:11px;color:var(--dim);font-weight:600;margin-top:2px">NYHOPS Chart Overlay</div>
     </div>
-    <div class="hdr-links">
+    <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+      <a class="back-btn" href="index.html">← Dashboard</a>
       <a class="back-btn" href="nyhops.html">NYHOPS Images</a>
-      <a class="back-btn" href="index.html">Wind & Tide Dashboard</a>
     </div>
   </div>
   <div class="hdr-meta" id="meta"><span class="spinner"></span>Finding latest model run…</div>
@@ -206,7 +207,7 @@ async function init() {
   const now = new Date();
   document.getElementById('meta').textContent =
     'As of ' + now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', hour12:true, timeZone:'America/New_York'}) +
-    ' ET · Model: ' + dateStr.slice(0,4) + '-' + dateStr.slice(4,6) + '-' + dateStr.slice(6);
+    ' ET · Model date: ' + dateStr.slice(0,4) + '-' + dateStr.slice(4,6) + '-' + dateStr.slice(6);
 
   // Build time-slot buttons
   const slotsEl = document.getElementById('slots');

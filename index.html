@@ -82,9 +82,15 @@ canvas{display:block;border-radius:8px}
 <div class="hdr">
   <div class="hdr-row">
     <div><div class="hdr-label">⛵ NYC Harbor</div><div class="hdr-title">Sailing Conditions</div></div>
-    <button class="btn" onclick="loadAll()"><span id="ri">↻</span> Refresh</button>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <button class="btn" onclick="loadAll()"><span id="ri">↻</span> Refresh</button>
+      <div class="hdr-meta" id="meta" style="text-align:right">Loading…</div>
+    </div>
   </div>
-  <div class="hdr-meta" id="meta">Loading…</div>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <a href="nyhops.html" class="btn" style="flex:1;text-align:center;text-decoration:none">NYHOPS Images</a>
+    <a href="nyhops-overlay.html" class="btn" style="flex:1;text-align:center;text-decoration:none">NYHOPS Chart</a>
+  </div>
 </div>
 
 <div class="cnt">
