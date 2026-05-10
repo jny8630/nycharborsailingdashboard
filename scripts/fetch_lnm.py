@@ -66,23 +66,37 @@ BOILERPLATE_RE = re.compile(
     re.MULTILINE | re.IGNORECASE,
 )
 
-PROMPT = """You are reviewing an extract from a USCG District 1 Local Notice to Mariners,
-pre-filtered for the NYC Harbor area. Extract notices relevant to small keelboat sailing in:
-- Upper/Lower New York Bay, The Narrows, Ambrose Channel
-- Governors Island, Buttermilk Channel, The Anchorage/Flats south of Governors Island
-- Hudson River (Battery to ~W 60th St)
-- East River south of Brooklyn Bridge
-- Kill Van Kull, Arthur Kill, Raritan Bay, Sandy Hook
-- Great Kills, Sheepshead Bay, Gravesend Bay
+PROMPT = """You are reviewing an extract from a USCG District 1 Local Notice to Mariners.
+Extract notices relevant to small keelboat day-sailing in the immediate NYC Harbor area.
 
-EXCLUDE notices clearly north of Brooklyn Bridge on East River, north of W 60th on Hudson,
-or in Long Island Sound / New England.
+INCLUDE notices for:
+- Ambrose Channel and The Narrows
+- Verrazzano Narrows Bridge (mile 0.0) — maintenance, traveler platforms, safety boats
+- Upper New York Bay and Lower New York Bay
+- Governors Island and Buttermilk Channel
+- The Anchorage / The Flats (south of Governors Island)
+- Kill Van Kull (western approach from The Narrows toward Staten Island)
+- Great Kills Harbor (Staten Island south shore)
+- Sheepshead Bay, Gravesend Bay, Coney Island
+- Raritan Bay approaches, Sandy Hook
+- Hudson River south of W 42nd St only
+- East River south of the Brooklyn Bridge only
+
+EXCLUDE — do NOT include:
+- Arthur Kill (NJ inland waterway, not our sailing area)
+- George Washington Bridge or Hudson River north of W 60th St
+- East River north of the Brooklyn Bridge (Hell Gate, Harlem River)
+- Long Island Sound, New England, Vermont, Maine, Rhode Island
+
+For each relevant notice return:
+- "location": specific place name
+- "chart": NOAA chart number if stated, else null
+- "summary": one practical sentence a sailor needs to know
+- "status": "ACTIVE", "TEMPORARY", or "CANCELLED"
+- "since": effective date, or "ongoing"
 
 Return ONLY this JSON, no other text:
-{"notices": [
-  {"location": "...", "chart": "12327 or null", "summary": "one sentence for a sailor",
-   "status": "ACTIVE|TEMPORARY|CANCELLED", "since": "date or ongoing"}
-]}
+{"notices": [...]}
 If nothing is relevant: {"notices": []}
 
 NYC HARBOR LNM EXTRACT:
@@ -114,12 +128,22 @@ def extract_pages(pdf_bytes):
 def get_section_header(page_text):
     """Return the first non-boilerplate, non-empty line of a page."""
     skip = {"4/29/26", "4/30/26", "maritime safety", "navigation center",
-            "local notice to mariners", "name llnr status"}
+            "local notice to mariners", "name llnr status",
+            "title subcategory", "subcategory description"}
     for line in page_text.split("\n"):
         line = line.strip()
         if line and not any(s in line.lower() for s in skip):
             return line
     return ""
+
+def page_contains_nyc_content(page_text):
+    """Secondary check: does the page body mention NYC Harbor terms even if header doesn't?"""
+    nyc_body_terms = ["ambrose channel", "verrazzano", "verrazano", "narrows bridge",
+                      "buttermilk channel", "governors island", "kill van kull",
+                      "great kills", "sheepshead bay", "robbins reef", "morris canal",
+                      "upper new york harbor", "lower new york harbor"]
+    body = page_text.lower()
+    return any(t in body for t in nyc_body_terms)
 
 def is_nyc_relevant(header):
     h = header.lower()
@@ -150,7 +174,7 @@ def prefilter(pages):
     total = 0
     for page in pages:
         header = get_section_header(page)
-        if not is_nyc_relevant(header):
+        if not is_nyc_relevant(header) and not page_contains_nyc_content(page):
             continue
         content = clean_page(page)
         excerpt = content[:MAX_SECTION_CHARS]

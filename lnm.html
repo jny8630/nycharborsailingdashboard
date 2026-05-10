@@ -200,41 +200,48 @@ function renderNotices(data) {
   renderPdfCard(data);
 }
 
-// ── PDF card: uses verified week from JSON as primary, shows current week status
+// ── PDF card: all weeks ordered newest-first, verified week clearly marked
 function renderPdfCard(data) {
   const noticesWeek = data ? data.week : null;
   const noticesYear = data ? data.year : null;
   const skipped = data ? (data.skipped || []) : [];
-  const cur = isoWeekData(new Date());
 
-  // Primary: the week we actually have data from (verified to exist)
-  if (noticesWeek && noticesYear) {
-    const el = document.getElementById('lnm-cur');
-    el.href = lnmUrl(noticesWeek, noticesYear);
-    el.textContent = `Open ${weekLabel(noticesWeek, noticesYear)} PDF ↗`;
-  }
+  // Build a unified list of all weeks, newest first
+  const allWeeks = [];
 
-  // Secondary links: show current week and any skipped weeks with honest labels
-  const extras = document.getElementById('lnm-extras');
-  if (!extras) return;
-  const extraLinks = [];
-
-  // Current week if different from notices week
-  if (noticesWeek !== cur.week || noticesYear !== cur.year) {
-    const skippedEntry = skipped.find(s => s.week === cur.week && s.year === cur.year);
-    const note = skippedEntry
-      ? (skippedEntry.reason === 'not_posted' ? 'not yet published' : 'scanned PDF — unavailable')
-      : 'may not be posted yet';
-    extraLinks.push(`<a class="pdf-btn-sm" href="${lnmUrl(cur.week, cur.year)}" target="_blank" rel="noopener">${weekLabel(cur.week, cur.year)} — ${note}</a>`);
-  }
-
-  // Any other skipped weeks between notices week and now
-  skipped.filter(s => s.week !== cur.week).forEach(s => {
-    const note = s.reason === 'scanned_pdf' ? 'scanned PDF — unavailable' : 'not published';
-    extraLinks.push(`<a class="pdf-btn-sm" href="${lnmUrl(s.week, s.year)}" target="_blank" rel="noopener">${weekLabel(s.week, s.year)} — ${note}</a>`);
+  // Skipped weeks (most recent first — they come out of fetch_lnm in that order)
+  skipped.forEach(s => {
+    const note = s.reason === 'not_posted' ? 'not yet published'
+               : s.reason === 'scanned_pdf' ? 'scanned PDF — no machine-readable text'
+               : 'unavailable';
+    allWeeks.push({ week: s.week, year: s.year, note, working: false });
   });
 
-  extras.innerHTML = extraLinks.join('');
+  // The verified working week (oldest of the set, shown last)
+  if (noticesWeek) {
+    allWeeks.push({ week: noticesWeek, year: noticesYear, note: 'last available', working: true });
+  }
+
+  // Sort newest-first
+  allWeeks.sort((a, b) => b.year !== a.year ? b.year - a.year : b.week - a.week);
+
+  // Primary button = the verified working week
+  const working = allWeeks.find(w => w.working);
+  const lnmCur = document.getElementById('lnm-cur');
+  if (working) {
+    lnmCur.href = lnmUrl(working.week, working.year);
+    lnmCur.textContent = `Open ${weekLabel(working.week, working.year)} PDF ↗`;
+  } else {
+    lnmCur.style.display = 'none';
+  }
+
+  // Secondary links: the other weeks in order
+  const extras = document.getElementById('lnm-extras');
+  if (!extras) return;
+  extras.innerHTML = allWeeks
+    .filter(w => !w.working)
+    .map(w => `<a class="pdf-btn-sm" href="${lnmUrl(w.week, w.year)}" target="_blank" rel="noopener">${weekLabel(w.week, w.year)} — ${w.note}</a>`)
+    .join('');
 }
 
 async function loadNotices() {
