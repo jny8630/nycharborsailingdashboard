@@ -108,10 +108,9 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     </div>
     <div class="card-body">
       <div class="sel-row">
-        <button class="sel-btn sel-active" data-h="4"  onclick="setSelector(4)">4h</button>
-        <button class="sel-btn" data-h="12" onclick="setSelector(12)">12h</button>
-        <button class="sel-btn" data-h="24" onclick="setSelector(24)">24h</button>
-        <button class="sel-btn" data-h="48" onclick="setSelector(48)">48h</button>
+        <button class="sel-btn sel-active" data-h="4"  onclick="setSelector(4)">Next 4h</button>
+        <button class="sel-btn" data-h="8"  onclick="setSelector(8)">Next 8h</button>
+        <button class="sel-btn" data-h="12" onclick="setSelector(12)">Next 12h</button>
       </div>
       <div id="fc-body">
         <div class="state-box"><div class="spinner"></div><br>Loading forecast…</div>
@@ -119,18 +118,26 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     </div>
   </div>
 
-  <!-- CARD 2: NWS MARINE ZONE FORECAST ANZ338 -->
+  <!-- CARD 2: NWS MARINE — TODAY & TOMORROW -->
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
     <div class="card-hdr">
-      <div class="card-t">⚓ Marine Forecast — ANZ338</div>
+      <div class="card-t">⚓ Marine Forecast — Today &amp; Tomorrow</div>
       <div style="font-size:10px;color:var(--fnt)" id="marine-updated"></div>
     </div>
-    <div class="card-body">
-      <div id="marine-body">
-        <div class="state-box"><div class="spinner"></div><br>Loading marine forecast…</div>
-      </div>
+    <div class="card-body" id="marine-near-body">
+      <div class="state-box"><div class="spinner"></div><br>Loading marine forecast…</div>
     </div>
+  </div>
+
+  <!-- CARD 2b: NWS MARINE — EXTENDED (collapsed, shown only if data exists) -->
+  <div class="card" id="marine-ext-card" style="display:none">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--bdr2),transparent)"></div>
+    <div class="card-hdr" onclick="toggleMarineExt()" style="cursor:pointer;user-select:none">
+      <div class="card-t" style="color:var(--mut)">⚓ ANZ338 Extended Outlook</div>
+      <span id="marine-ext-caret" style="color:var(--mut);font-size:12px">▶ Show</span>
+    </div>
+    <div class="card-body" id="marine-ext-body" style="display:none"></div>
   </div>
 
   <!-- CARD 3: RADAR -->
@@ -239,7 +246,7 @@ async function loadForecast() {
       + `?latitude=${LAT}&longitude=${LON}`
       + `&hourly=temperature_2m,precipitation,precipitation_probability,`
       + `thunderstorm_probability,cloud_cover,visibility,weather_code`
-      + `&forecast_hours=48&timezone=auto&timeformat=unixtime`;
+      + `&forecast_hours=12&timezone=auto&timeformat=unixtime`;
     const r = await fetch(url);
     if (!r.ok) throw new Error(r.status);
     forecastData = await r.json();
@@ -365,7 +372,7 @@ async function loadMarineForecast() {
   } catch(e) {
     console.error('Marine:', e);
     if (!marineData) {
-      $('marine-body').innerHTML = '<div class="state-box">Marine forecast temporarily unavailable</div>';
+      $('marine-near-body').innerHTML = '<div class="state-box">Marine forecast temporarily unavailable</div>';
     }
   }
 }
@@ -391,22 +398,49 @@ function renderMarineForecast() {
   if (!marineData) return;
   const {periods, note} = marineData;
 
-  let html = '';
-  for (const p of periods) {
-    // Flag periods with high winds (15+ kt gusts or tstms)
-    const isDanger = /1[5-9] to \d+|2\d to \d+|\d{2,} kt|tstm/i.test(p.detail);
-    html += `<div class="marine-row${isDanger ? ' marine-warn' : ''}">
-      <div class="marine-period">${titlePeriod(p.name)}</div>
-      <div class="marine-detail">${p.detail}</div>
-    </div>`;
+  // Split today+tomorrow vs extended.
+  // Count distinct daytime periods (not OVERNIGHT/TONIGHT/x NIGHT).
+  // Stop when we've seen 2 daytime periods — covers today + tomorrow.
+  let dayCount = 0;
+  let splitIdx = periods.length;
+  for (let i = 0; i < periods.length; i++) {
+    const n = periods[i].name.toUpperCase();
+    if (n !== 'OVERNIGHT' && n !== 'TONIGHT' && !n.endsWith('NIGHT')) {
+      dayCount++;
+      if (dayCount > 2) { splitIdx = i; break; }
+    }
   }
 
-  if (note) {
-    html += `<div class="marine-note">${note}</div>`;
+  function buildRows(list) {
+    return list.map(p => {
+      const isDanger = /1[5-9] to \d+|2\d to \d+|\d{2,} kt|tstm/i.test(p.detail);
+      return `<div class="marine-row${isDanger ? ' marine-warn' : ''}">
+        <div class="marine-period">${titlePeriod(p.name)}</div>
+        <div class="marine-detail">${p.detail}</div>
+      </div>`;
+    }).join('');
   }
 
-  html += `<div class="marine-meta">Source: NWS OKX · New York Harbor (ANZ338) · Issued twice daily</div>`;
-  $('marine-body').innerHTML = html;
+  const nearPeriods = periods.slice(0, splitIdx);
+  const extPeriods  = periods.slice(splitIdx);
+
+  let nearHtml = buildRows(nearPeriods);
+  if (note) nearHtml += `<div class="marine-note">${note}</div>`;
+  nearHtml += `<div class="marine-meta">Source: NWS OKX · New York Harbor (ANZ338) · Issued twice daily</div>`;
+  $('marine-near-body').innerHTML = nearHtml;
+
+  if (extPeriods.length > 0) {
+    $('marine-ext-body').innerHTML = buildRows(extPeriods);
+    $('marine-ext-card').style.display = '';
+  }
+}
+
+function toggleMarineExt() {
+  const body  = $('marine-ext-body');
+  const caret = $('marine-ext-caret');
+  const show  = body.style.display === 'none';
+  body.style.display  = show ? 'block' : 'none';
+  caret.textContent   = show ? '▼ Hide' : '▶ Show';
 }
 
 // ── RAINVIEWER RADAR ─────────────────────────────────────────────────────────
