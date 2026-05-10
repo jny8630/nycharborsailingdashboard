@@ -17,7 +17,6 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .hdr-label{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .hdr-title{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
 .hdr-meta{font-size:10px;color:var(--fnt);margin-top:4px}
-.nav-col{display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0}
 .back-btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;font-weight:600;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
 .back-btn:active{opacity:.7}
 .cnt{padding:10px 10px 30px}
@@ -60,13 +59,13 @@ canvas{display:block;border-radius:6px}
       <div class="hdr-title">Wind Tactics</div>
       <div class="hdr-meta" id="hdr-updated">Loading…</div>
     </div>
-    <div class="nav-col">
-      <a class="back-btn" href="index.html">← Dashboard</a>
-      <a class="back-btn" href="weather.html">Weather</a>
-      <a class="back-btn" href="nyhops.html">Currents</a>
-      <a class="back-btn" href="nyhops-overlay.html">Chart</a>
-      <a class="back-btn" href="lnm.html">LNM</a>
-    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+    <a class="back-btn" style="text-align:center;padding:10px 8px" href="index.html">← Dashboard</a>
+    <a class="back-btn" style="text-align:center;padding:10px 8px" href="weather.html">Weather</a>
+    <a class="back-btn" style="text-align:center;padding:10px 8px" href="nyhops.html">Currents</a>
+    <a class="back-btn" style="text-align:center;padding:10px 8px" href="nyhops-overlay.html">Chart Overlay</a>
+    <a class="back-btn" style="text-align:center;padding:10px 8px;grid-column:1/-1" href="lnm.html">LNM Digest</a>
   </div>
 </div>
 
