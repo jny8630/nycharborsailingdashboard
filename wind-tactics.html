@@ -433,9 +433,12 @@ async function fetchEvening() {
 }
 
 async function fetchAfternoon() {
-  const ny=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  const [m,d,y]=ny.split('/');
-  return fetchWindNOAA(`${y}${m}${d} 04:00`,12);
+  const fourPM = todayAtHourNY(16);
+  const anchor = new Date() < fourPM ? new Date() : fourPM;
+  const start = new Date(anchor.getTime() - 12.5 * 3600000);
+  const bd = fmt2(start) + ' ' + String(start.getHours()).padStart(2,'0') + ':' + String(start.getMinutes()).padStart(2,'0');
+  const data = await fetchWindNOAA(bd, 13);
+  return data.slice(-120);
 }
 
 async function fetchGradient() {
