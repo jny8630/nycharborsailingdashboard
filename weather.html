@@ -156,7 +156,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
         <span class="radar-ctr" id="radar-ctr"></span>
         <span class="radar-ts" id="radar-ts"></span>
       </div>
-      <div class="radar-note">Observed past precipitation only — not a future forecast</div>
+      <div class="radar-note" id="radar-note">Observed past precipitation only — not a future forecast · Radar visible at zoom ≤ 7</div>
     </div>
   </div>
 
@@ -445,12 +445,30 @@ function toggleMarineExt() {
 
 // ── RAINVIEWER RADAR ─────────────────────────────────────────────────────────
 
+const RADAR_MAX_ZOOM = 7;
+
 function initMap() {
-  radarMap = L.map('radar-map', {center: [40.72, -74.05], zoom: 8, zoomControl: true});
+  radarMap = L.map('radar-map', {center: [40.72, -74.05], zoom: 6, zoomControl: true});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
     maxZoom: 18
   }).addTo(radarMap);
+
+  // RainViewer free tier only serves radar tiles at zoom ≤ 7.
+  // Remove the overlay when user zooms in past that and restore when they zoom back out.
+  radarMap.on('zoomend', () => {
+    const z = radarMap.getZoom();
+    const note = $('radar-note');
+    if (z > RADAR_MAX_ZOOM) {
+      radarLayers.forEach(l => { try { radarMap.removeLayer(l); } catch(_){} });
+      note.textContent = 'Zoom ≤ 7 to see radar overlay · Observed past precipitation only';
+      note.style.color = 'var(--yellow)';
+    } else {
+      showFrame(radarIdx);
+      note.textContent = 'Observed past precipitation only — not a future forecast · Radar visible at zoom ≤ 7';
+      note.style.color = '';
+    }
+  });
 }
 
 async function loadRadar() {
