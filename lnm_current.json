@@ -1,0 +1,45 @@
+{
+  "week": 17,
+  "year": 2026,
+  "generated_utc": "2026-05-10T03:11:20Z",
+  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01172026.pdf",
+  "model": "gpt-4o-mini",
+  "notices": [
+    {
+      "location": "Ambrose Channel",
+      "chart": "12327",
+      "summary": "A sailing regatta race series is scheduled every Wednesday evening from April 29 to September 16, 2026, in Upper New York Harbor.",
+      "status": "ACTIVE",
+      "since": "2026-04-29"
+    },
+    {
+      "location": "Arthur Kill",
+      "chart": "12327",
+      "summary": "Shoaling has been reported in the Arthur Kill between buoys 34 and 32; mariners should exercise caution.",
+      "status": "ACTIVE",
+      "since": "2024-09-13"
+    },
+    {
+      "location": "Great Kills Harbor",
+      "chart": "12327",
+      "summary": "Shoaling has been reported in Great Kills Harbor between buoys 6 and 8; proceed with caution.",
+      "status": "ACTIVE",
+      "since": "2024-09-12"
+    },
+    {
+      "location": "East River",
+      "chart": "12327",
+      "summary": "Structural repairs to the Brooklyn Bridge will reduce vertical clearance by 17 feet until June 30, 2026; contact for full clearance.",
+      "status": "ACTIVE",
+      "since": "2024-05-01"
+    },
+    {
+      "location": "Hudson River",
+      "chart": "12327",
+      "summary": "Rehabilitation of the George Washington Bridge will reduce vertical clearance by 3ft 9in starting May 1, 2024.",
+      "status": "ACTIVE",
+      "since": "2024-05-01"
+    }
+  ],
+  "disclaimer": "AI-extracted from USCG D1 LNM via GitHub Models. Verify against source PDF before underway."
+}
