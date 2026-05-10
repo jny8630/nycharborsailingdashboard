@@ -1,0 +1,71 @@
+{
+  "week": 17,
+  "year": 2026,
+  "generated_utc": "2026-05-10T03:47:08Z",
+  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01172026.pdf",
+  "model": "gpt-4o-mini",
+  "skipped": [
+    {
+      "week": 19,
+      "year": 2026,
+      "reason": "not_posted"
+    },
+    {
+      "week": 18,
+      "year": 2026,
+      "reason": "scanned_pdf"
+    }
+  ],
+  "notices": [
+    {
+      "location": "Ambrose Channel",
+      "chart": null,
+      "summary": "Ambrose Channel Lighted Buoy 5 is off station and Lighted Gong Buoy 13 is missing/troubled.",
+      "status": "ACTIVE",
+      "since": "ongoing"
+    },
+    {
+      "location": "Verrazzano Narrows Bridge",
+      "chart": null,
+      "summary": "Preventive maintenance will occur at the Verrazzano Narrows Bridge from April 1, 2025, to May 6, 2026, with a traveler platform reducing vertical clearance.",
+      "status": "ACTIVE",
+      "since": "2025-04-01"
+    },
+    {
+      "location": "Upper New York Bay",
+      "chart": null,
+      "summary": "A sailing regatta will occur every Wednesday evening from April 29 to September 16, 2026, between Morris Canal and Robbins Reef.",
+      "status": "ACTIVE",
+      "since": "2026-04-29"
+    },
+    {
+      "location": "Great Kills Harbor",
+      "chart": null,
+      "summary": "Shoaling has been reported in the vicinity of Great Kills Harbor, between buoys 6 and 8; proceed with caution.",
+      "status": "ACTIVE",
+      "since": "ongoing"
+    },
+    {
+      "location": "Kill Van Kull",
+      "chart": null,
+      "summary": "Dredging operations and wharf construction will occur in Kill Van Kull from October 2, 2024, to January 29, 2029; use extreme caution.",
+      "status": "ACTIVE",
+      "since": "2024-10-02"
+    },
+    {
+      "location": "East River",
+      "chart": null,
+      "summary": "Structural repairs to the Brooklyn Bridge will reduce vertical clearance by 17 feet through at least June 30, 2026; contact the contractor for full clearance.",
+      "status": "ACTIVE",
+      "since": "ongoing"
+    },
+    {
+      "location": "Hudson River",
+      "chart": null,
+      "summary": "Marine construction for the Hudson Tunnel Project will occur from January 6, 2026, to January 21, 2027; transit at slowest safe speed and maintain distance from structures.",
+      "status": "ACTIVE",
+      "since": "2026-01-06"
+    }
+  ],
+  "disclaimer": "AI-extracted from USCG D1 LNM via GitHub Models. Verify against source PDF before underway."
+}
