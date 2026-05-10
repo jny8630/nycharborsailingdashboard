@@ -293,7 +293,7 @@ function renderForecast() {
     const wx = wCode(hr.wx);
     html += `
     <div class="wx-row${isNow ? ' now' : ''}">
-      <span>${fmtT(hr.time).replace(' AM',' AM').replace(' PM',' PM')}</span>
+      <span>${fmtT(hr.time)}</span>
       <span><span class="temp-c">${Math.round(hr.temp)}°C</span><span class="temp-f">${c2f(hr.temp)}°F</span></span>
       <span>${wx.i} ${wx.l}</span>
       <span style="color:${precipColor(hr.precipProb)}">${hr.precipProb}%</span>
@@ -503,6 +503,7 @@ async function loadRadar() {
 function showFrame(idx) {
   if (!radarMap || radarLayers.length === 0) return;
   radarLayers.forEach(l => { try { radarMap.removeLayer(l); } catch(_){} });
+  if (radarMap.getZoom() > RADAR_MAX_ZOOM) return;
   radarLayers[idx].addTo(radarMap);
   const ts = new Date(radarFrames[idx].time * 1000);
   $('radar-ts').textContent = fmtT(ts) + ' ET';
