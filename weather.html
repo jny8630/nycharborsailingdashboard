@@ -41,7 +41,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .fc-summary{padding:8px 12px;margin-bottom:10px;border-radius:6px;font-size:13px;font-weight:700;border-left-width:3px;border-left-style:solid}
 
 /* Forecast table */
-.wx-hdr,.wx-row{display:grid;grid-template-columns:50px 58px 88px 36px 36px 46px;gap:2px;padding:3px 4px;font-size:12px;font-family:var(--mono);align-items:center;border-radius:4px}
+.wx-hdr,.wx-row{display:grid;grid-template-columns:52px 62px 1fr 36px 36px 54px;gap:2px;padding:3px 4px;font-size:12px;font-family:var(--mono);align-items:center;border-radius:4px}
 .wx-hdr{font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--bdr);padding-bottom:6px;margin-bottom:2px;font-family:-apple-system,system-ui,sans-serif}
 .wx-row.now{background:#1a2d4260;border-left:2px solid var(--accent);padding-left:2px}
 .temp-c{display:block;font-size:12px;font-weight:700}
@@ -76,7 +76,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .leaflet-control-attribution{background:rgba(8,14,24,.8)!important;color:var(--fnt)!important;font-size:9px!important}
 .leaflet-control-attribution a{color:var(--accent)!important}
 
-@media(max-width:360px){.wx-hdr,.wx-row{grid-template-columns:44px 52px 78px 32px 32px 42px;font-size:11px}}
+@media(max-width:360px){.wx-hdr,.wx-row{grid-template-columns:44px 54px 1fr 32px 32px 46px;font-size:11px}}
 </style>
 </head>
 <body>
@@ -108,9 +108,10 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     </div>
     <div class="card-body">
       <div class="sel-row">
-        <button class="sel-btn sel-active" data-h="4" onclick="setSelector(4)">Next 4h</button>
-        <button class="sel-btn" data-h="8" onclick="setSelector(8)">Next 8h</button>
-        <button class="sel-btn" data-h="12" onclick="setSelector(12)">Next 12h</button>
+        <button class="sel-btn sel-active" data-h="4"  onclick="setSelector(4)">4h</button>
+        <button class="sel-btn" data-h="12" onclick="setSelector(12)">12h</button>
+        <button class="sel-btn" data-h="24" onclick="setSelector(24)">24h</button>
+        <button class="sel-btn" data-h="48" onclick="setSelector(48)">48h</button>
       </div>
       <div id="fc-body">
         <div class="state-box"><div class="spinner"></div><br>Loading forecast…</div>
@@ -201,8 +202,18 @@ const wCode = c => WX[c] || {l:'—', i:'?'};
 
 const precipColor = p => p >= 70 ? 'var(--orange)' : p >= 40 ? 'var(--yellow)' : p >= 20 ? 'var(--green)' : 'var(--fnt)';
 const cloudColor  = c => c >= 80 ? 'var(--mut)' : c >= 50 ? 'var(--dim)' : 'var(--accent)';
-const visColor    = v => v < 1000 ? 'var(--red)' : v < 5000 ? 'var(--yellow)' : 'var(--dim)';
-const visFmt      = v => v >= 1000 ? (v / 1000).toFixed(0) + ' km' : v + ' m';
+// Visibility thresholds in nautical miles (1 nm = 1852 m)
+// < 0.5 nm = restricted visibility (mariners' threshold); < 2 nm = poor
+const visColor = v => {
+  const nm = v / 1852;
+  return nm < 0.5 ? 'var(--red)' : nm < 2 ? 'var(--yellow)' : 'var(--dim)';
+};
+const visFmt = v => {
+  const nm = v / 1852;
+  if (nm < 0.1) return '<0.1nm';
+  if (nm < 10)  return nm.toFixed(1) + 'nm';
+  return Math.round(nm) + 'nm';
+};
 
 function makeSummary(hrs) {
   const maxThunder = Math.max(...hrs.map(h => h.thunder ?? 0));
@@ -214,7 +225,7 @@ function makeSummary(hrs) {
   if (hasThunder && maxThunder >= 30) return {t: 'Thunderstorm caution',     c: 'var(--red)'};
   if (maxPrecipP >= 70)               return {t: 'Rain likely',               c: 'var(--orange)'};
   if (maxPrecipP >= 40)               return {t: 'Rain possible',             c: 'var(--yellow)'};
-  if (minVis < 1000)                  return {t: 'Reduced visibility',        c: 'var(--yellow)'};
+  if (minVis < 1852)                  return {t: 'Reduced visibility',        c: 'var(--yellow)'};
   if (avgCloud < 25)                  return {t: 'Generally fair conditions', c: 'var(--green)'};
   if (avgCloud < 60)                  return {t: 'Partly cloudy',             c: 'var(--accent)'};
   return                                     {t: 'Mostly cloudy, likely dry', c: 'var(--dim)'};
@@ -228,7 +239,7 @@ async function loadForecast() {
       + `?latitude=${LAT}&longitude=${LON}`
       + `&hourly=temperature_2m,precipitation,precipitation_probability,`
       + `thunderstorm_probability,cloud_cover,visibility,weather_code`
-      + `&forecast_hours=12&timezone=auto&timeformat=unixtime`;
+      + `&forecast_hours=48&timezone=auto&timeformat=unixtime`;
     const r = await fetch(url);
     if (!r.ok) throw new Error(r.status);
     forecastData = await r.json();
@@ -267,7 +278,7 @@ function renderForecast() {
   let html = `
     <div class="fc-summary" style="background:${summary.c}18;border-color:${summary.c};color:${summary.c}">${summary.t}</div>
     <div class="wx-hdr">
-      <span>Time</span><span>Temp</span><span>Condition</span><span>💧%</span><span>☁️%</span><span>👁</span>
+      <span>Time</span><span>Temp</span><span>Condition</span><span>💧%</span><span>☁️%</span><span>👁 nm</span>
     </div>`;
 
   for (const hr of slice) {
@@ -277,7 +288,7 @@ function renderForecast() {
     <div class="wx-row${isNow ? ' now' : ''}">
       <span>${fmtT(hr.time).replace(' AM',' AM').replace(' PM',' PM')}</span>
       <span><span class="temp-c">${Math.round(hr.temp)}°C</span><span class="temp-f">${c2f(hr.temp)}°F</span></span>
-      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${wx.i} ${wx.l}</span>
+      <span>${wx.i} ${wx.l}</span>
       <span style="color:${precipColor(hr.precipProb)}">${hr.precipProb}%</span>
       <span style="color:${cloudColor(hr.cloud)}">${hr.cloud}%</span>
       <span style="color:${visColor(hr.vis)}">${visFmt(hr.vis)}</span>
@@ -401,7 +412,7 @@ function renderMarineForecast() {
 // ── RAINVIEWER RADAR ─────────────────────────────────────────────────────────
 
 function initMap() {
-  radarMap = L.map('radar-map', {center: [40.685, -74.042], zoom: 10, zoomControl: true});
+  radarMap = L.map('radar-map', {center: [40.72, -74.05], zoom: 8, zoomControl: true});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
     maxZoom: 18
