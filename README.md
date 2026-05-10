@@ -19,6 +19,9 @@ Five consecutive hourly surface current forecast images for Manhattan Waters fro
 ### `nyhops-overlay.html` — NYHOPS Chart Overlay
 Interactive Leaflet map with OSM + OpenSeaMap nautical chart as the base layer and the NYHOPS current forecast georeferenced on top. Includes 13 USCG buoy markers (G1, G5, G7, G9, G11, 31, 33, Y-A, Y-C, R26, R28, R30, R32) at verified coordinates.
 
+### `lnm.html` — Local Notice to Mariners Digest
+Weekly USCG District 1 LNM filtered to NYC Harbor. Shows active notices (shoaling, bridge work, marine events, buoys off-station) relevant to the immediate sailing area: Ambrose Channel, Verrazzano Narrows, Upper/Lower Bay, Governors Island, Buttermilk Channel, Kill Van Kull, Great Kills, Sheepshead Bay, Hudson River south of W42nd St. Also provides direct links to the current and recent weekly PDFs with honest availability status (not yet posted / scanned PDF unavailable).
+
 ---
 
 ## Wind & Tide Dashboard — What It Shows
@@ -81,7 +84,9 @@ Inspired by the B&G Advanced WindPlot display on Zeus/Vulcan chartplotters:
 | Surface currents | [Stevens NYHOPS](https://hudson.dl.stevens-tech.edu/maritimeforecast/) — Manhattan Waters | ~500m / hourly | Daily |
 | Nautical chart tiles | [OpenStreetMap](https://www.openstreetmap.org) + [OpenSeaMap](https://www.openseamap.org) | — | Continuous |
 
-All APIs are free, require no API key, and support CORS.
+All dashboard APIs are free, require no API key, and support CORS.
+
+The LNM digest uses the USCG NAVCEN PDF (public) and GitHub Models (GPT-4o-mini via built-in `GITHUB_TOKEN`) — no external API key required.
 
 ---
 
@@ -123,14 +128,20 @@ The forecast uses Open-Meteo's `minutely_15` endpoint sourced from NOAA HRRR (3k
 ## File Structure
 
 ```
-├── index.html          # Wind & tide dashboard — single file, zero dependencies
-├── nyhops.html         # NYHOPS surface current forecast images (5 hourly slots)
-├── nyhops-overlay.html # NYHOPS currents on interactive Leaflet nautical chart
-├── manifest.json       # PWA manifest for home screen install
-└── README.md
+├── index.html                        # Wind & tide dashboard
+├── nyhops.html                       # NYHOPS surface current forecast images
+├── nyhops-overlay.html               # NYHOPS currents on interactive Leaflet chart
+├── lnm.html                          # Local Notice to Mariners digest
+├── lnm_current.json                  # Auto-generated weekly notices (committed by CI)
+├── manifest.json                     # PWA manifest
+├── scripts/
+│   ├── fetch_lnm.py                  # PDF download + GitHub Models extraction
+│   └── requirements.txt
+└── .github/workflows/
+    └── lnm-update.yml                # Runs every Friday noon ET
 ```
 
-No server, no build step, no node_modules.
+No server, no build step, no node_modules. The LNM update is the only automated step (GitHub Actions).
 
 ---
 
