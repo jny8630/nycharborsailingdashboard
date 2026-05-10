@@ -34,12 +34,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 canvas{display:block;border-radius:6px}
 .chart-wrap{background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:6px 6px 4px;overflow:hidden}
 .chart-meta{font-size:9px;color:var(--fnt);text-align:center;margin-top:5px}
-.r-section{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 12px;background:rgba(12,21,32,.6);border:1px solid var(--bdr);border-radius:10px}
-.r-display{font-size:40px;font-weight:900;font-family:var(--mono);line-height:1;flex-shrink:0;min-width:72px;text-align:center}
-.r-right{flex:1;min-width:0}
-.r-label{font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.r-interp{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.4}
-.r-caveat{font-size:10px;color:var(--orange);margin-top:4px}
+.r-meta{font-size:11px;color:var(--fnt);margin-top:6px;margin-bottom:2px;line-height:1.5}
 .regime-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:8px;border-width:1px;border-style:solid}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
 .stat-box{background:var(--card2);border:1px solid var(--bdr);border-radius:8px;padding:10px;text-align:center}
@@ -346,19 +341,19 @@ function analyzeWind(data, gradDir, gradSpd) {
   let regime,interpretation;
   if(gradDirDiff!=null&&gradDirDiff<=20&&speedRatio>0.6){
     regime='Gradient-Dominated';
-    interpretation='Surface wind is tracking the synoptic pattern. Shifts follow pressure systems — Dellenbaugh percentage sailing applies. Sail the lifted tack.';
+    interpretation='Sail the lifted tack — percentage sailing applies. Shifts track pressure systems, not local thermal effects.';
   } else if(speedSlope<-0.1&&dirVarIncreasing&&dirStd>10){
     regime='Dying Thermal';
-    interpretation='Speed declining and direction becoming variable. Classic NYC Harbor evening collapse. Favor the inside of shifts, expect holes near shore. Gradient may reassert after thermal dies.';
+    interpretation='Favor the inside of shifts, expect holes near shore. Speed declining — gradient may reassert after thermal dies.';
   } else if(totalTrend>30){
     regime='Persistent Shift';
-    interpretation=dirSlope>0?'Direction trending right (clocking). Sea breeze establishing — hold the lifted tack, do not tack on shifts.':'Direction trending left (backing). Hold the lifted tack, do not chase shifts.';
+    interpretation=dirSlope>0?'Hold the lifted tack, do not tack on shifts. Direction trending right (clocking).':'Hold the lifted tack, do not chase shifts. Direction trending left (backing).';
   } else if(dirStd>10){
     regime='Oscillating';
-    interpretation='Wind oscillating around a mean. Tack on headers, sail the lifts. Track the mean direction to stay in phase.';
+    interpretation='Tack on headers, sail the lifts. Track the mean direction to stay in phase.';
   } else {
     regime='Light & Variable';
-    interpretation='Low direction variance, low speed variance. Gradient not establishing. Puffs may be random — conserve position.';
+    interpretation='Conserve position — puffs may be random. Gradient not establishing at the surface.';
   }
   const period=oscillationPeriod(dirs,meanDir);
   const lifts=liftFrequency(dirs,meanDir);
@@ -411,21 +406,15 @@ function renderShiftCard(data, gData, bodyId) {
   const rColor=a.r>0.4?'var(--green)':a.r<-0.4?'var(--red)':Math.abs(a.r)>0.2?'var(--yellow)':'var(--mut)';
   const regColors={'Gradient-Dominated':'var(--blue)','Dying Thermal':'var(--orange)','Persistent Shift':'var(--purple)','Oscillating':'var(--accent)','Light & Variable':'var(--fnt)'};
   const regColor=regColors[a.regime]||'var(--mut)';
-  const rInterp=a.r>0.4?'Lifts arrive with puffs — tack on headers':a.r<-0.4?'Headers arrive with puffs — hold on lifts':Math.abs(a.r)<0.2?'Speed and shift uncorrelated — gradient-dominated or dying':'Weak correlation — mixed conditions';
+  const rCtx=a.r>0.4?'Lifts arrive with puffs':a.r<-0.4?'Headers arrive with puffs':Math.abs(a.r)<0.2?'Speed and shift uncorrelated — gradient-dominated or dying':'Weak speed-shift correlation';
+  const sigNote=!a.significant?` <span style="color:var(--orange)">· Below significance threshold (|r| &lt; 0.18, n=${a.n})</span>`:'';
   el.innerHTML=`
-    <div class="r-section">
-      <div class="r-display" style="color:${rColor}">${a.r.toFixed(2)}</div>
-      <div class="r-right">
-        <div class="r-label">Pearson r · speed–shift</div>
-        <div class="r-interp">${rInterp}</div>
-        ${!a.significant?'<div class="r-caveat">Below significance threshold (|r| &lt; 0.18, n='+a.n+')</div>':''}
-      </div>
-    </div>
     <div class="regime-badge" style="background:${regColor}18;border-color:${regColor};color:${regColor}">${a.regime}</div>
-    <div class="interp-text">${a.interpretation}</div>
+    <div style="font-size:13px;font-weight:600;color:var(--txt);line-height:1.5;margin:6px 0 10px">${a.interpretation}</div>
+    <div class="r-meta">r = ${a.r.toFixed(2)} · ${rCtx}${sigNote}</div>
     <div class="stat-grid">
       <div class="stat-box"><div class="stat-label">Mean Direction</div><div class="stat-val">${a.meanDir.toFixed(0)}° ${cardinal(a.meanDir)}</div></div>
-      <div class="stat-box"><div class="stat-label">Dir Std Dev</div><div class="stat-val" style="color:${a.dirStd>15?'var(--yellow)':a.dirStd>10?'var(--accent)':'var(--mut)'}">${a.dirStd.toFixed(1)}°</div><div class="stat-sub">${a.dirStd>10?'Oscillating':'Tight'}</div></div>
+      <div class="stat-box"><div class="stat-label">Dir Std Dev</div><div class="stat-val" style="color:${a.dirStd>15?'var(--yellow)':a.dirStd>10?'var(--accent)':'var(--mut)'}">${a.dirStd.toFixed(1)}°</div></div>
       <div class="stat-box"><div class="stat-label">Osc Period</div><div class="stat-val">${a.period?a.period+' min':'—'}</div></div>
       <div class="stat-box"><div class="stat-label">Port / Stbd Lifts</div><div class="stat-val">${a.lifts.port}% · ${a.lifts.starboard}%</div></div>
     </div>
