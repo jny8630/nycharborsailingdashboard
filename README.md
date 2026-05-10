@@ -19,6 +19,15 @@ Five consecutive hourly surface current forecast images for Manhattan Waters fro
 ### `nyhops-overlay.html` — NYHOPS Chart Overlay
 Interactive Leaflet map with OSM + OpenSeaMap nautical chart as the base layer and the NYHOPS current forecast georeferenced on top. Includes 13 USCG buoy markers (G1, G5, G7, G9, G11, 31, 33, Y-A, Y-C, R26, R28, R30, R32) at verified coordinates.
 
+### `weather.html` — Weather Forecast
+Short-range weather outlook for NYC Harbor over the next 4, 8, or 12 hours.
+
+- **Hourly forecast** from Open-Meteo HRRR: temperature (°C/°F), condition, precipitation probability, cloud cover, visibility in nautical miles, and thunderstorm probability when available. Rule-based plain-language summary (e.g. "Rain likely", "Thunderstorm caution"). Model freshness metadata with estimated next update.
+- **NWS Marine Zone Forecast (ANZ338 — New York Harbor)**: official USCG/NWS coastal waters forecast with wind in knots, wave heights, and visibility in nm. Today & Tomorrow always shown; Extended Outlook (Wed–Thu) in a collapsible card. High-wind periods highlighted.
+- **Observed radar**: RainViewer past-2h animated radar on a Leaflet map, 10-minute steps, play/pause/prev/next controls. Clearly labeled as observed — not a future forecast.
+
+Forecast coordinate: G1 buoy (40.6797°N, 74.0288°W), central Upper Bay.
+
 ### `lnm.html` — Local Notice to Mariners Digest
 Weekly USCG District 1 LNM filtered to NYC Harbor. Shows active notices (shoaling, bridge work, marine events, buoys off-station) relevant to the immediate sailing area: Ambrose Channel, Verrazzano Narrows, Upper/Lower Bay, Governors Island, Buttermilk Channel, Kill Van Kull, Great Kills, Sheepshead Bay, Hudson River south of W42nd St. Also provides direct links to the current and recent weekly PDFs with honest availability status (not yet posted / scanned PDF unavailable).
 
@@ -82,6 +91,8 @@ Inspired by the B&G Advanced WindPlot display on Zeus/Vulcan chartplotters:
 | Forecast | [Open-Meteo](https://open-meteo.com/en/docs/gfs-api) — HRRR model | 3 km / 15-min | Hourly |
 | Radar | [Windy](https://www.windy.com) embed | — | Real-time |
 | Surface currents | [Stevens NYHOPS](https://hudson.dl.stevens-tech.edu/maritimeforecast/) — Manhattan Waters | ~500m / hourly | Daily |
+| Marine zone forecast | [NWS OKX](https://www.weather.gov) — ANZ338 New York Harbor CWF | Text product | Twice daily |
+| Observed radar | [RainViewer](https://www.rainviewer.com) | 10-min frames | Real-time |
 | Nautical chart tiles | [OpenStreetMap](https://www.openstreetmap.org) + [OpenSeaMap](https://www.openseamap.org) | — | Continuous |
 
 All dashboard APIs are free, require no API key, and support CORS.
@@ -129,6 +140,7 @@ The forecast uses Open-Meteo's `minutely_15` endpoint sourced from NOAA HRRR (3k
 
 ```
 ├── index.html                        # Wind & tide dashboard
+├── weather.html                      # Weather forecast (Open-Meteo · NWS ANZ338 · RainViewer radar)
 ├── nyhops.html                       # NYHOPS surface current forecast images
 ├── nyhops-overlay.html               # NYHOPS currents on interactive Leaflet chart
 ├── lnm.html                          # Local Notice to Mariners digest
