@@ -111,7 +111,7 @@ canvas{display:block;border-radius:6px}
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)">
-      <div class="card-t">📊 Shift Analysis — Evening</div>
+      <div class="card-t">📊 Shift Analysis — Last 12 Hours</div>
       <span class="caret">▼</span>
     </div>
     <div class="card-body" id="card2-body">
@@ -131,39 +131,6 @@ canvas{display:block;border-radius:6px}
     </div>
   </div>
 
-  <!-- CARD 4: AFTERNOON RACING WINDOW (collapsed by default) -->
-  <div class="card" id="card4">
-    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--orange),transparent)"></div>
-    <div class="card-hdr" onclick="toggleCard4(this)">
-      <div class="card-t" style="color:var(--mut)">🕑 Afternoon Context — 4 AM–4 PM</div>
-      <span class="caret">▲</span>
-    </div>
-    <div class="card-body collapsed" id="card4-body">
-      <div style="font-size:11px;color:var(--mut);margin-bottom:10px;padding:4px 0">Most relevant for Saturday afternoon racing (1–4 PM)</div>
-      <div style="display:flex;gap:12px;margin-bottom:6px">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em">TWD</div>
-          <div style="font-size:13px;font-weight:800;color:#63b3ed;font-family:var(--mono)" id="pm-dir">—</div>
-        </div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em">TWS / GUST</div>
-          <div style="font-size:13px;font-weight:800;color:#48bb78;font-family:var(--mono)" id="pm-spd">—</div>
-        </div>
-      </div>
-      <div class="chart-wrap">
-        <div style="display:flex;gap:4px">
-          <div style="flex:1"><canvas id="cvDirPM" style="width:100%;height:420px"></canvas></div>
-          <div style="flex:1"><canvas id="cvSpdPM" style="width:100%;height:420px"></canvas></div>
-        </div>
-      </div>
-      <div class="chart-meta" id="pm-chart-meta">Top = 4 PM anchor · Bottom = 4 AM · <span style="color:#ecc94b;opacity:.6">┈</span> rolling avg</div>
-      <div style="font-size:10px;color:var(--fnt);text-align:right;margin-top:4px" id="pm-time"></div>
-      <div id="card4-shift" style="margin-top:12px">
-        <div class="state-box"><div class="spinner"></div><br>Analyzing afternoon window…</div>
-      </div>
-    </div>
-  </div>
-
   <div class="footer">Wind: NOAA Robbins Reef (8530973) · Gradient: Open-Meteo 850 hPa<br>For racing reference only — not for navigation · Wind refreshes every 10 min</div>
 </div>
 
@@ -172,9 +139,7 @@ const LAT = 40.6797, LON = -74.0288, ROB = '8530973';
 const $ = id => document.getElementById(id);
 
 let windEvening = null;
-let windAfternoon = null;
 let gradientData = null;
-let card4Drawn = false;
 
 // ── UTILITIES ────────────────────────────────────────────────
 
@@ -197,11 +162,6 @@ function parseNOAA(ts) {
   return isNaN(d) ? null : d;
 }
 
-function todayAtHourNY(hour) {
-  const ny = new Intl.DateTimeFormat('en-US', {timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  const [m, d, y] = ny.split('/');
-  return parseNOAA(`${y}-${m}-${d} ${String(hour).padStart(2,'0')}:00`);
-}
 
 function setupCanvas(cv) {
   const dpr = window.devicePixelRatio || 1;
@@ -219,16 +179,6 @@ function toggle(hdr) {
   const b = hdr.nextElementSibling;
   b.classList.toggle('collapsed');
   hdr.querySelector('.caret').textContent = b.classList.contains('collapsed') ? '▲' : '▼';
-}
-
-function toggleCard4(hdr) {
-  const b = $('card4-body');
-  const wasCollapsed = b.classList.contains('collapsed');
-  b.classList.toggle('collapsed');
-  hdr.querySelector('.caret').textContent = b.classList.contains('collapsed') ? '▲' : '▼';
-  if (wasCollapsed && windAfternoon && !card4Drawn) {
-    requestAnimationFrame(() => { renderAfternoonCharts(); card4Drawn = true; });
-  }
 }
 
 // ── 12H VERTICAL WIND CHART ──────────────────────────────────
@@ -432,15 +382,6 @@ async function fetchEvening() {
   return data.slice(-120);
 }
 
-async function fetchAfternoon() {
-  const fourPM = todayAtHourNY(16);
-  const anchor = new Date() < fourPM ? new Date() : fourPM;
-  const start = new Date(anchor.getTime() - 12.5 * 3600000);
-  const bd = fmt2(start) + ' ' + String(start.getHours()).padStart(2,'0') + ':' + String(start.getMinutes()).padStart(2,'0');
-  const data = await fetchWindNOAA(bd, 13);
-  return data.slice(-120);
-}
-
 async function fetchGradient() {
   const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=windspeed_850hPa,winddirection_850hPa&wind_speed_unit=kn&timezone=auto&timeformat=unixtime&past_hours=12&forecast_hours=12`;
   const r=await fetch(url); if(!r.ok)throw new Error(`OM ${r.status}`);
@@ -460,23 +401,11 @@ function renderEveningCharts() {
   drawTacticsV($('cvSpd'),windEvening,{key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2});
 }
 
-function renderAfternoonCharts() {
-  if (!windAfternoon?.length) return;
-  const anchor=(() => { const fourPM=todayAtHourNY(16); return new Date()>=fourPM?fourPM:windAfternoon[windAfternoon.length-1].time; })();
-  const last=windAfternoon[windAfternoon.length-1];
-  $('pm-dir').textContent=cardinal(last.dir)+' '+last.dir.toFixed(0)+'°';
-  $('pm-spd').textContent=last.speed.toFixed(1)+' kt  G'+last.gusts.toFixed(1);
-  $('pm-time').textContent='Latest in window: '+fmtT(last.time);
-  $('pm-chart-meta').innerHTML='Top = '+fmtHM(anchor)+' anchor · Bottom = 4 AM · <span style="color:#ecc94b;opacity:.6">┈</span> rolling avg · <span style="color:#ed893660">━</span> gusts';
-  drawTacticsV($('cvDirPM'),windAfternoon,{key:'dir',unwrap:true,color:'#63b3ed',fill:'rgba(99,179,237,.12)',minM:5,anchor});
-  drawTacticsV($('cvSpdPM'),windAfternoon,{key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2,anchor});
-}
-
-function renderShiftCard(data, gData, bodyId, isAfternoon) {
+function renderShiftCard(data, gData, bodyId) {
   const el=$(bodyId);
   if(!data?.length){el.innerHTML='<div class="state-box">Insufficient data for analysis</div>';return;}
   let gradDir=null,gradSpd=null;
-  if(gData){const target=isAfternoon?todayAtHourNY(14):new Date();const g=getGradientAt(gData,target);gradDir=g.dir;gradSpd=g.spd;}
+  if(gData){const g=getGradientAt(gData,new Date());gradDir=g.dir;gradSpd=g.spd;}
   const a=analyzeWind(data,gradDir,gradSpd);
   if(!a){el.innerHTML='<div class="state-box">Insufficient data (n < 10)</div>';return;}
   const rColor=a.r>0.4?'var(--green)':a.r<-0.4?'var(--red)':Math.abs(a.r)>0.2?'var(--yellow)':'var(--mut)';
@@ -567,7 +496,7 @@ function renderContextCard(windData, gData) {
 
 async function loadAll() {
   $('hdr-updated').textContent = 'Loading…';
-  const [evRes,pmRes,gradRes] = await Promise.allSettled([fetchEvening(),fetchAfternoon(),fetchGradient()]);
+  const [evRes,gradRes] = await Promise.allSettled([fetchEvening(),fetchGradient()]);
 
   if(gradRes.status==='fulfilled') gradientData=gradRes.value;
 
@@ -579,31 +508,17 @@ async function loadAll() {
     $('card2-body').innerHTML='<div class="state-box">Analysis unavailable — wind data offline</div>';
   }
 
-  if(windEvening) renderShiftCard(windEvening,gradientData,'card2-body',false);
+  if(windEvening) renderShiftCard(windEvening,gradientData,'card2-body');
   renderContextCard(windEvening,gradientData);
-
-  if(pmRes.status==='fulfilled'){
-    windAfternoon=pmRes.value;
-    const isOpen=!$('card4-body').classList.contains('collapsed');
-    if(isOpen&&!card4Drawn){renderAfternoonCharts();card4Drawn=true;}
-    renderShiftCard(windAfternoon,gradientData,'card4-shift',true);
-  } else {
-    $('card4-shift').innerHTML='<div class="state-box">Afternoon data unavailable</div>';
-  }
 
   $('hdr-updated').textContent='Updated '+fmtT(new Date());
 }
 
 async function refreshWind() {
   try {
-    const [evRes,pmRes]= await Promise.allSettled([fetchEvening(),fetchAfternoon()]);
-    if(evRes.status==='fulfilled'){windEvening=evRes.value;renderEveningCharts();renderShiftCard(windEvening,gradientData,'card2-body',false);}
-    if(pmRes.status==='fulfilled'){
-      windAfternoon=pmRes.value;
-      const isOpen=!$('card4-body').classList.contains('collapsed');
-      if(isOpen){renderAfternoonCharts();}
-      renderShiftCard(windAfternoon,gradientData,'card4-shift',true);
-    }
+    windEvening=await fetchEvening();
+    renderEveningCharts();
+    renderShiftCard(windEvening,gradientData,'card2-body');
     $('hdr-updated').textContent='Updated '+fmtT(new Date());
   } catch(e){ console.error('Wind refresh:',e); }
 }
@@ -612,15 +527,11 @@ async function refreshGradient() {
   try {
     gradientData=await fetchGradient();
     renderContextCard(windEvening,gradientData);
-    if(windEvening) renderShiftCard(windEvening,gradientData,'card2-body',false);
-    if(windAfternoon) renderShiftCard(windAfternoon,gradientData,'card4-shift',true);
+    if(windEvening) renderShiftCard(windEvening,gradientData,'card2-body');
   } catch(e){ console.error('Gradient refresh:',e); }
 }
 
-window.addEventListener('resize',()=>{
-  if(windEvening?.length) renderEveningCharts();
-  if(windAfternoon?.length&&!$('card4-body').classList.contains('collapsed')) renderAfternoonCharts();
-});
+window.addEventListener('resize',()=>{ if(windEvening?.length) renderEveningCharts(); });
 
 loadAll();
 setInterval(refreshWind, 10*60*1000);
