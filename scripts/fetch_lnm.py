@@ -36,6 +36,7 @@ MAX_TOTAL_CHARS   = 25000 # safety limit for total prompt content
 # Specific enough to avoid false positives (e.g. "Hudson" matches Hudson, NH).
 NYC_SECTION_TERMS = [
     "ambrose",
+    "buttermilk channel", "buttermilk",
     "kill van kull", "kill van",
     "arthur kill",
     "raritan bay", "raritan river",
@@ -51,7 +52,6 @@ NYC_SECTION_TERMS = [
     "upper bay", "lower bay",
     "upper new york bay", "lower new york bay",
     "new york harbor", "new york bay",
-    "buttermilk",
     "governors island",
     "verrazzano", "verrazano",
     "newark bay",
@@ -69,7 +69,7 @@ BOILERPLATE_RE = re.compile(
 PROMPT = """You are reviewing an extract from a USCG District 1 Local Notice to Mariners,
 pre-filtered for the NYC Harbor area. Extract notices relevant to small keelboat sailing in:
 - Upper/Lower New York Bay, The Narrows, Ambrose Channel
-- Governors Island, Buttermilk Channel, Anchorage/Flats
+- Governors Island, Buttermilk Channel, The Anchorage/Flats south of Governors Island
 - Hudson River (Battery to ~W 60th St)
 - East River south of Brooklyn Bridge
 - Kill Van Kull, Arthur Kill, Raritan Bay, Sandy Hook
@@ -188,19 +188,24 @@ def main():
 
     client = OpenAI(base_url=GITHUB_MODELS_URL, api_key=token)
 
-    # Find latest text-based LNM
+    # Find latest text-based LNM; track why each week was skipped
     pdf_bytes = pages = week = year = url = None
+    skipped = []
     for weeks_back in range(0, MAX_WEEKS_BACK * 7 + 1, 7):
         w, y = week_year_for_offset(days_back=weeks_back)
         u = lnm_url(w, y)
         print(f"Trying week {w}/{y}: {u}")
         data = download_pdf(u)
         if data is None:
-            print("  404 — skipping"); continue
+            print("  404 — skipping")
+            skipped.append({"week": w, "year": y, "reason": "not_posted"})
+            continue
         pg = extract_pages(data)
         text_pages = [p for p in pg if p.strip()]
         if not text_pages:
-            print("  Scanned PDF — skipping"); continue
+            print("  Scanned PDF — skipping")
+            skipped.append({"week": w, "year": y, "reason": "scanned_pdf"})
+            continue
         print(f"  OK — {len(data):,} bytes, {len(text_pages)} text pages")
         pdf_bytes, pages, week, year, url = data, pg, w, y, u
         break
@@ -235,6 +240,7 @@ def main():
         "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "pdf_url": url,
         "model": used_model,
+        "skipped": skipped,
         "notices": notices,
         "disclaimer": (
             "AI-extracted from USCG D1 LNM via GitHub Models. "

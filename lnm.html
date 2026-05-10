@@ -31,7 +31,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .notice-sum{font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:6px}
 .notice-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.05em;font-family:var(--mono)}
-.badge-active{background:rgba(245,101,101,.15);color:var(--red);border:1px solid rgba(245,101,101,.2)}
+.badge-active{background:rgba(237,137,54,.15);color:var(--orange);border:1px solid rgba(237,137,54,.25)}
 .badge-temporary{background:rgba(236,201,75,.12);color:var(--yellow);border:1px solid rgba(236,201,75,.2)}
 .badge-cancelled{background:rgba(72,187,120,.1);color:var(--green);border:1px solid rgba(72,187,120,.2)}
 .notice-chart{font-size:10px;color:var(--mut);font-family:var(--mono)}
@@ -100,13 +100,9 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
       <div class="card-t">📋 Current LNM PDF</div>
     </div>
     <div class="card-body">
-      <div style="margin-bottom:10px">
-        <span class="week-disp" id="lnm-week">—</span>
-        <span class="week-year" id="lnm-year"></span>
-      </div>
-      <a class="pdf-btn" id="lnm-cur" href="#" target="_blank" rel="noopener">Open Current Week PDF ↗</a>
-      <a class="pdf-btn-sm" id="lnm-prev" href="#" target="_blank" rel="noopener">Prior week (fallback)</a>
-      <div class="pdf-note">Published Thursdays · District 1 covers Maine to NJ<br>
+      <a class="pdf-btn" id="lnm-cur" href="#" target="_blank" rel="noopener">Loading PDF link…</a>
+      <div id="lnm-extras" style="margin-top:6px"></div>
+      <div class="pdf-note" style="margin-top:10px">Published Thursdays · District 1 covers Maine to NJ<br>
         <a href="https://www.navcen.uscg.gov/local-notices-to-mariners-by-cg-district" target="_blank" rel="noopener" style="color:var(--accent)">NAVCEN LNM index ↗</a>
       </div>
     </div>
@@ -120,59 +116,67 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 </div>
 
 <script>
-// ── PDF link week calculator (runs client-side always) ───────────────────────
-function isoWeek(d) {
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── ISO week helpers ─────────────────────────────────────────────────────────
+function isoWeekData(d) {
   const t = new Date(d); t.setHours(0,0,0,0);
   t.setDate(t.getDate() + 3 - (t.getDay() + 6) % 7);
   const w1 = new Date(t.getFullYear(), 0, 4);
-  return {
-    week: 1 + Math.round(((t - w1) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7),
-    year: t.getFullYear()
-  };
+  const week = 1 + Math.round(((t - w1) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7);
+  return {week, year: t.getFullYear()};
 }
+
+function weekStartDate(week, year) {
+  const jan4 = new Date(year, 0, 4);
+  const w1mon = new Date(jan4);
+  w1mon.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
+  const start = new Date(w1mon);
+  start.setDate(w1mon.getDate() + (week - 1) * 7);
+  return start;
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+
+function weekLabel(week, year) {
+  const start = weekStartDate(week, year);
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  return `Week ${week} · ${fmtDate(start)}–${fmtDate(end)}, ${year}`;
+}
+
 function lnmUrl(week, year) {
   return `https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01${String(week).padStart(2,'0')}${year}.pdf`;
 }
 
-const cur = isoWeek(new Date());
-const prv = isoWeek(new Date(Date.now() - 7*86400000));
-const late = new Date().getDay() >= 4; // Thu/Fri/Sat → current week posted
-const primary = late ? cur : prv;
-const fallback = late ? prv : cur;
-
-document.getElementById('lnm-week').textContent = `Week ${primary.week}`;
-document.getElementById('lnm-year').textContent  = primary.year;
-document.getElementById('lnm-cur').href        = lnmUrl(primary.week, primary.year);
-document.getElementById('lnm-cur').textContent = `Open Week ${primary.week} · ${primary.year} PDF ↗`;
-document.getElementById('lnm-prev').href        = lnmUrl(fallback.week, fallback.year);
-document.getElementById('lnm-prev').textContent = `Week ${fallback.week} · ${fallback.year}${late ? ' (prior)' : ' (not yet posted — try this one)'}`;
-
-// ── Active Notices from lnm_current.json ────────────────────────────────────
-const STALE_DAYS = 10;
-
+// ── Notices rendering ────────────────────────────────────────────────────────
 function badgeClass(status) {
-  const s = (status || '').toUpperCase();
-  if (s === 'ACTIVE')     return 'badge-active';
-  if (s === 'TEMPORARY')  return 'badge-temporary';
-  if (s === 'CANCELLED')  return 'badge-cancelled';
-  return 'badge-active';
+  const s = (status||'').toUpperCase();
+  return s === 'TEMPORARY' ? 'badge-temporary' : s === 'CANCELLED' ? 'badge-cancelled' : 'badge-active';
 }
 
 function renderNotices(data) {
   const body = document.getElementById('notices-body');
+  const notices = data.notices || [];
+  const skipped = data.skipped || [];
 
-  // Staleness warning
-  let staleHtml = '';
-  if (data.generated_utc) {
-    const ageDays = (Date.now() - new Date(data.generated_utc)) / 86400000;
-    if (ageDays > STALE_DAYS) {
-      staleHtml = `<div class="stale-warn">⚠ Last updated ${Math.round(ageDays)} days ago — may not reflect the current week's LNM.</div>`;
-    }
+  // Gap warning: are there newer weeks we couldn't process?
+  let gapHtml = '';
+  if (skipped.length) {
+    const reasons = skipped.map(s => {
+      if (s.reason === 'not_posted') return `Week ${s.week} not yet published`;
+      if (s.reason === 'scanned_pdf') return `Week ${s.week} was a scanned PDF (no machine-readable text)`;
+      return `Week ${s.week} unavailable`;
+    });
+    gapHtml = `<div class="stale-warn">Data is from ${weekLabel(data.week, data.year)}.<br>${reasons.join(' · ')}.</div>`;
   }
 
-  const notices = data.notices || [];
   if (!notices.length) {
-    body.innerHTML = staleHtml + '<div class="state-box" style="color:var(--green)">✓ No relevant notices found for NYC Harbor this week.</div>';
+    body.innerHTML = gapHtml + '<div class="state-box" style="color:var(--green)">✓ No relevant notices found for NYC Harbor.</div>';
+    renderPdfCard(data);
     return;
   }
 
@@ -182,23 +186,55 @@ function renderNotices(data) {
       <div class="notice-sum">${escHtml(n.summary || '')}</div>
       <div class="notice-meta">
         <span class="badge ${badgeClass(n.status)}">${escHtml((n.status||'ACTIVE').toUpperCase())}</span>
-        ${n.chart ? `<span class="notice-chart">Chart ${escHtml(n.chart)}</span>` : ''}
-        ${n.since ? `<span class="notice-since">Since ${escHtml(n.since)}</span>` : ''}
+        ${n.chart ? `<span class="notice-chart">Chart&nbsp;${escHtml(n.chart)}</span>` : ''}
+        ${n.since ? `<span class="notice-since">Since&nbsp;${escHtml(n.since)}</span>` : ''}
       </div>
     </div>`).join('');
 
-  const weekLabel = data.week ? `Week ${data.week} · ${data.year}` : '';
-  const modelLabel = data.model ? ` · ${data.model}` : '';
-
-  body.innerHTML = staleHtml + rows + `
+  body.innerHTML = gapHtml + rows + `
     <div class="attr">
-      <div class="attr-info">AI-extracted · ${weekLabel}${modelLabel}<br>${data.disclaimer || ''}</div>
-      <a class="attr-link" href="${escHtml(data.pdf_url || '#')}" target="_blank" rel="noopener">Source PDF ↗</a>
+      <div class="attr-info">AI-extracted · ${weekLabel(data.week, data.year)}<br>${escHtml(data.disclaimer||'')}</div>
+      <a class="attr-link" href="${escHtml(data.pdf_url||'#')}" target="_blank" rel="noopener">Source PDF ↗</a>
     </div>`;
+
+  renderPdfCard(data);
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ── PDF card: uses verified week from JSON as primary, shows current week status
+function renderPdfCard(data) {
+  const noticesWeek = data ? data.week : null;
+  const noticesYear = data ? data.year : null;
+  const skipped = data ? (data.skipped || []) : [];
+  const cur = isoWeekData(new Date());
+
+  // Primary: the week we actually have data from (verified to exist)
+  if (noticesWeek && noticesYear) {
+    const el = document.getElementById('lnm-cur');
+    el.href = lnmUrl(noticesWeek, noticesYear);
+    el.textContent = `Open ${weekLabel(noticesWeek, noticesYear)} PDF ↗`;
+  }
+
+  // Secondary links: show current week and any skipped weeks with honest labels
+  const extras = document.getElementById('lnm-extras');
+  if (!extras) return;
+  const extraLinks = [];
+
+  // Current week if different from notices week
+  if (noticesWeek !== cur.week || noticesYear !== cur.year) {
+    const skippedEntry = skipped.find(s => s.week === cur.week && s.year === cur.year);
+    const note = skippedEntry
+      ? (skippedEntry.reason === 'not_posted' ? 'not yet published' : 'scanned PDF — unavailable')
+      : 'may not be posted yet';
+    extraLinks.push(`<a class="pdf-btn-sm" href="${lnmUrl(cur.week, cur.year)}" target="_blank" rel="noopener">${weekLabel(cur.week, cur.year)} — ${note}</a>`);
+  }
+
+  // Any other skipped weeks between notices week and now
+  skipped.filter(s => s.week !== cur.week).forEach(s => {
+    const note = s.reason === 'scanned_pdf' ? 'scanned PDF — unavailable' : 'not published';
+    extraLinks.push(`<a class="pdf-btn-sm" href="${lnmUrl(s.week, s.year)}" target="_blank" rel="noopener">${weekLabel(s.week, s.year)} — ${note}</a>`);
+  });
+
+  extras.innerHTML = extraLinks.join('');
 }
 
 async function loadNotices() {
@@ -209,11 +245,8 @@ async function loadNotices() {
     const data = await r.json();
     renderNotices(data);
   } catch(e) {
-    body.innerHTML = `
-      <div class="state-box">
-        <div style="color:var(--mut);margin-bottom:10px">Active notices unavailable.<br>Use the PDF link below to check the current LNM.</div>
-        <div style="font-size:10px;color:var(--fnt)">(Updated automatically each Friday via GitHub Actions)</div>
-      </div>`;
+    body.innerHTML = `<div class="state-box"><div style="color:var(--mut);margin-bottom:8px">Notices unavailable — use the PDF below.</div><div style="font-size:10px;color:var(--fnt)">Auto-updated each Friday via GitHub Actions</div></div>`;
+    renderPdfCard(null);
   }
 }
 
