@@ -225,23 +225,18 @@ function renderPdfCard(data) {
   // Sort newest-first
   allWeeks.sort((a, b) => b.year !== a.year ? b.year - a.year : b.week - a.week);
 
-  // Primary button = the verified working week
-  const working = allWeeks.find(w => w.working);
+  // Hide the static primary button — we render everything dynamically in order
   const lnmCur = document.getElementById('lnm-cur');
-  if (working) {
-    lnmCur.href = lnmUrl(working.week, working.year);
-    lnmCur.textContent = `Open ${weekLabel(working.week, working.year)} PDF ↗`;
-  } else {
-    lnmCur.style.display = 'none';
-  }
+  lnmCur.style.display = 'none';
 
-  // Secondary links: the other weeks in order
+  // Render all weeks newest-first; working week gets the primary (teal) style
   const extras = document.getElementById('lnm-extras');
   if (!extras) return;
-  extras.innerHTML = allWeeks
-    .filter(w => !w.working)
-    .map(w => `<a class="pdf-btn-sm" href="${lnmUrl(w.week, w.year)}" target="_blank" rel="noopener">${weekLabel(w.week, w.year)} — ${w.note}</a>`)
-    .join('');
+  extras.innerHTML = allWeeks.map(w =>
+    w.working
+      ? `<a class="pdf-btn" href="${lnmUrl(w.week, w.year)}" target="_blank" rel="noopener">${weekLabel(w.week, w.year)} — available ↗</a>`
+      : `<a class="pdf-btn-sm" href="${lnmUrl(w.week, w.year)}" target="_blank" rel="noopener">${weekLabel(w.week, w.year)} — ${w.note}</a>`
+  ).join('');
 }
 
 async function loadNotices() {
