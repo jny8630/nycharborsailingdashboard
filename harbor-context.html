@@ -93,7 +93,10 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
     <div style="padding:8px 8px 0">
-      <img id="wpc-chart" style="width:100%;border-radius:8px;display:block" alt="NWS WPC Surface Analysis">
+      <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Northeast</div>
+      <img id="wpc-chart-ne" style="width:100%;border-radius:8px;display:block" alt="NWS WPC Northeast Surface Analysis">
+      <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:10px 0 4px">CONUS</div>
+      <img id="wpc-chart-conus" style="width:100%;border-radius:8px;display:block" alt="NWS WPC CONUS Surface Analysis">
     </div>
     <div class="chart-meta" style="padding:6px 10px 10px">NWS Weather Prediction Center · Surface Analysis · Updated every 3 hrs · <a href="https://www.wpc.ncep.noaa.gov/html/sfc2.shtml" target="_blank" style="color:var(--accent)">wpc.ncep.noaa.gov</a></div>
   </div>
@@ -500,7 +503,9 @@ async function loadAll() {
   renderStationGrid();
   renderPressureCard();
   renderInterpCard();
-  $('wpc-chart').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + Date.now();
+  const t = Date.now();
+  $('wpc-chart-ne').src = 'https://www.wpc.ncep.noaa.gov/sfc/namnesfcwbg.gif?t=' + t;
+  $('wpc-chart-conus').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + t;
   $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
 }
 
@@ -517,7 +522,9 @@ async function refreshAll() {
     renderStationGrid();
     renderPressureCard();
     renderInterpCard();
-    $('wpc-chart').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + Date.now();
+    const t = Date.now();
+  $('wpc-chart-ne').src = 'https://www.wpc.ncep.noaa.gov/sfc/namnesfcwbg.gif?t=' + t;
+  $('wpc-chart-conus').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + t;
     $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
   } catch(e) { console.error('Refresh error:', e); }
 }
