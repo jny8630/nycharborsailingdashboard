@@ -93,6 +93,15 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     </div>
   </div>
 
+  <div class="sec-lbl">Synoptic Analysis</div>
+  <div class="card">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
+    <div style="padding:8px 8px 0">
+      <img id="wpc-chart" style="width:100%;border-radius:8px;display:block" alt="NWS WPC Surface Analysis">
+    </div>
+    <div class="chart-meta" style="padding:6px 10px 10px">NWS Weather Prediction Center · Surface Analysis · Updated every 3 hrs · <a href="https://www.wpc.ncep.noaa.gov/html/sfc2.shtml" target="_blank" style="color:var(--accent)">wpc.ncep.noaa.gov</a></div>
+  </div>
+
   <div onclick="toggleStnGrid()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:10px 2px 4px;margin-top:2px">
     <span class="sec-lbl" style="padding:0;margin:0">Current Conditions</span>
     <span id="stn-caret" style="font-size:10px;color:var(--fnt)">▲ show</span>
@@ -495,6 +504,7 @@ async function loadAll() {
   renderStationGrid();
   renderPressureCard();
   renderInterpCard();
+  $('wpc-chart').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + Date.now();
   $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
 }
 
@@ -511,6 +521,7 @@ async function refreshAll() {
     renderStationGrid();
     renderPressureCard();
     renderInterpCard();
+    $('wpc-chart').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + Date.now();
     $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
   } catch(e) { console.error('Refresh error:', e); }
 }
