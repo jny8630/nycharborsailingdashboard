@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080e18">
+<title>Harbor Context — NYC Harbor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{--bg:#080e18;--card:#131f2e;--card2:#0c1520;--bdr:#1a2d42;--bdr2:#2a4060;--txt:#f0f4f8;--dim:#c4d0de;--mut:#8fa3b8;--fnt:#6b8299;--accent:#4fd1c5;--blue:#63b3ed;--orange:#ed8936;--green:#48bb78;--red:#f56565;--yellow:#ecc94b;--purple:#9f7aea;--mono:'SF Mono','Cascadia Code','JetBrains Mono','Fira Code',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;background:linear-gradient(170deg,var(--bg),#0c1822 40%,var(--bg));color:var(--txt);max-width:440px;margin:0 auto;min-height:100vh;-webkit-font-smoothing:antialiased}
+.hdr{background:linear-gradient(135deg,#0e1f30,#162d46);padding:18px 16px 14px;border-bottom:1px solid var(--bdr)}
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.hdr-label{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.hdr-title{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
+.hdr-meta{font-size:10px;color:var(--fnt);margin-top:4px}
+.back-btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;font-weight:600;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
+.back-btn:active{opacity:.7}
+.cnt{padding:10px 10px 30px}
+.card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--bdr);border-radius:14px;margin-bottom:10px;box-shadow:0 2px 12px rgba(0,0,0,.3);overflow:hidden}
+.card-bar{height:2px}
+.card-body{padding:0 16px 16px}
+.state-box{padding:20px 16px;text-align:center;color:var(--mut);font-size:12px;line-height:1.7}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--bdr2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stat-val{font-size:14px;font-weight:800;font-family:var(--mono);margin-top:2px}
+.stat-label{font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.chart-meta{font-size:9px;color:var(--fnt);text-align:center}
+.sec-lbl{font-size:9px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:10px 2px 4px;margin-top:2px}
+.footer{text-align:center;padding:14px 0;font-size:10px;color:var(--fnt);border-top:1px solid var(--bdr);margin-top:6px}
+.stn-card{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--bdr);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.stn-name{font-size:12px;font-weight:700;color:var(--dim);letter-spacing:.04em}
+.stn-note{font-size:9px;color:var(--fnt);margin-left:6px}
+.stn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.stn-cell{text-align:center}
+/* Leaflet dark theme */
+.leaflet-container{background:#080e18!important}
+.leaflet-control-zoom a{background:#131f2e!important;color:var(--accent)!important;border-color:var(--bdr)!important}
+.leaflet-control-attribution{background:rgba(8,14,24,.85)!important;color:var(--fnt)!important;font-size:8px!important}
+.leaflet-control-attribution a{color:var(--accent)!important}
+.leaflet-popup-content-wrapper{background:#131f2e;border:1px solid var(--bdr2);border-radius:10px;color:var(--txt);box-shadow:0 4px 16px rgba(0,0,0,.6)}
+.leaflet-popup-tip{background:#131f2e}
+.leaflet-popup-content{margin:10px 14px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-row">
+    <div>
+      <div class="hdr-label">⛵ NYC Harbor · Multi-Station</div>
+      <div class="hdr-title">Harbor Context</div>
+      <div class="hdr-meta" id="hdr-updated">Loading…</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px">
+    <a class="back-btn" style="text-align:center;padding:10px 4px;grid-column:1/3;grid-row:1" href="index.html">← Dashboard</a>
+    <a class="back-btn" style="text-align:center;padding:10px 4px;grid-column:3/5;grid-row:1" href="weather.html">Weather</a>
+    <a class="back-btn" style="text-align:center;padding:10px 4px;grid-column:5/7;grid-row:1" href="nyhops.html">Currents</a>
+    <a class="back-btn" style="text-align:center;padding:10px 4px;grid-column:2/4;grid-row:2" href="wind-tactics.html">Wind Context</a>
+    <a class="back-btn" style="text-align:center;padding:10px 4px;grid-column:4/6;grid-row:2" href="lnm.html">LNM Digest</a>
+  </div>
+</div>
+
+<div class="cnt">
+
+  <div class="sec-lbl">Harbor Map</div>
+  <div class="card">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
+    <div style="padding:8px 8px 0">
+      <div id="harbor-map" style="height:300px;border-radius:8px"></div>
+    </div>
+    <div class="chart-meta" style="padding:6px 10px 10px">Arrow points toward wind source (FROM direction) · Tap marker for details<br>Interpretive — sparse station coverage</div>
+  </div>
+
+  <div class="sec-lbl">Current Conditions</div>
+  <div id="stations-grid">
+    <div class="state-box"><div class="spinner"></div><br>Fetching station data…</div>
+  </div>
+
+  <div class="sec-lbl">Pressure Gradient</div>
+  <div id="pressure-card" class="card">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
+    <div class="card-body" style="padding-top:14px">
+      <div class="state-box" style="padding:10px 0"><div class="spinner"></div><br>Computing…</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">Interpretation</div>
+  <div id="interp-card" class="card">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
+    <div class="card-body" style="padding-top:14px">
+      <div class="state-box" style="padding:10px 0"><div class="spinner"></div><br>Analyzing…</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    NOAA CO-OPS: The Battery (8518750) · Robbins Reef (8530973) · Sandy Hook (8531680)<br>
+    Heuristic reference only — not a forecast, not for navigation · Refreshes every 10 min
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const STATIONS = [
+  {id:'8518750', name:'The Battery',  short:'Battery',  lat:40.7006, lon:-74.0142, note:'N. Harbor'},
+  {id:'8530973', name:'Robbins Reef', short:'Rob.Reef', lat:40.6566, lon:-74.0649, note:'S. Harbor'},
+  {id:'8531680', name:'Sandy Hook',   short:'S.Hook',   lat:40.4668, lon:-74.0099, note:'Entrance'},
+];
+
+const $ = id => document.getElementById(id);
+
+const cardinal = d => {
+  if (d == null || isNaN(d)) return '—';
+  return ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
+};
+const fmtT = d => d ? d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/New_York'}) : '—';
+const wCSS = k => k >= 25 ? '#f56565' : k >= 18 ? '#ed8936' : k >= 12 ? '#ecc94b' : k >= 6 ? '#48bb78' : '#8fa3b8';
+
+let stationData = {};
+let map, markers = {};
+
+// ── NOAA FETCH ────────────────────────────────────────────────
+
+async function fetchStationData(station) {
+  const base = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
+  const common = `station=${station.id}&units=english&time_zone=lst_ldt&format=json&date=latest`;
+
+  const [windRes, pressRes] = await Promise.allSettled([
+    fetch(`${base}?${common}&product=wind`).then(r => r.json()),
+    fetch(`${base}?${common}&product=air_pressure`).then(r => r.json()),
+  ]);
+
+  let wind = null, pressure = null;
+
+  if (windRes.status === 'fulfilled' && windRes.value?.data?.length) {
+    const w = windRes.value.data[0];
+    const spd = parseFloat(w.s), dir = parseFloat(w.d), gst = parseFloat(w.g);
+    if (!isNaN(spd) && !isNaN(dir)) wind = {speed:spd, dir, gusts:isNaN(gst)?null:gst, time:w.t};
+  }
+  if (pressRes.status === 'fulfilled' && pressRes.value?.data?.length) {
+    const p = parseFloat(pressRes.value.data[0].v);
+    if (!isNaN(p)) pressure = p;
+  }
+
+  return {station, wind, pressure};
+}
+
+// ── MAP ───────────────────────────────────────────────────────
+
+function makeIcon(data, shortName) {
+  const hasWind = data?.wind != null;
+  const spd = hasWind ? data.wind.speed.toFixed(0) : '—';
+  const dir = hasWind ? data.wind.dir : 0;
+  const col = hasWind ? wCSS(data.wind.speed) : '#6b8299';
+  // Arrow points upward at 0°; rotate by dir so it points toward wind source (FROM)
+  const arrow = hasWind
+    ? `<svg viewBox="0 0 20 24" width="22" height="26" style="display:block;margin:0 auto;transform:rotate(${dir}deg);transform-origin:10px 13px"><polygon points="10,2 6,18 10,14 14,18" fill="${col}" stroke="#060b12" stroke-width="1.2"/></svg>`
+    : `<div style="width:22px;height:26px;line-height:26px;text-align:center;color:#6b8299;font-size:14px">?</div>`;
+  return L.divIcon({
+    className: '',
+    html: `<div style="text-align:center;filter:drop-shadow(0 1px 4px rgba(0,0,0,.9))">
+      ${arrow}
+      <div style="font-size:10px;font-weight:800;font-family:monospace;color:${col};margin-top:1px;white-space:nowrap;text-shadow:0 1px 3px #000">${spd} kt</div>
+      <div style="font-size:8px;color:#8fa3b8;white-space:nowrap;text-shadow:0 1px 2px #000">${shortName}</div>
+    </div>`,
+    iconSize: [60, 62],
+    iconAnchor: [30, 20],
+    popupAnchor: [0, -22],
+  });
+}
+
+function popupHtml(d) {
+  const w = d.wind, p = d.pressure;
+  return `<div style="font-size:12px;line-height:1.7;min-width:130px">
+    <strong style="font-size:13px;color:#f0f4f8">${d.station.name}</strong><br>
+    <span style="color:#6b8299;font-size:10px">${d.station.note}</span><br>
+    ${w
+      ? `<span style="color:${wCSS(w.speed)}">${w.speed.toFixed(1)} kt${w.gusts ? ' G'+w.gusts.toFixed(1) : ''}</span> · ${cardinal(w.dir)} ${w.dir.toFixed(0)}°`
+      : '<span style="color:#6b8299">Wind unavailable</span>'
+    }<br>
+    ${p != null ? `${p.toFixed(1)} hPa` : '<span style="color:#6b8299">Pressure N/A</span>'}
+  </div>`;
+}
+
+function initMap() {
+  map = L.map('harbor-map', {center:[40.59,-74.04], zoom:10, zoomControl:true, attributionControl:true});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains:'abcd', maxZoom:19
+  }).addTo(map);
+  STATIONS.forEach(s => {
+    const m = L.marker([s.lat, s.lon], {icon: makeIcon(null, s.short)})
+      .addTo(map)
+      .bindPopup(`<div style="font-size:12px;color:#f0f4f8"><strong>${s.name}</strong><br><span style="color:#6b8299">${s.note}</span><br>Loading…</div>`);
+    markers[s.id] = m;
+  });
+}
+
+function updateMarker(d) {
+  const m = markers[d.station.id];
+  if (!m) return;
+  m.setIcon(makeIcon(d, d.station.short));
+  m.setPopupContent(popupHtml(d));
+}
+
+// ── STATION GRID ──────────────────────────────────────────────
+
+function renderStationGrid() {
+  const el = $('stations-grid');
+  if (!Object.keys(stationData).length) return;
+
+  el.innerHTML = STATIONS.map(s => {
+    const d = stationData[s.id];
+    if (!d) return '';
+    const w = d.wind, p = d.pressure;
+    const noData = !w && p == null;
+    const spdCol = w ? wCSS(w.speed) : 'var(--fnt)';
+    const pCol = p == null ? 'var(--fnt)' : p < 1008 ? 'var(--yellow)' : p < 1013 ? 'var(--dim)' : 'var(--blue)';
+
+    return `<div class="stn-card">
+      <div style="display:flex;align-items:baseline">
+        <span class="stn-name">${s.name}</span>
+        <span class="stn-note">${s.note}</span>
+      </div>
+      ${noData
+        ? '<div style="font-size:11px;color:var(--fnt);margin-top:8px">Data unavailable from this station</div>'
+        : `<div class="stn-row">
+          <div class="stn-cell">
+            <div class="stat-label">Direction</div>
+            <div class="stat-val" style="color:var(--blue)">${w ? cardinal(w.dir)+' '+w.dir.toFixed(0)+'°' : '—'}</div>
+          </div>
+          <div class="stn-cell">
+            <div class="stat-label">Spd / Gust</div>
+            <div class="stat-val" style="color:${spdCol}">${w ? w.speed.toFixed(1)+(w.gusts?' G'+w.gusts.toFixed(1):'') : '—'}<span style="font-size:9px;color:var(--fnt)"> kt</span></div>
+          </div>
+          <div class="stn-cell">
+            <div class="stat-label">Pressure</div>
+            <div class="stat-val" style="color:${pCol}">${p != null ? p.toFixed(1) : '—'}<span style="font-size:9px;color:var(--fnt)">${p != null ? ' hPa' : ''}</span></div>
+          </div>
+        </div>
+        ${w?.time ? `<div style="font-size:9px;color:var(--fnt);margin-top:4px;text-align:right">NOAA 6-min · ${w.time}</div>` : ''}`
+      }
+    </div>`;
+  }).join('');
+}
+
+// ── PRESSURE GRADIENT ─────────────────────────────────────────
+
+function renderPressureCard() {
+  const el = $('pressure-card');
+  const pts = STATIONS.map(s => ({...s, p:stationData[s.id]?.pressure ?? null})).filter(x => x.p != null);
+
+  if (pts.length < 2) {
+    el.innerHTML = `<div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
+      <div class="card-body" style="padding-top:14px"><div style="font-size:11px;color:var(--fnt)">Insufficient pressure data — need at least 2 stations for a gradient estimate.</div></div>`;
+    return;
+  }
+
+  const minP = pts.reduce((a,b)=>b.p<a.p?b:a);
+  const maxP = pts.reduce((a,b)=>b.p>a.p?b:a);
+  const delta = maxP.p - minP.p;
+  const deltaCol = delta > 2 ? 'var(--yellow)' : delta > 0.5 ? 'var(--accent)' : 'var(--mut)';
+
+  const batP = stationData['8518750']?.pressure;
+  const shkP = stationData['8531680']?.pressure;
+  let nsNote = '';
+  if (batP != null && shkP != null) {
+    const ns = shkP - batP;
+    if (Math.abs(ns) < 0.3) {
+      nsNote = 'N–S pressure nearly equal — no strong meridional gradient detected.';
+    } else if (ns > 0) {
+      const mag = Math.abs(ns).toFixed(1);
+      nsNote = `Sandy Hook (harbor entrance) higher by ${mag} hPa than Battery (N. tip). Surface air tends to flow northward into the harbor — consistent with onshore or sea-breeze circulation.`;
+    } else {
+      const mag = Math.abs(ns).toFixed(1);
+      nsNote = `Battery (N. tip) higher by ${mag} hPa than Sandy Hook (entrance). Surface air tends to flow southward — consistent with offshore or gradient-driven flow.`;
+    }
+  }
+
+  // Pressure bar: map 990–1030 hPa to 0–100%
+  const rows = pts.map(x => {
+    const pct = Math.max(5, Math.min(100, Math.round(((x.p-990)/40)*100)));
+    const barCol = x.p === maxP.p ? 'var(--blue)' : x.p === minP.p ? 'var(--accent)' : 'var(--mut)';
+    const valCol = x.p === maxP.p ? 'var(--blue)' : x.p === minP.p ? 'var(--accent)' : 'var(--dim)';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-size:10px;color:var(--dim);font-weight:600;min-width:64px">${x.name}</div>
+      <div style="flex:1;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${barCol};border-radius:3px"></div>
+      </div>
+      <div style="font-size:11px;font-weight:800;font-family:var(--mono);color:${valCol};min-width:52px;text-align:right">${x.p.toFixed(1)} hPa</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
+    <div class="card-body" style="padding-top:14px">
+      ${rows}
+      <div style="font-size:10px;color:var(--dim);margin-top:10px;padding-top:8px;border-top:1px solid var(--bdr)">
+        Station spread: <strong style="color:${deltaCol}">${delta.toFixed(1)} hPa</strong>
+        <span style="color:var(--fnt)"> · ${minP.name} (low) → ${maxP.name} (high)</span>
+      </div>
+      ${nsNote ? `<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.6">${nsNote}</div>` : ''}
+      <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:8px;line-height:1.5">Estimated from sparse surface stations — treat as directional context only. Not a measured pressure field.</div>
+    </div>`;
+}
+
+// ── INTERPRETATION ────────────────────────────────────────────
+
+function circularMean(dirs) {
+  const v = dirs.filter(d=>d!=null&&!isNaN(d));
+  if (!v.length) return null;
+  const s=v.reduce((a,d)=>a+Math.sin(d*Math.PI/180),0), c=v.reduce((a,d)=>a+Math.cos(d*Math.PI/180),0);
+  return ((Math.atan2(s,c)*180/Math.PI)+360)%360;
+}
+
+function maxSpread(dirs) {
+  const v = dirs.filter(d=>d!=null&&!isNaN(d));
+  if (v.length < 2) return null;
+  const mean = circularMean(v);
+  return Math.max(...v.map(d=>{let diff=Math.abs(d-mean);return diff>180?360-diff:diff;}));
+}
+
+function renderInterpCard() {
+  const el = $('interp-card');
+  const allWind = STATIONS.map(s=>stationData[s.id]?.wind).filter(Boolean);
+
+  if (!allWind.length) {
+    el.innerHTML = `<div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
+      <div class="card-body"><div class="state-box">No wind data available for interpretation</div></div>`;
+    return;
+  }
+
+  const dirs = allWind.map(w=>w.dir);
+  const spds = allWind.map(w=>w.speed);
+  const spread = maxSpread(dirs);
+  const meanDir = circularMean(dirs);
+  const meanSpd = spds.reduce((a,v)=>a+v,0)/spds.length;
+
+  let consistency, consistencyCol;
+  if (spread == null) {
+    consistency = 'Single station only'; consistencyCol = 'var(--fnt)';
+  } else if (spread < 20) {
+    consistency = `Broadly consistent (max ${spread.toFixed(0)}° from mean)`; consistencyCol = 'var(--green)';
+  } else if (spread < 45) {
+    consistency = `Moderate variation (max ${spread.toFixed(0)}° from mean)`; consistencyCol = 'var(--yellow)';
+  } else {
+    consistency = `Significant divergence (max ${spread.toFixed(0)}° from mean)`; consistencyCol = 'var(--orange)';
+  }
+
+  const batP = stationData['8518750']?.pressure;
+  const shkP = stationData['8531680']?.pressure;
+  let gradNote = 'N–S pressure gradient: insufficient data (need Battery + Sandy Hook).';
+  let seaBreeze = null;
+  if (batP != null && shkP != null) {
+    const ns = shkP - batP;
+    if (Math.abs(ns) < 0.3) {
+      gradNote = 'N–S pressure nearly equal — no strong directional forcing from gradient alone.';
+    } else if (ns > 0) {
+      seaBreeze = ns > 1.0 ? 'likely' : 'possible';
+      gradNote = `Harbor entrance (S) ${Math.abs(ns).toFixed(1)} hPa higher than Battery (N) — onshore pressure gradient, consistent with sea-breeze circulation.`;
+    } else {
+      gradNote = `Battery (N) ${Math.abs(ns).toFixed(1)} hPa higher than harbor entrance (S) — offshore pressure gradient, consistent with gradient or land-breeze flow.`;
+    }
+  }
+
+  let summary, summaryCol;
+  if (spread != null && spread < 30 && seaBreeze === 'likely') {
+    summary = 'Stations broadly agree and pressure gradient favors onshore flow — sea breeze appears active across the harbor.';
+    summaryCol = 'var(--green)';
+  } else if (spread != null && spread < 30 && seaBreeze === 'possible') {
+    summary = 'Stations broadly agree; weak onshore gradient suggests sea breeze may be establishing — monitor for development.';
+    summaryCol = 'var(--yellow)';
+  } else if (spread != null && spread < 30 && seaBreeze === null) {
+    summary = 'Stations broadly consistent; pressure gradient favors offshore or gradient-driven flow. Sea-breeze circulation is not clearly present.';
+    summaryCol = 'var(--blue)';
+  } else if (spread != null && spread > 45) {
+    summary = 'Station directions diverging — local effects or transitional conditions likely. Avoid a single harbor-wide conclusion; use per-station data.';
+    summaryCol = 'var(--orange)';
+  } else {
+    summary = 'Mixed picture — no single strong driver is clearly identifiable from available stations. Monitor for developing pattern.';
+    summaryCol = 'var(--dim)';
+  }
+
+  el.innerHTML = `<div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
+    <div class="card-body" style="padding-top:14px">
+      <div style="font-size:13px;font-weight:600;color:${summaryCol};line-height:1.55;margin-bottom:12px">${summary}</div>
+      <div style="font-size:11px;color:var(--dim);line-height:1.65;margin-bottom:5px">Station consistency: <strong style="color:${consistencyCol}">${consistency}</strong></div>
+      <div style="font-size:11px;color:var(--dim);line-height:1.65;margin-bottom:5px">${gradNote}</div>
+      <div style="font-size:11px;color:var(--dim);line-height:1.65">
+        Mean direction: <strong style="color:var(--blue)">${meanDir != null ? cardinal(meanDir)+' '+meanDir.toFixed(0)+'°' : '—'}</strong>
+        &nbsp;·&nbsp;
+        Mean speed: <strong style="color:var(--green)">${meanSpd.toFixed(1)} kt</strong>
+        &nbsp;·&nbsp;
+        <span style="color:var(--fnt)">${allWind.length} of ${STATIONS.length} stations reporting</span>
+      </div>
+      <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:10px;line-height:1.6">Interpretive — a single station does not prove harbor-wide flow. Avoid strong conclusions unless multiple stations agree. Not a forecast.</div>
+    </div>`;
+}
+
+// ── MAIN LOAD ─────────────────────────────────────────────────
+
+async function loadAll() {
+  $('hdr-updated').textContent = 'Loading…';
+  initMap();
+
+  const results = await Promise.allSettled(STATIONS.map(s => fetchStationData(s)));
+  results.forEach(r => {
+    if (r.status === 'fulfilled') {
+      const d = r.value;
+      stationData[d.station.id] = d;
+      updateMarker(d);
+    }
+  });
+
+  renderStationGrid();
+  renderPressureCard();
+  renderInterpCard();
+  $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
+}
+
+async function refreshAll() {
+  try {
+    const results = await Promise.allSettled(STATIONS.map(s => fetchStationData(s)));
+    results.forEach(r => {
+      if (r.status === 'fulfilled') {
+        const d = r.value;
+        stationData[d.station.id] = d;
+        updateMarker(d);
+      }
+    });
+    renderStationGrid();
+    renderPressureCard();
+    renderInterpCard();
+    $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
+  } catch(e) { console.error('Refresh error:', e); }
+}
+
+loadAll();
+setInterval(refreshAll, 10 * 60 * 1000);
+</script>
+</body>
+</html>
