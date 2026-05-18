@@ -74,12 +74,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     <div style="padding:8px 8px 0">
       <div id="harbor-map" style="height:300px;border-radius:8px"></div>
     </div>
-    <div class="chart-meta" style="padding:6px 10px 10px">Arrow points toward wind source (FROM direction) · Tap marker for details<br>Interpretive — sparse station coverage</div>
-  </div>
-
-  <div class="sec-lbl">Current Conditions</div>
-  <div id="stations-grid">
-    <div class="state-box"><div class="spinner"></div><br>Fetching station data…</div>
+    <div class="chart-meta" style="padding:6px 10px 10px">Arrow = wind FROM direction · Tap marker for details · Static view</div>
   </div>
 
   <div class="sec-lbl">Pressure Gradient</div>
@@ -98,8 +93,14 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     </div>
   </div>
 
+  <div onclick="toggleStnGrid()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:10px 2px 4px;margin-top:2px">
+    <span class="sec-lbl" style="padding:0;margin:0">Current Conditions</span>
+    <span id="stn-caret" style="font-size:10px;color:var(--fnt)">▲ show</span>
+  </div>
+  <div id="stations-grid" style="display:none"></div>
+
   <div class="footer">
-    NOAA CO-OPS: The Battery (8518750) · Robbins Reef (8530973) · Sandy Hook (8531680)<br>
+    CO-OPS: Sandy Hook · Robbins Reef · The Battery &nbsp;·&nbsp; ASOS: JFK · LaGuardia · Newark · Central Park<br>
     Heuristic reference only — not a forecast, not for navigation · Refreshes every 10 min
   </div>
 </div>
@@ -107,9 +108,14 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const STATIONS = [
-  {id:'8518750', name:'The Battery',  short:'Battery',  lat:40.7006, lon:-74.0142, note:'N. Harbor'},
-  {id:'8530973', name:'Robbins Reef', short:'Rob.Reef', lat:40.6566, lon:-74.0649, note:'S. Harbor'},
-  {id:'8531680', name:'Sandy Hook',   short:'S.Hook',   lat:40.4668, lon:-74.0099, note:'Entrance'},
+  // Geographic order S→N (coastal), then inland — drives pressure chart display order
+  {id:'8531680', src:'coops', group:'coastal', name:'Sandy Hook',   short:'S.Hook',  lat:40.4668, lon:-74.0099, note:'Entrance'},
+  {id:'8530973', src:'coops', group:'coastal', name:'Robbins Reef', short:'Rob.Reef',lat:40.6566, lon:-74.0649, note:'S. Harbor'},
+  {id:'8518750', src:'coops', group:'coastal', name:'The Battery',  short:'Battery', lat:40.7006, lon:-74.0142, note:'N. Harbor'},
+  {id:'KJFK',    src:'nws',   group:'coastal', name:'JFK Airport',  short:'JFK',     lat:40.6413, lon:-73.7781, note:'S. Queens'},
+  {id:'KLGA',    src:'nws',   group:'coastal', name:'LaGuardia',    short:'LGA',     lat:40.7769, lon:-73.8740, note:'N. Queens'},
+  {id:'KEWR',    src:'nws',   group:'inland',  name:'Newark',       short:'Newark',  lat:40.6895, lon:-74.1745, note:'NJ Urban'},
+  {id:'KNYC',    src:'nws',   group:'inland',  name:'Central Park', short:'Cen.Pk',  lat:40.7789, lon:-73.9692, note:'Manhattan'},
 ];
 
 const $ = id => document.getElementById(id);
@@ -124,9 +130,9 @@ const wCSS = k => k >= 25 ? '#f56565' : k >= 18 ? '#ed8936' : k >= 12 ? '#ecc94b
 let stationData = {};
 let map, markers = {};
 
-// ── NOAA FETCH ────────────────────────────────────────────────
+// ── FETCHERS ─────────────────────────────────────────────────
 
-async function fetchStationData(station) {
+async function fetchCOOPSStation(station) {
   const base = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
   const common = `station=${station.id}&units=english&time_zone=lst_ldt&format=json&date=latest`;
 
@@ -147,7 +153,38 @@ async function fetchStationData(station) {
     if (!isNaN(p)) pressure = p;
   }
 
-  return {station, wind, pressure};
+  return {station, wind, pressure, tempF:null, tempC:null};
+}
+
+async function fetchNWSStation(station) {
+  const r = await fetch(`https://api.weather.gov/stations/${station.id}/observations/latest`, {
+    headers:{'User-Agent':'(NYC Harbor Sailing Dashboard, jens.nachtigal@gmail.com)','Accept':'application/geo+json'}
+  });
+  if (!r.ok) throw new Error(`NWS ${r.status} for ${station.id}`);
+  const d = await r.json();
+  const p = d.properties;
+
+  const rawSpd = p.windSpeed?.value, rawDir = p.windDirection?.value;
+  const rawGst = p.windGust?.value;
+  const rawPress = p.seaLevelPressure?.value ?? p.barometricPressure?.value;
+  const rawTemp = p.temperature?.value;
+
+  const speed = (rawSpd != null && !isNaN(rawSpd)) ? rawSpd * 1.944 : null;
+  const gusts = (rawGst != null && !isNaN(rawGst) && rawGst > 0) ? rawGst * 1.944 : null;
+  const pressure = (rawPress != null && !isNaN(rawPress)) ? rawPress / 100 : null;
+  const tempC = (rawTemp != null && !isNaN(rawTemp)) ? rawTemp : null;
+  const tempF = tempC != null ? tempC * 9/5 + 32 : null;
+
+  let wind = null;
+  if (speed != null && rawDir != null && !isNaN(rawDir)) {
+    wind = {speed, dir:rawDir, gusts, time: p.timestamp ? fmtT(new Date(p.timestamp)) : null};
+  }
+
+  return {station, wind, pressure, tempF, tempC};
+}
+
+async function fetchStationData(station) {
+  return station.src === 'nws' ? fetchNWSStation(station) : fetchCOOPSStation(station);
 }
 
 // ── MAP ───────────────────────────────────────────────────────
@@ -174,25 +211,34 @@ function makeIcon(data, shortName) {
   });
 }
 
+const tempCol = f => f >= 86 ? '#f56565' : f >= 76 ? '#ed8936' : f >= 66 ? '#ecc94b' : '#48bb78';
+
 function popupHtml(d) {
   const w = d.wind, p = d.pressure;
-  return `<div style="font-size:12px;line-height:1.7;min-width:130px">
+  const src = d.station.src === 'nws' ? 'NWS ASOS' : 'NOAA CO-OPS';
+  return `<div style="font-size:12px;line-height:1.7;min-width:140px">
     <strong style="font-size:13px;color:#f0f4f8">${d.station.name}</strong><br>
-    <span style="color:#6b8299;font-size:10px">${d.station.note}</span><br>
+    <span style="color:#6b8299;font-size:10px">${d.station.note} · ${src}</span><br>
     ${w
       ? `<span style="color:${wCSS(w.speed)}">${w.speed.toFixed(1)} kt${w.gusts ? ' G'+w.gusts.toFixed(1) : ''}</span> · ${cardinal(w.dir)} ${w.dir.toFixed(0)}°`
       : '<span style="color:#6b8299">Wind unavailable</span>'
     }<br>
     ${p != null ? `${p.toFixed(1)} hPa` : '<span style="color:#6b8299">Pressure N/A</span>'}
+    ${d.tempF != null ? `<br><span style="color:${tempCol(d.tempF)}">${d.tempF.toFixed(0)}°F</span> / ${d.tempC.toFixed(0)}°C` : ''}
   </div>`;
 }
 
 function initMap() {
-  map = L.map('harbor-map', {center:[40.59,-74.04], zoom:10, zoomControl:true, attributionControl:true});
+  map = L.map('harbor-map', {
+    zoomControl:false, scrollWheelZoom:false, doubleClickZoom:false,
+    touchZoom:false, boxZoom:false, dragging:false, keyboard:false,
+    attributionControl:true
+  });
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains:'abcd', maxZoom:19
   }).addTo(map);
+  map.fitBounds(STATIONS.map(s=>[s.lat,s.lon]), {padding:[24,24]});
   STATIONS.forEach(s => {
     const m = L.marker([s.lat, s.lon], {icon: makeIcon(null, s.short)})
       .addTo(map)
@@ -210,9 +256,18 @@ function updateMarker(d) {
 
 // ── STATION GRID ──────────────────────────────────────────────
 
+function toggleStnGrid() {
+  const g = $('stations-grid'), c = $('stn-caret');
+  if (g.style.display === 'none') { g.style.display = ''; c.textContent = '▼ hide'; }
+  else { g.style.display = 'none'; c.textContent = '▲ show'; }
+}
+
 function renderStationGrid() {
   const el = $('stations-grid');
-  if (!Object.keys(stationData).length) return;
+  if (!Object.keys(stationData).length) {
+    el.innerHTML = '<div class="state-box"><div class="spinner"></div><br>Loading…</div>';
+    return;
+  }
 
   el.innerHTML = STATIONS.map(s => {
     const d = stationData[s.id];
@@ -222,10 +277,16 @@ function renderStationGrid() {
     const spdCol = w ? wCSS(w.speed) : 'var(--fnt)';
     const pCol = p == null ? 'var(--fnt)' : p < 1008 ? 'var(--yellow)' : p < 1013 ? 'var(--dim)' : 'var(--blue)';
 
+    const tempBadge = d.tempF != null
+      ? `<span style="font-size:9px;background:var(--bdr);padding:1px 7px;border-radius:10px;margin-left:6px;color:${tempCol(d.tempF)}">${d.tempF.toFixed(0)}°F</span>`
+      : '';
+    const srcLabel = s.src === 'nws' ? 'ASOS' : 'CO-OPS';
+
     return `<div class="stn-card">
-      <div style="display:flex;align-items:baseline">
+      <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:0">
         <span class="stn-name">${s.name}</span>
         <span class="stn-note">${s.note}</span>
+        ${tempBadge}
       </div>
       ${noData
         ? '<div style="font-size:11px;color:var(--fnt);margin-top:8px">Data unavailable from this station</div>'
@@ -243,7 +304,7 @@ function renderStationGrid() {
             <div class="stat-val" style="color:${pCol}">${p != null ? p.toFixed(1) : '—'}<span style="font-size:9px;color:var(--fnt)">${p != null ? ' hPa' : ''}</span></div>
           </div>
         </div>
-        ${w?.time ? `<div style="font-size:9px;color:var(--fnt);margin-top:4px;text-align:right">NOAA 6-min · ${w.time}</div>` : ''}`
+        ${w?.time ? `<div style="font-size:9px;color:var(--fnt);margin-top:4px;text-align:right">${srcLabel} · ${w.time}</div>` : ''}`
       }
     </div>`;
   }).join('');
@@ -253,7 +314,7 @@ function renderStationGrid() {
 
 function renderPressureCard() {
   const el = $('pressure-card');
-  const pts = STATIONS.map(s => ({...s, p:stationData[s.id]?.pressure ?? null})).filter(x => x.p != null);
+  const pts = STATIONS.map(s => ({...s, p:stationData[s.id]?.pressure??null, tempF:stationData[s.id]?.tempF??null})).filter(x => x.p != null);
 
   if (pts.length < 2) {
     el.innerHTML = `<div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
@@ -266,45 +327,40 @@ function renderPressureCard() {
   const delta = maxP.p - minP.p;
   const deltaCol = delta > 2 ? 'var(--yellow)' : delta > 0.5 ? 'var(--accent)' : 'var(--mut)';
 
-  const batP = stationData['8518750']?.pressure;
-  const shkP = stationData['8531680']?.pressure;
-  let nsNote = '';
-  if (batP != null && shkP != null) {
-    const ns = shkP - batP;
-    if (Math.abs(ns) < 0.3) {
-      nsNote = 'N–S pressure nearly equal — no strong meridional gradient detected.';
-    } else if (ns > 0) {
-      const mag = Math.abs(ns).toFixed(1);
-      nsNote = `Sandy Hook (harbor entrance) higher by ${mag} hPa than Battery (N. tip). Surface air tends to flow northward into the harbor — consistent with onshore or sea-breeze circulation.`;
-    } else {
-      const mag = Math.abs(ns).toFixed(1);
-      nsNote = `Battery (N. tip) higher by ${mag} hPa than Sandy Hook (entrance). Surface air tends to flow southward — consistent with offshore or gradient-driven flow.`;
-    }
-  }
-
   // Pressure bar: map 990–1030 hPa to 0–100%
+  const hdr = `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--bdr)">
+    <div style="font-size:9px;color:var(--fnt);font-weight:600;min-width:80px">Station</div>
+    <div style="width:80px;flex-shrink:0;font-size:9px;color:var(--fnt)">Relative</div>
+    <div style="font-size:9px;color:var(--fnt);min-width:52px;text-align:right">hPa</div>
+    <div style="font-size:9px;color:var(--fnt);min-width:40px;text-align:right">Temp</div>
+  </div>`;
   const rows = pts.map(x => {
     const pct = Math.max(5, Math.min(100, Math.round(((x.p-990)/40)*100)));
     const barCol = x.p === maxP.p ? 'var(--blue)' : x.p === minP.p ? 'var(--accent)' : 'var(--mut)';
     const valCol = x.p === maxP.p ? 'var(--blue)' : x.p === minP.p ? 'var(--accent)' : 'var(--dim)';
-    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      <div style="font-size:10px;color:var(--dim);font-weight:600;min-width:64px">${x.name}</div>
-      <div style="flex:1;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden">
+    const grpTag = x.group === 'inland'
+      ? `<span style="font-size:8px;color:var(--orange);margin-left:3px">inland</span>`
+      : `<span style="font-size:8px;color:var(--blue);margin-left:3px">coastal</span>`;
+    const tStr = x.tempF != null ? x.tempF.toFixed(0)+'°' : '—';
+    const tCol = x.tempF != null ? tempCol(x.tempF) : 'var(--fnt)';
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+      <div style="font-size:10px;color:var(--dim);font-weight:600;min-width:80px">${x.short}${grpTag}</div>
+      <div style="width:80px;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;flex-shrink:0">
         <div style="width:${pct}%;height:100%;background:${barCol};border-radius:3px"></div>
       </div>
-      <div style="font-size:11px;font-weight:800;font-family:var(--mono);color:${valCol};min-width:52px;text-align:right">${x.p.toFixed(1)} hPa</div>
+      <div style="font-size:11px;font-weight:800;font-family:var(--mono);color:${valCol};min-width:52px;text-align:right">${x.p.toFixed(1)}</div>
+      <div style="font-size:11px;font-weight:800;font-family:var(--mono);color:${tCol};min-width:40px;text-align:right">${tStr}</div>
     </div>`;
   }).join('');
 
   el.innerHTML = `<div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
     <div class="card-body" style="padding-top:14px">
-      ${rows}
+      ${hdr}${rows}
       <div style="font-size:10px;color:var(--dim);margin-top:10px;padding-top:8px;border-top:1px solid var(--bdr)">
         Station spread: <strong style="color:${deltaCol}">${delta.toFixed(1)} hPa</strong>
         <span style="color:var(--fnt)"> · ${minP.name} (low) → ${maxP.name} (high)</span>
       </div>
-      ${nsNote ? `<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.6">${nsNote}</div>` : ''}
-      <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:8px;line-height:1.5">Estimated from sparse surface stations — treat as directional context only. Not a measured pressure field.</div>
+      <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:8px;line-height:1.5">Sparse surface stations — directional context only. Not a measured pressure field.</div>
     </div>`;
 }
 
@@ -351,20 +407,46 @@ function renderInterpCard() {
     consistency = `Significant divergence (max ${spread.toFixed(0)}° from mean)`; consistencyCol = 'var(--orange)';
   }
 
-  const batP = stationData['8518750']?.pressure;
-  const shkP = stationData['8531680']?.pressure;
-  let gradNote = 'N–S pressure gradient: insufficient data (need Battery + Sandy Hook).';
+  // Pressure: coastal vs. inland
+  const cPts = STATIONS.map(s=>({...s,p:stationData[s.id]?.pressure??null})).filter(x=>x.p!=null);
+  const cCoastal = cPts.filter(x=>x.group==='coastal');
+  const cInland  = cPts.filter(x=>x.group==='inland');
+  const pCoastal = cCoastal.length ? cCoastal.reduce((a,x)=>a+x.p,0)/cCoastal.length : null;
+  const pInland  = cInland.length  ? cInland.reduce((a,x)=>a+x.p,0)/cInland.length   : null;
+  let gradNote = 'Pressure gradient: insufficient data across station groups.';
   let seaBreeze = null;
-  if (batP != null && shkP != null) {
-    const ns = shkP - batP;
-    if (Math.abs(ns) < 0.3) {
-      gradNote = 'N–S pressure nearly equal — no strong directional forcing from gradient alone.';
-    } else if (ns > 0) {
-      seaBreeze = ns > 1.0 ? 'likely' : 'possible';
-      gradNote = `Harbor entrance (S) ${Math.abs(ns).toFixed(1)} hPa higher than Battery (N) — onshore pressure gradient, consistent with sea-breeze circulation.`;
+  if (pCoastal != null && pInland != null) {
+    const diff = pCoastal - pInland;
+    if (Math.abs(diff) < 0.3) {
+      gradNote = 'Coastal and inland pressures nearly equal — no strong onshore/offshore gradient.';
+    } else if (diff > 0) {
+      seaBreeze = diff > 1.0 ? 'likely' : 'possible';
+      gradNote = `Coastal stations ${diff.toFixed(1)} hPa higher than inland — onshore pressure gradient, consistent with sea-breeze circulation.`;
     } else {
-      gradNote = `Battery (N) ${Math.abs(ns).toFixed(1)} hPa higher than harbor entrance (S) — offshore pressure gradient, consistent with gradient or land-breeze flow.`;
+      gradNote = `Inland stations ${Math.abs(diff).toFixed(1)} hPa higher than coastal — offshore gradient, consistent with gradient-driven flow.`;
     }
+  }
+
+  // Temperature: inland urban vs. coastal ASOS
+  const nwsData = STATIONS.filter(s=>s.src==='nws').map(s=>stationData[s.id]).filter(Boolean);
+  const inlandTemps  = nwsData.filter(d=>d.station.group==='inland'  && d.tempF!=null).map(d=>d.tempF);
+  const coastalTemps = nwsData.filter(d=>d.station.group==='coastal' && d.tempF!=null).map(d=>d.tempF);
+  const avgInlandF  = inlandTemps.length  ? inlandTemps.reduce((a,v)=>a+v,0)/inlandTemps.length   : null;
+  const avgCoastalF = coastalTemps.length ? coastalTemps.reduce((a,v)=>a+v,0)/coastalTemps.length : null;
+  let tempNote = '';
+  if (avgInlandF != null && avgCoastalF != null) {
+    const tDiff = avgInlandF - avgCoastalF;
+    if (tDiff >= 8) {
+      tempNote = `Urban core ${tDiff.toFixed(0)}°F warmer than coastal stations — strong thermal low driver, sea-breeze conditions favorable.`;
+    } else if (tDiff >= 4) {
+      tempNote = `Urban core ${tDiff.toFixed(0)}°F warmer than coastal stations — moderate thermal driver present.`;
+    } else if (tDiff > 0) {
+      tempNote = `Urban core marginally warmer (${tDiff.toFixed(0)}°F) — weak thermal driver; sea breeze may be limited.`;
+    } else {
+      tempNote = `Urban and coastal temps similar (Δ${Math.abs(tDiff).toFixed(0)}°F) — thermal driver not clearly present.`;
+    }
+  } else if (avgInlandF != null) {
+    tempNote = `Urban mean: ${avgInlandF.toFixed(0)}°F — coastal ASOS temp unavailable for comparison.`;
   }
 
   let summary, summaryCol;
@@ -390,14 +472,8 @@ function renderInterpCard() {
       <div style="font-size:13px;font-weight:600;color:${summaryCol};line-height:1.55;margin-bottom:12px">${summary}</div>
       <div style="font-size:11px;color:var(--dim);line-height:1.65;margin-bottom:5px">Station consistency: <strong style="color:${consistencyCol}">${consistency}</strong></div>
       <div style="font-size:11px;color:var(--dim);line-height:1.65;margin-bottom:5px">${gradNote}</div>
-      <div style="font-size:11px;color:var(--dim);line-height:1.65">
-        Mean direction: <strong style="color:var(--blue)">${meanDir != null ? cardinal(meanDir)+' '+meanDir.toFixed(0)+'°' : '—'}</strong>
-        &nbsp;·&nbsp;
-        Mean speed: <strong style="color:var(--green)">${meanSpd.toFixed(1)} kt</strong>
-        &nbsp;·&nbsp;
-        <span style="color:var(--fnt)">${allWind.length} of ${STATIONS.length} stations reporting</span>
-      </div>
-      <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:10px;line-height:1.6">Interpretive — a single station does not prove harbor-wide flow. Avoid strong conclusions unless multiple stations agree. Not a forecast.</div>
+      ${tempNote ? `<div style="font-size:11px;color:var(--dim);line-height:1.65;margin-bottom:5px">${tempNote}</div>` : ''}
+      <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:10px;line-height:1.6">${allWind.length} of ${STATIONS.length} stations reporting wind. Interpretive — a single station does not prove harbor-wide flow. Avoid strong conclusions unless multiple stations agree. Not a forecast.</div>
     </div>`;
 }
 
