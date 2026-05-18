@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#080e18">
-<title>Wind Tactics — NYC Harbor</title>
+<title>Wind Context — NYC Harbor</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
 <style>
 :root{--bg:#080e18;--card:#131f2e;--card2:#0c1520;--bdr:#1a2d42;--bdr2:#2a4060;--txt:#f0f4f8;--dim:#c4d0de;--mut:#8fa3b8;--fnt:#6b8299;--accent:#4fd1c5;--blue:#63b3ed;--orange:#ed8936;--green:#48bb78;--red:#f56565;--yellow:#ecc94b;--purple:#9f7aea;--mono:'SF Mono','Cascadia Code','JetBrains Mono','Fira Code',monospace}
@@ -48,6 +48,7 @@ canvas{display:block;border-radius:6px}
 .interp-text{font-size:12px;color:var(--dim);line-height:1.55;margin-top:8px}
 .diff-row{display:flex;gap:16px;font-size:10px;color:var(--mut);margin-bottom:8px}
 .footer{text-align:center;padding:14px 0;font-size:10px;color:var(--fnt);border-top:1px solid var(--bdr);margin-top:6px}
+.sec-lbl{font-size:9px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:10px 2px 4px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -56,7 +57,7 @@ canvas{display:block;border-radius:6px}
   <div class="hdr-row">
     <div>
       <div class="hdr-label">⛵ NYC Harbor · Robbins Reef</div>
-      <div class="hdr-title">Wind Tactics</div>
+      <div class="hdr-title">Wind Context</div>
       <div class="hdr-meta" id="hdr-updated">Loading…</div>
     </div>
   </div>
@@ -71,11 +72,34 @@ canvas{display:block;border-radius:6px}
 
 <div class="cnt">
 
-  <!-- CARD 1: EVENING 12H WIND HISTORY -->
+  <!-- OBSERVED NOW -->
+  <div class="sec-lbl">Observed Now</div>
+  <div class="card" style="margin-bottom:8px">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:12px 14px 8px">
+      <div style="text-align:center">
+        <div class="stat-label">Direction</div>
+        <div class="stat-val" style="color:var(--blue)" id="obs-dir">—</div>
+      </div>
+      <div style="text-align:center">
+        <div class="stat-label">Speed</div>
+        <div class="stat-val" id="obs-spd">—</div>
+      </div>
+      <div style="text-align:center">
+        <div class="stat-label">Gusts</div>
+        <div class="stat-val" id="obs-gst">—</div>
+      </div>
+    </div>
+    <div style="font-size:9px;color:var(--fnt);text-align:center;padding:0 14px 10px" id="obs-meta">Robbins Reef · NOAA 6-min avg</div>
+  </div>
+
+  <div class="sec-lbl">Recent Behavior</div>
+
+  <!-- CARD 1: 12H WIND HISTORY -->
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--green),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)">
-      <div class="card-t">📈 Wind History — Last 12 Hours</div>
+      <div class="card-t">📈 12h Wind History</div>
       <span class="caret">▼</span>
     </div>
     <div class="card-body">
@@ -96,6 +120,7 @@ canvas{display:block;border-radius:6px}
         </div>
       </div>
       <div class="chart-meta">Top = NOW · Bottom = 12h ago · <span style="color:#ecc94b;opacity:.6">┈</span> rolling avg · <span style="color:#ed893660">━</span> gusts</div>
+      <div style="font-size:9px;color:var(--fnt);margin-top:5px;line-height:1.6">Left panel: wind direction (°, unwrapped — values outside 0–360° indicate the trace crossed north). Right panel: speed and gusts. Shaded band = 5-pt rolling average.</div>
       <div style="font-size:10px;color:var(--fnt);text-align:right;margin-top:4px" id="ev-time"></div>
       <div id="card1-err"></div>
     </div>
@@ -105,7 +130,7 @@ canvas{display:block;border-radius:6px}
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)">
-      <div class="card-t">📊 Shift Analysis — Last 12 Hours</div>
+      <div class="card-t">📊 Shift Analysis</div>
       <span class="caret">▼</span>
     </div>
     <div class="card-body" id="card2-body">
@@ -113,11 +138,13 @@ canvas{display:block;border-radius:6px}
     </div>
   </div>
 
-  <!-- CARD 3: GRADIENT vs THERMAL -->
+  <div class="sec-lbl">Background Context</div>
+
+  <!-- CARD 3: GRADIENT vs SURFACE -->
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)">
-      <div class="card-t">🌬️ Gradient vs. Thermal Context</div>
+      <div class="card-t">🌬️ Gradient vs. Surface</div>
       <span class="caret">▼</span>
     </div>
     <div class="card-body" id="card3-body">
@@ -125,7 +152,7 @@ canvas{display:block;border-radius:6px}
     </div>
   </div>
 
-  <div class="footer">Wind: NOAA Robbins Reef (8530973) · Gradient: Open-Meteo 850 hPa<br>For racing reference only — not for navigation · Wind refreshes every 10 min</div>
+  <div class="footer">Wind: NOAA Robbins Reef (8530973) · Gradient: Open-Meteo 850 hPa<br>Heuristic reference only — not a forecast, not for navigation · Thresholds are local rules of thumb · Refreshes every 10 min</div>
 </div>
 
 <script>
@@ -345,20 +372,20 @@ function analyzeWind(data, gradDir, gradSpd) {
   }
   let regime,interpretation;
   if(gradDirDiff!=null&&gradDirDiff<=20&&speedRatio>0.6){
-    regime='Gradient-Dominated';
-    interpretation='Sail the lifted tack — percentage sailing applies. Shifts track pressure systems, not local thermal effects.';
+    regime='Likely Gradient-Driven';
+    interpretation='Conditions suggest sailing the lifted tack — percentage sailing may apply. Shifts likely tracking synoptic pressure patterns rather than local thermal effects.';
   } else if(speedSlope<-0.1&&dirVarIncreasing&&dirStd>10){
-    regime='Dying Thermal';
-    interpretation='Favor the inside of shifts, expect holes near shore. Speed declining — gradient may reassert after thermal dies.';
+    regime='Possible Dying Thermal';
+    interpretation='Consider favoring the inside of shifts; holes near shore are possible. Speed declining — gradient influence may reassert as thermal weakens.';
   } else if(totalTrend>30){
-    regime='Persistent Shift';
-    interpretation=dirSlope>0?'Hold the lifted tack, do not tack on shifts. Direction trending right (clocking).':'Hold the lifted tack, do not chase shifts. Direction trending left (backing).';
+    regime='Possible Persistent Shift';
+    interpretation=dirSlope>0?'Recent shifts look persistent rather than oscillatory — consider holding the lifted tack. Direction trending right (clocking).':'Recent shifts look persistent rather than oscillatory — consider holding the lifted tack. Direction trending left (backing).';
   } else if(dirStd>10){
-    regime='Oscillating';
-    interpretation='Tack on headers, sail the lifts. Track the mean direction to stay in phase.';
+    regime='Oscillating Pattern';
+    interpretation='Conditions consistent with oscillating shifts — consider tacking on headers, sailing lifts. Track the mean direction to stay in phase.';
   } else {
     regime='Light & Variable';
-    interpretation='Conserve position — puffs may be random. Gradient not establishing at the surface.';
+    interpretation='Conserve position — puffs may be random. Gradient not clearly establishing at the surface.';
   }
   const period=oscillationPeriod(dirs,meanDir);
   const lifts=liftFrequency(dirs,meanDir);
@@ -397,6 +424,12 @@ function renderEveningCharts() {
   $('ev-dir').textContent=cardinal(last.dir)+' '+last.dir.toFixed(0)+'°';
   $('ev-spd').textContent=last.speed.toFixed(1)+' kt  G'+last.gusts.toFixed(1);
   $('ev-time').textContent='NOAA 6-min · Latest: '+fmtT(last.time);
+  $('obs-dir').textContent=cardinal(last.dir)+' '+last.dir.toFixed(0)+'°';
+  $('obs-spd').textContent=last.speed.toFixed(1)+' kt';
+  $('obs-spd').style.color=wCSS(last.speed);
+  $('obs-gst').textContent=last.gusts.toFixed(1)+' kt';
+  $('obs-gst').style.color=wCSS(last.gusts);
+  $('obs-meta').textContent='Robbins Reef · Latest '+fmtT(last.time)+' · NOAA 6-min avg';
   drawTacticsV($('cvDir'),windEvening,{key:'dir',unwrap:true,color:'#63b3ed',fill:'rgba(99,179,237,.12)',minM:5});
   drawTacticsV($('cvSpd'),windEvening,{key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2});
 }
@@ -409,13 +442,14 @@ function renderShiftCard(data, gData, bodyId) {
   const a=analyzeWind(data,gradDir,gradSpd);
   if(!a){el.innerHTML='<div class="state-box">Insufficient data (n < 10)</div>';return;}
   const rColor=a.r>0.4?'var(--green)':a.r<-0.4?'var(--red)':Math.abs(a.r)>0.2?'var(--yellow)':'var(--mut)';
-  const regColors={'Gradient-Dominated':'var(--blue)','Dying Thermal':'var(--orange)','Persistent Shift':'var(--purple)','Oscillating':'var(--accent)','Light & Variable':'var(--fnt)'};
+  const regColors={'Likely Gradient-Driven':'var(--blue)','Possible Dying Thermal':'var(--orange)','Possible Persistent Shift':'var(--purple)','Oscillating Pattern':'var(--accent)','Light & Variable':'var(--fnt)'};
   const regColor=regColors[a.regime]||'var(--mut)';
   const rCtx=a.r>0.4?'Lifts arrive with puffs':a.r<-0.4?'Headers arrive with puffs':Math.abs(a.r)<0.2?'Speed and shift uncorrelated — gradient-dominated or dying':'Weak speed-shift correlation';
   const sigNote=!a.significant?` <span style="color:var(--orange)">· Below significance threshold (|r| &lt; 0.18, n=${a.n})</span>`:'';
   el.innerHTML=`
     <div class="regime-badge" style="background:${regColor}18;border-color:${regColor};color:${regColor}">${a.regime}</div>
-    <div style="font-size:13px;font-weight:600;color:var(--txt);line-height:1.5;margin:6px 0 10px">${a.interpretation}</div>
+    <div style="font-size:13px;font-weight:600;color:var(--txt);line-height:1.5;margin:6px 0 6px">${a.interpretation}</div>
+    <div style="font-size:10px;color:var(--fnt);font-style:italic;margin-bottom:10px;line-height:1.5">Heuristic — single sensor, 6-min data. Use as a decision aid, not a forecast.</div>
     <div class="r-meta">r = ${a.r.toFixed(2)} · ${rCtx}${sigNote}</div>
     <div class="stat-grid">
       <div class="stat-box"><div class="stat-label">Mean Direction</div><div class="stat-val">${a.meanDir.toFixed(0)}° ${cardinal(a.meanDir)}</div></div>
@@ -451,24 +485,26 @@ function renderContextCard(windData, gData) {
   const dirStdAll=circularStd(windData.map(d=>d.dir));
   let regime,regColor,interp;
   if(dirDiff<=20&&ratio>0.6){
-    regime='Gradient-Dominated';regColor='var(--blue)';
-    interp='Sail the lifted tack — shifts track pressure systems. Percentage sailing applies.';
+    regime='Likely Gradient-Driven';regColor='var(--blue)';
+    interp='Aloft flow appears materially stronger than the surface layer — shifts may track synoptic pressure patterns. Percentage sailing may apply.';
   } else if(dirDiff>40&&last30slope<-0.1&&dirStdAll>10){
-    regime='Dying Thermal';regColor='var(--orange)';
-    interp='Favor inside of shifts, expect holes near shore. Gradient may reassert after thermal dies.';
+    regime='Possible Dying Thermal';regColor='var(--orange)';
+    interp='Surface layer appears decoupled from aloft flow; speed declining. Local thermal may be weakening — gradient influence possible as thermal dies.';
   } else if(dirDiff>40&&ratio>=0.4){
-    regime='Thermal Active';regColor='var(--yellow)';
-    interp='Sea breeze holding — direction clocking predictably. Speed builds then dies at sunset.';
+    regime='Thermal Likely Active';regColor='var(--yellow)';
+    interp='Local thermal/sea-breeze effects likely shaping the surface wind. Direction clocking pattern consistent with sea breeze — speed may build then ease at sunset.';
   } else if(ratio<0.4){
-    regime='Thermal Suppressed';regColor='var(--mut)';
-    interp='Conditions likely light and variable. Gradient not reaching the surface.';
+    regime='Gradient Likely Weak at Surface';regColor='var(--mut)';
+    interp='Conditions may be light and variable. Aloft flow does not appear to be reaching the surface strongly.';
   } else {
-    regime='Transitional';regColor='var(--dim)';
-    interp='Monitor for regime shift. Surface and gradient partially coupled.';
+    regime='Mixed / Transitional';regColor='var(--dim)';
+    interp='Surface and aloft flows partially coupled — monitor for regime shift.';
   }
   const gradTs=grad.time?fmtT(grad.time):'';
   const dColor=dirDiff>40?'var(--yellow)':dirDiff>20?'var(--accent)':'var(--green)';
   const rColor=ratio<0.4?'var(--orange)':ratio>0.6?'var(--green)':'var(--yellow)';
+  const diffRange=dirDiff<20?'low decoupling':dirDiff<40?'moderate decoupling':'high decoupling';
+  const ratioRange=ratio>0.6?'strong coupling':ratio>0.4?'moderate coupling':'weak coupling';
   el.innerHTML=`
     <div class="regime-badge" style="background:${regColor}18;border-color:${regColor};color:${regColor}">${regime}</div>
     <div style="font-size:13px;font-weight:600;color:var(--txt);line-height:1.5;margin:6px 0 12px">${interp}</div>
@@ -495,10 +531,11 @@ function renderContextCard(windData, gData) {
       </div>
     </div>
     <div class="diff-row" style="align-items:flex-start;flex-direction:column;gap:4px">
-      <span style="font-size:11px">Direction differential: <strong style="color:${dColor}">${dirDiff.toFixed(0)}°</strong> <span style="color:var(--fnt);font-size:10px">— surface vs. gradient. &gt;40° = thermal in control.</span></span>
-      <span style="font-size:11px">Speed ratio: <strong style="color:${rColor}">${(ratio*100).toFixed(0)}%</strong> <span style="color:var(--fnt);font-size:10px">— Robbins Reef ÷ gradient. Below 40% = gradient not reaching surface. J/80 mast ratio: ${(mastRatio*100).toFixed(0)}%.</span></span>
+      <span style="font-size:11px">Dir differential: <strong style="color:${dColor}">${dirDiff.toFixed(0)}°</strong> <span style="color:var(--fnt);font-size:10px">surface vs. aloft · ${diffRange} (rule of thumb: &lt;20° low, 20–40° moderate, &gt;40° high)</span></span>
+      <span style="font-size:11px">Speed ratio: <strong style="color:${rColor}">${(ratio*100).toFixed(0)}%</strong> <span style="color:var(--fnt);font-size:10px">Robbins Reef ÷ aloft · ${ratioRange} (rule of thumb: &gt;60% strong, &lt;40% weak) · J/80 mast: ${(mastRatio*100).toFixed(0)}%</span></span>
     </div>
-    <div style="font-size:9px;color:var(--fnt);margin-top:8px;line-height:1.5">Mast estimates: power law α=0.11 from 54 ft sensor · Open-Meteo HRRR 850 hPa ${gradTs}</div>`;
+    <div style="font-size:9px;color:var(--fnt);margin-top:8px;line-height:1.5">Mast estimates: power law α=0.11 from 54 ft sensor · Open-Meteo 850 hPa ${gradTs}</div>
+    <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:4px;line-height:1.5">Interpretive view — single aloft reference, one surface sensor. Use as sailing context, not a verdict.</div>`;
 }
 
 // ── MAIN LOADER ───────────────────────────────────────────────
