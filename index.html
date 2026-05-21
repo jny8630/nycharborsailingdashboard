@@ -592,6 +592,7 @@ window.addEventListener('resize',()=>{if(window._wh)renderWind(window._wh);if(wi
 const _fw=fetchWindHistory;fetchWindHistory=async()=>{const d=await _fw();window._wh=d;return d};
 const _fp=fetchPressure;fetchPressure=async()=>{const d=await _fp();window._pr=d;return d};
 loadAlerts();loadAll();setInterval(loadAll,600000);setInterval(loadAlerts,600000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){loadAlerts();loadAll();}});
 </script>
 </body>
 </html>
