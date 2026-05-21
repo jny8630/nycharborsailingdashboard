@@ -77,6 +77,14 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .leaflet-control-attribution a{color:var(--accent)!important}
 
 @media(max-width:360px){.wx-hdr,.wx-row{grid-template-columns:44px 54px 1fr 32px 32px 46px;font-size:11px}}
+.alert-banner{border-radius:10px;padding:11px 14px;margin-bottom:10px;border-left:4px solid}
+.alert-warning{background:rgba(245,101,101,.1);border-color:var(--red)}
+.alert-watch{background:rgba(237,137,54,.1);border-color:var(--orange)}
+.alert-advisory{background:rgba(236,201,75,.08);border-color:var(--yellow)}
+.alert-event{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.alert-hl{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.5}
+.alert-exp{font-size:10px;color:var(--fnt);margin-top:3px}
+.marine-watchline{padding:8px 12px;background:rgba(237,137,54,.1);border:1px solid rgba(237,137,54,.3);border-radius:6px;font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;text-transform:uppercase;letter-spacing:.02em}
 </style>
 </head>
 <body>
@@ -93,6 +101,8 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 </div>
 
 <div class="cnt">
+
+  <div id="alert-banner"></div>
 
   <!-- CARD 1: OPEN-METEO HOURLY FORECAST -->
   <div class="card">
@@ -346,7 +356,18 @@ async function loadMarineForecast() {
     if (!sectionMatch) throw new Error('ANZ338 not found in CWF');
     const section = sectionMatch[0];
 
-    // Step 4: parse forecast periods
+    // Step 4: extract watch/warning/advisory headlines (appear before first .PERIOD block)
+    const firstPeriodIdx = section.search(/\n\.[A-Z]/);
+    const preamble = firstPeriodIdx > 0 ? section.slice(0, firstPeriodIdx) : '';
+    const watchLines = [];
+    const wRe = /\.\.\.(.*?)\.\.\./g;
+    let wm;
+    while ((wm = wRe.exec(preamble)) !== null) {
+      const line = wm[1].trim();
+      if (line.length > 10) watchLines.push(line);
+    }
+
+    // Step 5: parse forecast periods
     const periods = [];
     const re = /\n\.([A-Z][A-Z ]+)\.\.\.([\s\S]*?)(?=\n\.[A-Z]|\n\nWinds|\n\$\$|$)/g;
     let m;
@@ -361,7 +382,7 @@ async function loadMarineForecast() {
     const note = noteMatch ? noteMatch[1].replace(/\n/g, ' ').trim() : null;
 
     if (periods.length === 0) throw new Error('No periods parsed');
-    marineData = {periods, note};
+    marineData = {periods, note, watchLines};
     $('marine-updated').textContent = fmtIssuance(issued);
     renderMarineForecast();
   } catch(e) {
@@ -391,7 +412,7 @@ function titlePeriod(name) {
 
 function renderMarineForecast() {
   if (!marineData) return;
-  const {periods, note} = marineData;
+  const {periods, note, watchLines} = marineData;
 
   // Split today+tomorrow vs extended.
   // Count distinct daytime periods (not OVERNIGHT/TONIGHT/x NIGHT).
@@ -419,7 +440,10 @@ function renderMarineForecast() {
   const nearPeriods = periods.slice(0, splitIdx);
   const extPeriods  = periods.slice(splitIdx);
 
-  let nearHtml = buildRows(nearPeriods);
+  const watchHtml = (watchLines || []).map(w =>
+    `<div class="marine-watchline">⚠ ${w}</div>`
+  ).join('');
+  let nearHtml = watchHtml + buildRows(nearPeriods);
   if (note) nearHtml += `<div class="marine-note">${note}</div>`;
   nearHtml += `<div class="marine-meta">Source: NWS OKX · New York Harbor (ANZ338) · Issued twice daily</div>`;
   $('marine-near-body').innerHTML = nearHtml;
@@ -529,12 +553,48 @@ function toggleRadar() {
   $('radar-play').textContent = radarPlaying ? '⏸' : '▶';
 }
 
+// ── ALERTS ───────────────────────────────────────────────────────────────────
+
+async function loadAlerts() {
+  try {
+    const r = await fetch('https://api.weather.gov/alerts/active?zone=ANZ338',
+      {headers:{'User-Agent':'(NYC Harbor Sailing Dashboard, jens.nachtigal@gmail.com)','Accept':'application/geo+json'}});
+    if (!r.ok) return;
+    const d = await r.json();
+    const now = new Date();
+    const alerts = (d.features || []).filter(a => {
+      const exp = a.properties?.expires;
+      return !exp || new Date(exp) > now;
+    });
+    const el = $('alert-banner');
+    if (!alerts.length) { el.innerHTML = ''; return; }
+    el.innerHTML = alerts.map(a => {
+      const p = a.properties;
+      const evt = p.event || 'Weather Alert';
+      const hl = p.headline || '';
+      const exp = p.expires ? 'Until ' + fmtAlertTime(p.expires) : '';
+      const evtLC = evt.toLowerCase();
+      const cls = evtLC.includes('warning') ? 'alert-warning' : evtLC.includes('watch') ? 'alert-watch' : 'alert-advisory';
+      const col = evtLC.includes('warning') ? 'var(--red)' : evtLC.includes('watch') ? 'var(--orange)' : 'var(--yellow)';
+      return `<div class="alert-banner ${cls}"><div class="alert-event" style="color:${col}">⚠ ${evt}</div>${hl?`<div class="alert-hl">${hl}</div>`:''}${exp?`<div class="alert-exp">${exp}</div>`:''}</div>`;
+    }).join('');
+  } catch(e) { console.warn('Alerts:', e); }
+}
+
+function fmtAlertTime(iso) {
+  try {
+    return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/New_York'}) + ' ET';
+  } catch(_) { return ''; }
+}
+
 // ── INIT ─────────────────────────────────────────────────────────────────────
 
+loadAlerts();
 loadForecast();
 loadMarineForecast();
 loadRadar();
 
+setInterval(loadAlerts,        10 * 60 * 1000);   // 10 min
 setInterval(loadForecast,      30 * 60 * 1000);   // 30 min
 setInterval(loadMarineForecast, 60 * 60 * 1000);  // 60 min
 setInterval(loadRadar,          10 * 60 * 1000);  // 10 min
