@@ -102,8 +102,6 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 
 <div class="cnt">
 
-  <div id="alert-banner"></div>
-
   <!-- CARD 1: OPEN-METEO HOURLY FORECAST -->
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
@@ -122,6 +120,8 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
       </div>
     </div>
   </div>
+
+  <div id="alert-banner"></div>
 
   <!-- CARD 2: NWS MARINE — TODAY & TOMORROW -->
   <div class="card">
@@ -576,7 +576,8 @@ async function loadAlerts() {
       const evtLC = evt.toLowerCase();
       const cls = evtLC.includes('warning') ? 'alert-warning' : evtLC.includes('watch') ? 'alert-watch' : 'alert-advisory';
       const col = evtLC.includes('warning') ? 'var(--red)' : evtLC.includes('watch') ? 'var(--orange)' : 'var(--yellow)';
-      return `<div class="alert-banner ${cls}"><div class="alert-event" style="color:${col}">⚠ ${evt}</div>${hl?`<div class="alert-hl">${hl}</div>`:''}${exp?`<div class="alert-exp">${exp}</div>`:''}</div>`;
+      const alertUrl = 'https://forecast.weather.gov/MapClick.php?x=258&y=69&site=phi&zmx=1&zmy=1&map_x=257.5&map_y=69.13333129882812';
+      return `<a href="${alertUrl}" target="_blank" rel="noopener" style="display:block;text-decoration:none"><div class="alert-banner ${cls}"><div class="alert-event" style="color:${col}">⚠ ${evt} ↗</div>${hl?`<div class="alert-hl">${hl}</div>`:''}${exp?`<div class="alert-exp">${exp}</div>`:''}</div></a>`;
     }).join('');
   } catch(e) { console.warn('Alerts:', e); }
 }
