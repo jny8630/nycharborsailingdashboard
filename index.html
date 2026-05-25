@@ -21,7 +21,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600;font-family:inherit}
 .btn:active{opacity:.7}
 .cnt{padding:10px 10px 30px}
-.glance{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.glance{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
 .gl{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--bdr);border-radius:12px;padding:12px 8px;text-align:center}
 .gl-l{font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.1em}
 .gl-v{font-size:26px;font-weight:800;font-family:var(--mono);margin-top:2px}
@@ -69,10 +69,6 @@ canvas{display:block;border-radius:8px}
 .chart-title{font-size:10px;color:var(--mut);font-weight:600;letter-spacing:.06em;margin-bottom:6px}
 .chart-legend{display:flex;gap:14px;justify-content:center;margin-top:5px;font-size:10px;color:var(--mut)}
 .hidden{display:none}
-.baro-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
-.baro-stat{background:var(--card2);border:1px solid var(--bdr);border-radius:8px;padding:10px;text-align:center}
-.baro-val{font-size:18px;font-weight:800;font-family:var(--mono)}
-.baro-lbl{font-size:9px;color:var(--mut);margin-top:2px;font-weight:600}
 .sunset-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(12,21,32,.5);border:1px solid var(--bdr);border-radius:10px;margin-top:8px}
 @media(max-width:360px){.fc-hdr,.fc-row{grid-template-columns:48px 46px 38px 30px 30px 40px 32px;font-size:11px}}
 .alert-banner{border-radius:10px;padding:11px 14px;margin-bottom:10px;border-left:4px solid}
@@ -94,14 +90,14 @@ canvas{display:block;border-radius:8px}
       <div class="hdr-meta" id="meta" style="text-align:right">Loading…</div>
     </div>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
-    <a href="weather.html" class="btn" style="flex:1;min-width:0;text-align:center;text-decoration:none">Weather</a>
-    <a href="wind-tactics.html" class="btn" style="flex:1;min-width:0;text-align:center;text-decoration:none">Wind Context</a>
-    <a href="harbor-context.html" class="btn" style="flex:1;min-width:0;text-align:center;text-decoration:none">Pressure</a>
-    <a href="nyhops.html" class="btn" style="flex:1;min-width:0;text-align:center;text-decoration:none">Currents</a>
-    <a href="nyhops-overlay.html" class="btn" style="flex:1;min-width:0;text-align:center;text-decoration:none">Chart</a>
-    <a href="lnm.html" class="btn" style="flex:1;min-width:0;text-align:center;text-decoration:none">LNM</a>
-    <a href="feedback.html" class="btn" style="flex:1;min-width:0;text-align:center;text-decoration:none">Feedback</a>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">
+    <a href="weather.html" class="btn" style="text-align:center;text-decoration:none">Weather</a>
+    <a href="wind-tactics.html" class="btn" style="text-align:center;text-decoration:none">Wind</a>
+    <a href="harbor-context.html" class="btn" style="text-align:center;text-decoration:none">Pressure</a>
+    <a href="nyhops.html" class="btn" style="text-align:center;text-decoration:none">Currents</a>
+    <a href="nyhops-overlay.html" class="btn" style="text-align:center;text-decoration:none">Chart</a>
+    <a href="lnm.html" class="btn" style="text-align:center;text-decoration:none">LNM</a>
+    <a href="feedback.html" class="btn" style="text-align:center;text-decoration:none">Feedback</a>
   </div>
 </div>
 
@@ -109,7 +105,7 @@ canvas{display:block;border-radius:8px}
   <div class="glance">
     <div class="gl"><div class="gl-l">WIND</div><div class="gl-v" id="gw" style="color:var(--green)">—</div><div class="gl-s" id="gwd"></div></div>
     <div class="gl"><div class="gl-l">TEMP</div><div class="gl-v" id="gt">—</div><div class="gl-s" id="gts"></div></div>
-    <div class="gl" style="grid-column:1/-1"><div class="gl-l">TIDE</div><div id="gtd" style="font-size:13px;font-weight:800;color:var(--blue);margin-top:4px">—</div><div class="gl-s" id="gtn"></div></div>
+    <div class="gl"><div class="gl-l">TIDE</div><div id="gtd" style="font-size:13px;font-weight:800;color:var(--blue);margin-top:4px">—</div><div class="gl-s" id="gtn"></div></div>
   </div>
 
   <div id="alert-banner"></div>
@@ -171,12 +167,14 @@ canvas{display:block;border-radius:8px}
   <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,#78909c,transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>🔵</span> Barometric Pressure</div><span class="caret">▼</span></div>
     <div class="card-body">
-      <div style="font-size:22px;font-weight:800;font-family:var(--mono);margin-bottom:4px" id="baro-now">—</div>
-      <div style="font-size:11px;color:var(--mut);margin-bottom:10px" id="baro-sub">Loading…</div>
-      <div class="baro-stats">
-        <div class="baro-stat"><div class="baro-val" id="baro-3h">—</div><div class="baro-lbl">3-HOUR CHANGE</div></div>
-        <div class="baro-stat"><div class="baro-val" id="baro-6h">—</div><div class="baro-lbl">6-HOUR CHANGE</div></div>
-        <div class="baro-stat"><div class="baro-val" style="color:var(--mut)">1015</div><div class="baro-lbl">NYC AVG (mbar)</div></div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px">
+        <div style="font-size:22px;font-weight:800;font-family:var(--mono)" id="baro-now">—</div>
+        <div style="font-size:10px;color:var(--fnt)">avg 1015</div>
+      </div>
+      <div style="font-size:11px;color:var(--mut);margin-bottom:8px" id="baro-sub">Loading…</div>
+      <div style="display:flex;gap:16px;font-size:11px;color:var(--mut);margin-bottom:10px">
+        <span><span style="font-size:9px;color:var(--fnt);letter-spacing:.06em">3H </span><span id="baro-3h">—</span></span>
+        <span><span style="font-size:9px;color:var(--fnt);letter-spacing:.06em">6H </span><span id="baro-6h">—</span></span>
       </div>
       <div class="chart-wrap" style="margin-top:0">
         <div class="chart-title">PRESSURE — LAST 6 HOURS (mbar)</div>
@@ -296,7 +294,7 @@ async function loadAlerts() {
       const evtLC = evt.toLowerCase();
       const cls = evtLC.includes('warning') ? 'alert-warning' : evtLC.includes('watch') ? 'alert-watch' : 'alert-advisory';
       const col = evtLC.includes('warning') ? 'var(--red)' : evtLC.includes('watch') ? 'var(--orange)' : 'var(--yellow)';
-      const alertUrl = p.web || 'https://forecast.weather.gov/MapClick.php?x=258&y=69&site=phi&zmx=1&zmy=1&map_x=257.5&map_y=69.13333129882812';
+      const alertUrl = 'https://forecast.weather.gov/MapClick.php?x=258&y=69&site=phi&zmx=1&zmy=1&map_x=257.5&map_y=69.13333129882812';
       return `<a href="${alertUrl}" target="_blank" rel="noopener" style="display:block;text-decoration:none"><div class="alert-banner ${cls}"><div class="alert-event" style="color:${col}">⚠ ${evt} ↗</div>${hl?`<div class="alert-hl">${hl}</div>`:''}${exp?`<div class="alert-exp">${exp}</div>`:''}</div></a>`;
     }).join('');
   } catch(e) { console.warn('Alerts:', e); }
