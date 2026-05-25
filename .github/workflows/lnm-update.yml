@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.4.0
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -27,8 +27,6 @@ jobs:
 
       - name: Fetch and extract LNM
         run: python3 scripts/fetch_lnm.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
 
       - name: Commit updated JSON if changed
         run: |
