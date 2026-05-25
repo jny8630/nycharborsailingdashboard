@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write            # needed to commit lnm_current.json back to repo
+  models: read               # needed to call GitHub Models API
 
 jobs:
   update-lnm:
