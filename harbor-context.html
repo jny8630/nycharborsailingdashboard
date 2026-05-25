@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#080e18">
-<title>Harbor Context — NYC Harbor</title>
+<title>Pressure — NYC Harbor</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
@@ -37,6 +37,17 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .stn-note{font-size:9px;color:var(--fnt);margin-left:6px}
 .stn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
 .stn-cell{text-align:center}
+/* Synoptic image zoom modal */
+.zoom-wrap{position:relative;cursor:zoom-in}
+.zoom-hint{position:absolute;bottom:6px;right:8px;font-size:9px;color:rgba(255,255,255,.55);pointer-events:none;background:rgba(0,0,0,.4);border-radius:4px;padding:2px 5px}
+.zoom-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;flex-direction:column;touch-action:none}
+.zoom-modal.open{display:flex}
+.zoom-img-wrap{overflow:hidden;width:100vw;height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center}
+.zoom-img-wrap img{max-width:none;transform-origin:var(--zo-x,50%) var(--zo-y,50%);transition:transform .25s ease;will-change:transform;display:block}
+.zoom-controls{height:56px;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0;padding:0 16px;width:100%}
+.zoom-ctrl{background:#1a2d42;border:1px solid #2a4060;border-radius:8px;color:#4fd1c5;font-size:14px;font-weight:700;padding:8px 18px;cursor:pointer;font-family:inherit}
+.zoom-ctrl:active{opacity:.7}
+.zoom-close{background:rgba(245,101,101,.15);border-color:rgba(245,101,101,.4);color:#f56565}
 /* Leaflet dark theme */
 .leaflet-container{background:#080e18!important}
 .leaflet-control-zoom a{background:#131f2e!important;color:var(--accent)!important;border-color:var(--bdr)!important}
@@ -53,7 +64,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
   <div class="hdr-row">
     <div>
       <div class="hdr-label">⛵ NYC Harbor · Multi-Station</div>
-      <div class="hdr-title">Harbor Context</div>
+      <div class="hdr-title">Pressure</div>
       <div class="hdr-meta" id="hdr-updated">Loading…</div>
     </div>
   </div>
@@ -94,9 +105,15 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
     <div style="padding:8px 8px 0">
       <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Northeast</div>
-      <img id="wpc-chart-ne" style="width:100%;border-radius:8px;display:block" alt="NWS WPC Northeast Surface Analysis">
+      <div class="zoom-wrap" onclick="openZoom('ne')">
+        <img id="wpc-chart-ne" style="width:100%;border-radius:8px;display:block" alt="NWS WPC Northeast Surface Analysis">
+        <span class="zoom-hint">tap to zoom</span>
+      </div>
       <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:10px 0 4px">CONUS</div>
-      <img id="wpc-chart-conus" style="width:100%;border-radius:8px;display:block" alt="NWS WPC CONUS Surface Analysis">
+      <div class="zoom-wrap" onclick="openZoom('conus')">
+        <img id="wpc-chart-conus" style="width:100%;border-radius:8px;display:block" alt="NWS WPC CONUS Surface Analysis">
+        <span class="zoom-hint">tap to zoom</span>
+      </div>
     </div>
     <div class="chart-meta" style="padding:6px 10px 10px">NWS Weather Prediction Center · Surface Analysis · Updated every 3 hrs · <a href="https://www.wpc.ncep.noaa.gov/html/sfc2.shtml" target="_blank" style="color:var(--accent)">wpc.ncep.noaa.gov</a></div>
   </div>
@@ -110,6 +127,18 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
   <div class="footer">
     CO-OPS: Sandy Hook · Robbins Reef · The Battery &nbsp;·&nbsp; ASOS: JFK · LaGuardia · Newark · Central Park<br>
     Heuristic reference only — not a forecast, not for navigation · Refreshes every 10 min
+  </div>
+</div>
+
+<!-- Synoptic zoom modal -->
+<div class="zoom-modal" id="zoom-modal" onclick="handleModalTap(event)">
+  <div class="zoom-img-wrap" id="zoom-img-wrap">
+    <img id="zoom-modal-img" src="" alt="">
+  </div>
+  <div class="zoom-controls">
+    <button class="zoom-ctrl" onclick="event.stopPropagation();zoomStep(-1)">− Out</button>
+    <button class="zoom-ctrl" onclick="event.stopPropagation();zoomStep(1)">+ In</button>
+    <button class="zoom-ctrl zoom-close" onclick="event.stopPropagation();closeZoom()">✕ Close</button>
   </div>
 </div>
 
@@ -531,6 +560,48 @@ async function refreshAll() {
 
 loadAll();
 setInterval(refreshAll, 10 * 60 * 1000);
+
+// ── Synoptic zoom ──────────────────────────────────────────────────────────────
+// NY region transform-origins (x% y%): NE chart NY ~38% 28%, CONUS NY ~72% 22%
+const ZOOM_CFG = {
+  ne:    { x: '38%', y: '28%' },
+  conus: { x: '72%', y: '22%' }
+};
+const ZOOM_LEVELS = [1, 1.9, 3.2];
+let zoomIdx = 0;
+let activeChart = null;
+
+function openZoom(chart) {
+  activeChart = chart;
+  zoomIdx = 0;
+  const src = $('wpc-chart-' + chart).src;
+  const img = document.getElementById('zoom-modal-img');
+  img.src = src;
+  const cfg = ZOOM_CFG[chart];
+  img.style.setProperty('--zo-x', cfg.x);
+  img.style.setProperty('--zo-y', cfg.y);
+  img.style.transform = 'scale(1)';
+  document.getElementById('zoom-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeZoom() {
+  document.getElementById('zoom-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  activeChart = null;
+}
+
+function zoomStep(dir) {
+  zoomIdx = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, zoomIdx + dir));
+  document.getElementById('zoom-modal-img').style.transform = 'scale(' + ZOOM_LEVELS[zoomIdx] + ')';
+}
+
+function handleModalTap(e) {
+  if (e.target === document.getElementById('zoom-modal') ||
+      e.target === document.getElementById('zoom-img-wrap')) {
+    closeZoom();
+  }
+}
 </script>
 </body>
 </html>

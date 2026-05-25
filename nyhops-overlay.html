@@ -209,7 +209,7 @@ async function init() {
   // Build time-slot buttons
   const slotsEl = document.getElementById('slots');
   const buttons = [];
-  [0,1,2,3,4].forEach(offset => {
+  [0,1,2,3,4,5].forEach(offset => {
     const frame = BASE_FRAME + currentHour + offset;
     const range = fmtRange(etDate, offset);
     const [line1, line2] = range.split('\n');
