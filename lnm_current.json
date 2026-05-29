@@ -1,17 +1,12 @@
 {
-  "week": 20,
+  "week": 21,
   "year": 2026,
-  "generated_utc": "2026-05-25T16:07:21Z",
-  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01202026.pdf",
+  "generated_utc": "2026-05-29T18:26:45Z",
+  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01212026.pdf",
   "model": "text-parser",
   "skipped": [
     {
       "week": 22,
-      "year": 2026,
-      "reason": "not_posted"
-    },
-    {
-      "week": 21,
       "year": 2026,
       "reason": "not_posted"
     }
@@ -19,38 +14,45 @@
   "notices": [
     {
       "chart": null,
-      "summary": "Main Channel - East River Main Bridges From May 1, 2026 \u2013 December 31, 2026, Monday-Friday, with occasional Saturdays and Sundays, between 8:00 a.m. and Lat::00 p.m., a biennial bridge inspection using a traveler and rigging will be conducted on the Manhattan Bridge, mile 1.1 in the East River, New York City. The safety boat Kylie Anne (CT8893BM) will be on scene during inspection operations.\u2026",
+      "summary": "Main Channel - East River Main Bridges Structural repairs to the Brooklyn Bridge, over the East River at mile 0.8, have commenced and will be ongoing through at Lat:. Active work will occur between 8:00 a.m. and 2:00 p.m., Monday through Friday. The traveler will reduce the vertical clearance of the bridge by 17 feet. During work hours the Lon:\ntraveler can move with 2 hours\u2019 notice for vessels\u2026",
       "status": "ACTIVE",
-      "since": "2026-05-21",
-      "location": "Main Channel - East River Main Bridges"
+      "since": "2026-05-11",
+      "location": "Main Channel - East River Main Bridges Structural repairs to"
     },
     {
       "chart": null,
-      "summary": "2026-04-27 To:&. Equipment on scene will be the NORTHSTAR VOYAGER, monitoring VHF-FM CH 13 & 16. The\nBridges) VOYAGER is approximately 65 feet wide. Channel widths are approximately 800 feet, which provides ample room for vessel\ntransits on either side, even when the VOYAGER is positioned near the center of the channel. Exact clearance will vary\ndepending on the vessel\u2019s position at the time.\u2026",
+      "summary": "2026-03-23 Lat:: 2028-11-04 Location: 40-42-34..388W Reicon will be conducting pile repair and rehabilitation operations.3N, 073-59-05.4W, from February 23, 2026, to November 3, 2028, Lon::00am to 2:00pm, local time. Equipment on scene will be a dive barge, monitoring VHF- -FM Ch 13 and is requesting mariners to minimize their wake, while operations are being conducted. : 2026-07-20 Lat::. The\u2026",
       "status": "ACTIVE",
-      "since": "2026-04-27",
+      "since": "2026-03-23",
       "location": "Main Channel - East River"
     },
     {
       "chart": null,
-      "summary": "2026-02-12 To: 2027-01-01 Location: 40-50-22..536W On February 16, 2026, Lat::00 am and 3:30 pm on weekdays, in-water bridge maintenance will be performed on the New Jersey Turnpike (117.6) IVO Piers three and six over Overpeck Creek, mile .68 in Ridgefield, Bergen County, New Jersey. This work will be completed in three non- Lon:\nconsecutive weeks. A 15 ft skip and a 60 ft X 160 ft platform will\u2026",
+      "summary": "2024-05-24 To: 2027-10-22 Location: Bridge Name: Portal (N) Bridge Lat:.04 is in progress. Hours of operations are from Monday to Friday between 6:30 a.m. to midnight. There will be waterborne equipment blocking one draw of a Lon:\nswing bridge at a time and the other draw will be free and clear of any equipment for the passage of vessels. Mariners can contact one -\"\n(including possible return\u2026",
       "status": "ACTIVE",
-      "since": "2026-02-12",
+      "since": "2024-05-24",
       "location": "Newark Bay - Hackensack Bridges"
     },
     {
       "chart": null,
-      "summary": "To: Lat:: 40.74064, -74.08136 Bridge Name: Rt 7 Wittpenn Bridge n order to facilitate the transportation of spectators attending Deviation regional FIFA World Cup matches, the Wittpenn (Route 7) Bridge, mile 3.2 across the Hackensack River NJ, will not open for marine Lon:\ntraffic during the following time periods: From 5:00 a.m. Saturday, June 13, 2026, to 1:00 a.m. Sunday, June 14, 2026. From\u2026",
-      "status": "ACTIVE",
-      "since": "2026-04-21",
-      "location": "Newark Bay - Hackensack Bridges Newark Bay - Hackensack"
+      "summary": "Newark Bay - Hackensack Bridges The Coast Guard has issued a temporary deviation from the regulation governing the operation of the NJ Transit Upper Hack Bridge, Lat:.9, across the Hackensack River. In order to facilitate the transportation of spectators attending regional FIFA World Cup matches, Deviation NJT will not open the Upper Hack RR Bridge for marine traffic during the following time\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-04-20",
+      "location": "Newark Bay - Hackensack Bridges The Coast Guard"
     },
     {
       "chart": null,
-      "summary": "2024-09-12 To: 2039-12-01 Location: . In Esopus Creek, shoaling has occurred faster than anticipated at the\nmouth of the creek when passing between Saugerties Lighthouse and Hudson River Lighted Buoy 93. In Roundout Creek, there is\nshoaling at the mouth of the creek. Mariners should exercise caution when navigating these areas.\u00a7 165.T01-0336 Safety Zone; Hudson River, Manhattan, NY (a) Location.:\u2026",
+      "summary": "2026-05-22 To: 2026-06-30 Location: 40.74064, -74.08136 Bridge Name: Rt 7 Witt-Penn Bridge Lat:\u00b0 Deviation Witt-Penn Bridge across Hackensack River at mile 3.1. , due to a mechanical malfunction with its barrier gates. Without functional Lon:\nbarrier gates, the bridge cannot safety open for marine traffic. NJDOT will provide a return to service date when available. Mariners are -advised to plan\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-05-22",
+      "location": "Newark Bay - Hackensack Bridges Hackensack"
+    },
+    {
+      "chart": null,
+      "summary": "Main Channel - Hudson Bridges In order to facilitate the transportation of spectators attending regional FIFA World Cup matches, the Spuyten Duyvil Bridge, mile 7.9 Lat:: From 2:00 p.m. Saturday, June 13, (Scheduled Or Emergency) 2026, to 6:00 p.m. Saturday, June 13, 2026. From 8:00 p.m. Saturday, June 13, 2026, to 12:00 a.m. Sunday, June 14, 2026. From 3:00 Lon:\np.m. Sunday, June 14, 2026, to\u2026",
       "status": "ACTIVE",
       "since": "2024-09-12",
-      "location": "Main Channel - Hudson"
+      "location": "Main Channel - Hudson Bridges In order to facilitate the tra"
     },
     {
       "chart": null,
@@ -58,6 +60,13 @@
       "status": "TEMPORARY",
       "since": "2026-01-06",
       "location": "Main Channel - Hudson"
+    },
+    {
+      "chart": "13221",
+      "summary": "Bridge across Reynolds Channel at mile 8.2. Work hours are 7:00 a.m. to 4:00 p.m. Monday through Friday. During work hours, a 20-foot by 40-foot work barge will be deployed in the navigable channel. Mariners requiring full Lon:. -Mariners are advised to exercise caution when transiting this area. :\nMeadowbrook Parkway Bridge across False Channel at mile 0.7. Work hours are 7:00 a.m. to 4:00 p.m.\u2026",
+      "status": "ACTIVE",
+      "since": "2024-09-12",
+      "location": "Jericho Bay"
     },
     {
       "chart": null,
@@ -68,9 +77,16 @@
     },
     {
       "chart": null,
-      "summary": "2026-05-20 To::00am, May 20, 2026, to 8:00am, May 27, 2026, Mariners are to avoid transiting within 500-meters of the following\nRestriction positions: C09: 20\u203225.307N, 26\u203250.160W; E08: 18\u203257.671N, 27\u203243.888W; D14: 18\u203254.499N, 22\u203233.644W; C15:\n19\u203225.110N, 21\u203241.185W; B17: 19\u203245.652N, 19\u203257.228W; B19: 19\u203225.511N, 18\u203214.273W; C18: 18\u203254.926N,\n19\u203206.757W; B01: 22\u203225.878N, 33\u203241.509W; D18: 18\u203214.268N,\u2026",
+      "summary": "Raritan River Cutoff Channel - RaritanBridges NEW JERSEY \u2013 RARITAN RIVER \u2013 Construction and demolition operations to replace the Raritan River Railroad Bridge will commence Lat:. During April-May 2026, A number of barges and support vessels will be moored outside the navigational channel. Due to ongoing construction activities, mariners will be unable to use the south navigational Lon:\nchannel.\u2026",
       "status": "ACTIVE",
-      "since": "2026-05-20",
+      "since": "2026-06-12",
+      "location": "Raritan River Cutoff Channel - RaritanBridges NEW JERSEY \u2013 R"
+    },
+    {
+      "chart": null,
+      "summary": "2026-05-18 To:. Equipment on scene will be the RAM XV, monitoring VHF-FM CH 16.: 2025-11-11 To: 2026-06-08 Location: 42-58-29..016W The Lat:\u00b0 position 42-58-29.740N, 070-37-05.030W, from November 11, 2025, to June 7, 2026. The object is a small instrumented lander (3 Lon:\nm tall x 3 m x 3 m) on the seafloor in approximately 20 m water depth. -: 2026-04-01 To: 2026-12-31 SAILDRONE\u2026",
+      "status": "ACTIVE",
+      "since": "2026-05-18",
       "location": "Sector New York"
     },
     {
