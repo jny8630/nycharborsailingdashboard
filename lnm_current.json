@@ -1,12 +1,12 @@
 {
-  "week": 21,
+  "week": 22,
   "year": 2026,
-  "generated_utc": "2026-05-29T18:26:45Z",
-  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01212026.pdf",
+  "generated_utc": "2026-06-05T17:47:25Z",
+  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01222026.pdf",
   "model": "text-parser",
   "skipped": [
     {
-      "week": 22,
+      "week": 23,
       "year": 2026,
       "reason": "not_posted"
     }
@@ -14,59 +14,52 @@
   "notices": [
     {
       "chart": null,
-      "summary": "Main Channel - East River Main Bridges Structural repairs to the Brooklyn Bridge, over the East River at mile 0.8, have commenced and will be ongoing through at Lat:. Active work will occur between 8:00 a.m. and 2:00 p.m., Monday through Friday. The traveler will reduce the vertical clearance of the bridge by 17 feet. During work hours the Lon:\ntraveler can move with 2 hours\u2019 notice for vessels\u2026",
+      "summary": "2024-11-06 To: 2026-12-25 Location: :Bridge Name: Borden Ave Bridge NEW YORK \u2013 EAST RIVER NEWTOWN CREEK \u2013 DUTCH KILLS \u2013 Bridge Or Emergency) Closure \u2013 The Borden Ave Bridge, mile 1.2, is closed due to vandalism. Vessels able to pass under the bridge in the closed Lon:\nposition may do so. Mariners with questions may contact Keith Burrows at (212) 839-3741, NYCDOT Director of Bridge -& Tunnel\u2026",
       "status": "ACTIVE",
-      "since": "2026-05-11",
-      "location": "Main Channel - East River Main Bridges Structural repairs to"
+      "since": "2024-11-06",
+      "location": "Main Channel - East River Main Bridges"
     },
     {
       "chart": null,
-      "summary": "2026-03-23 Lat:: 2028-11-04 Location: 40-42-34..388W Reicon will be conducting pile repair and rehabilitation operations.3N, 073-59-05.4W, from February 23, 2026, to November 3, 2028, Lon::00am to 2:00pm, local time. Equipment on scene will be a dive barge, monitoring VHF- -FM Ch 13 and is requesting mariners to minimize their wake, while operations are being conducted. : 2026-07-20 Lat::. The\u2026",
+      "summary": "2026-03-20 Lat:: 2027-08-31 Location: 40-48-15..980W Trevcon Construction Company will be conducting demolition .) to Metro North Rail Bridge Lon:.)in position 40-48-15.1N, 073-55-50W, through August 2027, Monday through Friday, between 5:00am to 6:00pm. -quipment on scene will be multiple crane barges, and material barges, monitoring VHF-FM CH 13, 16, 65, &75. Floating Equipment will be\u2026",
       "status": "ACTIVE",
-      "since": "2026-03-23",
+      "since": "2026-03-20",
       "location": "Main Channel - East River"
     },
     {
       "chart": null,
-      "summary": "2024-05-24 To: 2027-10-22 Location: Bridge Name: Portal (N) Bridge Lat:.04 is in progress. Hours of operations are from Monday to Friday between 6:30 a.m. to midnight. There will be waterborne equipment blocking one draw of a Lon:\nswing bridge at a time and the other draw will be free and clear of any equipment for the passage of vessels. Mariners can contact one -\"\n(including possible return\u2026",
+      "summary": "2026-04-20 To: 2026-07-20 Location: 40-47-17..650W In order to facilitate the Lat:.7 across the Hackensack River Deviation NJ, will not open for marine traffic during the following time periods: From 5:00 a.m. Saturday, June 13, 2026, to 1:00 a.m. Sunday, June Lon:\n14, 2026. From 5:00 a.m. Sunday, June 14, 2026, to 1:00 a.m. Monday, June 15, 2026. From 5:00 a.m. Tuesday, June 16, 2026, to 1:00\u2026",
       "status": "ACTIVE",
-      "since": "2024-05-24",
+      "since": "2026-04-20",
       "location": "Newark Bay - Hackensack Bridges"
     },
     {
       "chart": null,
-      "summary": "Newark Bay - Hackensack Bridges The Coast Guard has issued a temporary deviation from the regulation governing the operation of the NJ Transit Upper Hack Bridge, Lat:.9, across the Hackensack River. In order to facilitate the transportation of spectators attending regional FIFA World Cup matches, Deviation NJT will not open the Upper Hack RR Bridge for marine traffic during the following time\u2026",
-      "status": "TEMPORARY",
-      "since": "2026-04-20",
-      "location": "Newark Bay - Hackensack Bridges The Coast Guard"
-    },
-    {
-      "chart": null,
-      "summary": "2026-05-22 To: 2026-06-30 Location: 40.74064, -74.08136 Bridge Name: Rt 7 Witt-Penn Bridge Lat:\u00b0 Deviation Witt-Penn Bridge across Hackensack River at mile 3.1. , due to a mechanical malfunction with its barrier gates. Without functional Lon:\nbarrier gates, the bridge cannot safety open for marine traffic. NJDOT will provide a return to service date when available. Mariners are -advised to plan\u2026",
-      "status": "TEMPORARY",
-      "since": "2026-05-22",
-      "location": "Newark Bay - Hackensack Bridges Hackensack"
-    },
-    {
-      "chart": null,
-      "summary": "Main Channel - Hudson Bridges In order to facilitate the transportation of spectators attending regional FIFA World Cup matches, the Spuyten Duyvil Bridge, mile 7.9 Lat:: From 2:00 p.m. Saturday, June 13, (Scheduled Or Emergency) 2026, to 6:00 p.m. Saturday, June 13, 2026. From 8:00 p.m. Saturday, June 13, 2026, to 12:00 a.m. Sunday, June 14, 2026. From 3:00 Lon:\np.m. Sunday, June 14, 2026, to\u2026",
+      "summary": "\u00a7 165.T01-0336 Safety Zone; Hudson River, Manhattan, NY (a) Location.: All waters of the Hudson River from surface to bottom, encompassed by a line connecting the following points beginning at\n45\u203220.32\u2033 N, 00\u203223.84\u2033 W; thence to 45\u203223.34\u2033 N, 00\u203230.60\u2033 W; thence to 45\u203224.03\u2033 N, 00\u203240.85\u2033 W; thence to\n45\u203218.89\u2033 N, 00\u203248.18\u2033 W; thence to 45\u203213.80\u2033 N, 00\u2032thence to 45\u203208.03\u2033 N, 00\u203246.44\u2033 W; thence\u2026",
       "status": "ACTIVE",
-      "since": "2024-09-12",
-      "location": "Main Channel - Hudson Bridges In order to facilitate the tra"
-    },
-    {
-      "chart": null,
-      "summary": "2026-01-06 To:.: 40-45-20.32N 074-00-23.84W; 40-45-18.89N, 074-00-48.18W; 40-45-13.80N 074-00-48.64W;\n40-45-12.40N. 074-00-28.47W. The USCG has established a Safety Zone, 33 CFR 165.T01-0336 Safety Zone; Hudson River,\nManhattan, NY. Mariners transiting west of the safety zone should proceed at a speed to minimize potential wake or surge damage\nto the vessels working the construction area. There\u2026",
-      "status": "TEMPORARY",
-      "since": "2026-01-06",
+      "since": "2025-06-16",
       "location": "Main Channel - Hudson"
     },
     {
       "chart": "13221",
-      "summary": "Bridge across Reynolds Channel at mile 8.2. Work hours are 7:00 a.m. to 4:00 p.m. Monday through Friday. During work hours, a 20-foot by 40-foot work barge will be deployed in the navigable channel. Mariners requiring full Lon:. -Mariners are advised to exercise caution when transiting this area. :\nMeadowbrook Parkway Bridge across False Channel at mile 0.7. Work hours are 7:00 a.m. to 4:00 p.m.\u2026",
+      "summary": "Hutchinson River\nHutchinson River Buoy 6 26055 MISSING FD\nHutchinson Bridges NYCDOT is currently conducting emergency repairs to the Hutchinson River Parkway Bridge, mile 0.9, across the Hutchinson River in Bronx Lat:. During work hours (11:00 p.m. to 5:00 a.m.), a barge will reduce the horizontal clearance beneath the bridge by 30 feet. The barge will Painting, Or Fender Replacement be relocated\u2026",
       "status": "ACTIVE",
-      "since": "2024-09-12",
-      "location": "Jericho Bay"
+      "since": "2026-05-01",
+      "location": "Hutchinson River"
+    },
+    {
+      "chart": "13275",
+      "summary": "2024-08-30 To:\u2013 BLOSSOM ST EXT \u2013 LYNN 4TH OF JULY CELEBRATION \u2013:15 PM to 10:15 PM at Blossom St Ext in Lynn.. The person responsible for on scene safety can be reached at 978-432-3893.\nFor more information please contact Tara Hughgill at 603-532-8324. Chart 13275\nMain Channel\nRam Island Reef Lighted Bell Buoy 20 20110 MISSING FD\nPrivate Discrepancies\nPier 9 Northeast Lighted Hazard Buoy null\u2026",
+      "status": "ACTIVE",
+      "since": "2024-08-30",
+      "location": "Lynn Harbor"
+    },
+    {
+      "chart": null,
+      "summary": "2026-04-29 To: 2026-10-18 New York, NY \u2013 UPPER BAY \u2013:00 p.m. to 9:00 p.m., on Saturdays between the hours of 12:00 p.m. to 5:00 p.m., and on Sunday October 18, 2026 between\nthe hours of 12:00 p.m. to 5:00 p.m. Approximately 13 sailboats, 24-26 feet in length, with multiple motorized support\nvessels will participate. Interested mariners may contact the Executive Director on marine band radio\u2026",
+      "status": "ACTIVE",
+      "since": "2026-04-29",
+      "location": "Ambrose Channel - Main Marine Events"
     },
     {
       "chart": null,
@@ -77,24 +70,24 @@
     },
     {
       "chart": null,
-      "summary": "Raritan River Cutoff Channel - RaritanBridges NEW JERSEY \u2013 RARITAN RIVER \u2013 Construction and demolition operations to replace the Raritan River Railroad Bridge will commence Lat:. During April-May 2026, A number of barges and support vessels will be moored outside the navigational channel. Due to ongoing construction activities, mariners will be unable to use the south navigational Lon:\nchannel.\u2026",
+      "summary": "Raritan River\nRaritan River Channel Lighted Buoy 17 36495 OFF STATION FD\nRaritan River Channel Lighted Buoy 15 36490 WATCHING PROPERLY FD 2026-05-27\nRaritan River Cutoff Channel - RaritanBridges The TIR published in the Federal Register at https://www.govinfo..pdf.. This establishes a RNA from 12:01 a.m. on April\n15, 2026, until 11:59 p.m. on June 30, 2030. ADDRESSES: You may submit comments at\u2026",
       "status": "ACTIVE",
       "since": "2026-06-12",
-      "location": "Raritan River Cutoff Channel - RaritanBridges NEW JERSEY \u2013 R"
+      "location": "Raritan River"
     },
     {
       "chart": null,
-      "summary": "2026-05-18 To:. Equipment on scene will be the RAM XV, monitoring VHF-FM CH 16.: 2025-11-11 To: 2026-06-08 Location: 42-58-29..016W The Lat:\u00b0 position 42-58-29.740N, 070-37-05.030W, from November 11, 2025, to June 7, 2026. The object is a small instrumented lander (3 Lon:\nm tall x 3 m x 3 m) on the seafloor in approximately 20 m water depth. -: 2026-04-01 To: 2026-12-31 SAILDRONE\u2026",
+      "summary": "2026-06-08 To: 2026-06-19 Aqua Survey, Inc..S.. The project, led by Lisa Pipolo, is scheduled to occur from June 8 to June 19,\nSamples Bridges) 2026, with work conducted Monday through Friday between 0800 and 1600 hours. The research vessel Manasquan will be on scene\nand accessible via radio channels 13 and 16. To ensure safe navigation, the team is prepared to move the vessel on demand as\u2026",
       "status": "ACTIVE",
-      "since": "2026-05-18",
-      "location": "Sector New York"
+      "since": "2026-06-08",
+      "location": "Raritan River Cutoff Channel - RaritanMarine"
     },
     {
       "chart": null,
-      "summary": "2025-04-23 To: 2026-06-30 Location: Demolition of the S-32 Lat:.0 is in progress through June 30, 2026. There will be barge equipment operating IVO the bridge. For daily barge placement details, please contact Kevin Cummons at (609) 839-0595, Nick Scuderi at (609) Lon:. Updates will be provided, as they are available, in the D1 LNM and -on the project website at https: / /\u2026",
+      "summary": "Sector New York, Submerged Lands Act (SLA)\nEast Rockaway Inlet Lighted Buoy 3 31520 MISSING FD\nPrivate Discrepancies\nHighlands Light 35025 LT IMCH PA\nEmpire Offshore Wind WTG C12 604.:.196N, 073- .103W. THE VESSEL IS REPORTED TO BE WOODEN, 80 FEET LONG, WITH A BLACK TOP AND WHITE HULL. CURRENTLY NOT Lon:\nMARKED. ALL MARINERS ADVISED TO TRANSIT THE AREA WITH EXTREME CAUTION. -: 2026-06-03\u2026",
       "status": "ACTIVE",
-      "since": "2025-04-23",
-      "location": "Raritan Bay - Shrewsbury Bridges"
+      "since": "2026-06-03",
+      "location": "Sector New York, Submerged Lands Act (SLA)"
     }
   ],
   "disclaimer": "Extracted from USCG D1 LNM via keyword filtering. Verify against source PDF before underway."
