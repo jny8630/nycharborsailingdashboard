@@ -108,7 +108,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 
 <div class="footer">
   Data: <a href="https://www.navcen.uscg.gov" target="_blank" rel="noopener">USCG NAVCEN</a> · District 1 LNM<br>
-  For planning only — not for navigation
+  Personal, experimental project · Not for navigation · Use at your own risk · Data from public sources, verify all data independently · No liability for accuracy, completeness, or timeliness
 </div>
 
 <script>
@@ -189,7 +189,7 @@ function renderNotices(data) {
 
   body.innerHTML = gapHtml + rows + `
     <div class="attr">
-      <div class="attr-info">AI-extracted · ${weekLabel(data.week, data.year)}<br>${escHtml(data.disclaimer||'')}</div>
+      <div class="attr-info">AI-extracted · ${weekLabel(data.week, data.year)}<br>AI-generated summary — may be inaccurate or omit material information. Not a substitute for the official NTM. Use at your own risk.</div>
       <a class="attr-link" href="${escHtml(data.pdf_url||'#')}" target="_blank" rel="noopener">Source PDF ↗</a>
     </div>`;
 
