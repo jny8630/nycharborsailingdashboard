@@ -102,7 +102,7 @@ canvas{display:block;border-radius:8px}
 <div class="cnt">
   <div class="glance">
     <div class="gl"><div class="gl-l">WIND</div><div class="gl-v" id="gw" style="color:var(--green)">—</div><div class="gl-s" id="gwd"></div></div>
-    <div class="gl"><div class="gl-l">TEMP</div><div class="gl-v" id="gt">—</div><div class="gl-s" id="gts"></div></div>
+    <div class="gl"><div class="gl-l">TEMP <span id="gtwx" style="font-size:11px"></span></div><div class="gl-v" id="gt">—</div><div class="gl-v" id="gts" style="margin-top:0">—</div></div>
     <div class="gl"><div class="gl-l">TIDE</div><div id="gtd" style="font-size:13px;font-weight:800;color:var(--blue);margin-top:4px">—</div><div class="gl-s" id="gtn"></div></div>
   </div>
 
@@ -146,6 +146,16 @@ canvas{display:block;border-radius:8px}
     </div>
   </div>
 
+  <!-- FORECAST -->
+  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
+    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>📊</span> Wind Forecast — HRRR (3km)</div><span class="caret">▼</span></div>
+    <div class="card-body">
+      <div class="fc-hdr"><span>Time</span><span>Wind</span><span>Gust</span><span>Dir</span><span>Deg</span><span>Temp</span><span>Rain</span></div>
+      <div id="fcrows"></div>
+      <div style="font-size:9px;color:var(--fnt);margin-top:8px;text-align:right">Open-Meteo HRRR (3km) · Updated hourly</div>
+    </div>
+  </div>
+
   <!-- TIDES -->
   <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>🌊</span> Tides — The Battery</div><span class="caret">▼</span></div>
@@ -158,6 +168,16 @@ canvas{display:block;border-radius:8px}
       <div id="tevents"></div>
       <div id="tupcoming" class="upcoming hidden"><div class="upcoming-l">UPCOMING</div><div id="tulist"></div></div>
       <div id="sunset-info"></div>
+    </div>
+  </div>
+
+  <!-- WEATHER -->
+  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--yellow),transparent)"></div>
+    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>☀️</span> Weather & Temperature</div><span class="caret">▼</span></div>
+    <div class="card-body">
+      <div class="wx-row"><span class="wx-icon" id="wxi">🌤️</span><div><div style="font-size:22px;font-weight:800" id="wxt">—</div><div style="font-size:12px;color:var(--mut)" id="wxd">Loading…</div></div></div>
+      <div class="storm-bar" style="border:1px solid rgba(72,187,120,.2)"><span style="color:var(--mut)">⛈ Thunderstorm Risk</span><span id="stormv" style="font-weight:700;color:var(--green)">—</span></div>
+      <div id="wtemp" style="font-size:12px;color:var(--mut)"></div>
     </div>
   </div>
 
@@ -179,26 +199,6 @@ canvas{display:block;border-radius:8px}
         <canvas id="cvBaro" style="width:100%;height:130px"></canvas>
       </div>
       <div style="font-size:9px;color:var(--fnt);text-align:right;margin-top:4px">NOAA Robbins Reef · 6-min data</div>
-    </div>
-  </div>
-
-  <!-- WEATHER -->
-  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--yellow),transparent)"></div>
-    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>☀️</span> Weather & Temperature</div><span class="caret">▼</span></div>
-    <div class="card-body">
-      <div class="wx-row"><span class="wx-icon" id="wxi">🌤️</span><div><div style="font-size:22px;font-weight:800" id="wxt">—</div><div style="font-size:12px;color:var(--mut)" id="wxd">Loading…</div></div></div>
-      <div class="storm-bar" style="border:1px solid rgba(72,187,120,.2)"><span style="color:var(--mut)">⛈ Thunderstorm Risk</span><span id="stormv" style="font-weight:700;color:var(--green)">—</span></div>
-      <div id="wtemp" style="font-size:12px;color:var(--mut)"></div>
-    </div>
-  </div>
-
-  <!-- FORECAST -->
-  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
-    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>📊</span> Wind Forecast — HRRR (3km)</div><span class="caret">▼</span></div>
-    <div class="card-body">
-      <div class="fc-hdr"><span>Time</span><span>Wind</span><span>Gust</span><span>Dir</span><span>Deg</span><span>Temp</span><span>Rain</span></div>
-      <div id="fcrows"></div>
-      <div style="font-size:9px;color:var(--fnt);margin-top:8px;text-align:right">Open-Meteo HRRR (3km) · Updated hourly</div>
     </div>
   </div>
 
@@ -552,7 +552,7 @@ function renderTides(t,sunData){
 function renderWeather(wx,wt){
   if(!wx?.current)return;const c=wx.current,tc=c.temperature_2m,tf=c2f(tc),code=c.weather_code;
   $('wxi').textContent=wxI(code);$('wxt').textContent=tc.toFixed(1)+'°C / '+tf+'°F';$('wxd').textContent=wxD(code)+' · Feels '+c.apparent_temperature.toFixed(0)+'°C';
-  $('gt').textContent=tc.toFixed(0)+'°';$('gts').textContent=tf+'°F '+wxI(code);
+  $('gt').textContent=tc.toFixed(0)+'°C';$('gts').textContent=tf+'°F';$('gtwx').textContent=wxI(code);
   const cape=wx.hourly?.cape?.[0]||0;let risk='None',sc='var(--green)';
   if(cape>2000){risk='HIGH';sc='var(--red)'}else if(cape>1000){risk='Moderate';sc='var(--orange)'}else if(cape>500){risk='Low';sc='var(--yellow)'}
   $('stormv').textContent=risk+(cape?' (CAPE: '+cape.toFixed(0)+')':'');$('stormv').style.color=sc;
