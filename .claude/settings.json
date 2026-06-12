@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git show *)",
+      "Bash(git check-ignore *)",
+      "Bash(curl -s *)",
+      "Bash(curl -sI *)",
+      "Bash(curl -I *)",
+      "Bash(curl -v *)",
+      "Bash(curl --version)",
+      "Bash(python3 -m http.server *)",
+      "Bash(kill %1)",
+      "Bash(xargs kill *)",
+      "Bash(/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --headless *)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "Read(//Applications/**)",
+      "WebFetch(domain:api.open-meteo.com)",
+      "WebFetch(domain:api.tidesandcurrents.noaa.gov)",
+      "WebFetch(domain:www.navcen.uscg.gov)",
+      "WebFetch(domain:www.wpc.ncep.noaa.gov)",
+      "WebFetch(domain:hudson.dl.stevens-tech.edu)",
+      "WebFetch(domain:www.dco.uscg.mil)",
+      "WebFetch(domain:content.govdelivery.com)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  }
+}
