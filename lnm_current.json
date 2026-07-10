@@ -1,12 +1,12 @@
 {
-  "week": 26,
+  "week": 27,
   "year": 2026,
-  "generated_utc": "2026-07-03T17:12:22Z",
-  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01262026.pdf",
+  "generated_utc": "2026-07-10T17:39:46Z",
+  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01272026.pdf",
   "model": "text-parser",
   "skipped": [
     {
-      "week": 27,
+      "week": 28,
       "year": 2026,
       "reason": "not_posted"
     }
@@ -20,7 +20,7 @@
       "location": "Ambrose Channel"
     },
     {
-      "chart": null,
+      "chart": "13275",
       "summary": "00 am and 3:30 pm on weekdays, bridge maintenance will be Lat:.70ANI) IVO Interchange 13) over Elizabeth River, mile .61 to the mouth of Elizabeth Reach, in Elizabeth, Union County, New Jersey. This work will be completed in 5 non-consecutive days. A 15 ft skiff and a 60 ft X 160 ft Lon:\nplatform will be in the waterway intermittently. Mariners requiring full horizontal clearance can contact Matt\u2026",
       "status": "ACTIVE",
       "since": "2026-02-13",
@@ -28,9 +28,23 @@
     },
     {
       "chart": null,
-      "summary": "2026-06-22 To: 2026-07-18 Location: 40-49-41.:.680W Bridge Name: Macombs Dam Bridge From June 22, 2026, to July 17, 2026, between 6:00 a.m. and 2:30 p.m., two Or Fender Replacement barges will be moored adjacent either to the north end or south end of the fender system of the Macombs Dam Bridge over Lon:\nHarlem River at mile 3.2 to perform fender repairs. Marine traffic will have access through\u2026",
+      "summary": "Providence River Approach - Bristol Marine Events RI \u2013 BRISTOL HARBOR \u2013 BRISTOL YACHT CLUB J-22 SERIES \u2013. The event will take place on Thursdays from June 4\n(Race) through August 27, 2026 from 6:00 p.m. to Sunset each day. Expect up to 10 sailing vessels, 22 ft in length. Mariners are advised to\ntransit the area with extreme caution. Mariners may contact the person in charge by phone at (516)\u2026",
       "status": "ACTIVE",
-      "since": "2026-06-22",
+      "since": "2025-11-14",
+      "location": "Providence River Approach - Bristol Marine Events RI \u2013 BRIST"
+    },
+    {
+      "chart": null,
+      "summary": "2026-06-17 To: 2026-09-26 Location: BROOKLYN, NY \u2013 LOWER BAY \u2013\u2013:15 p.m. until 10:45 p.m. The fireworks launch site will be near the waters of the Lower\nBay of New York Harbor in approximate position 34\u2019 20\u201d N, 58\u2019 43\u201d W (NAD 83). Mariners are advised to keep a minimum safe\ndistance of 450 feet from the shoreline to avoid pyrotechnic fallout.: 2025-05-08 To: 2029-12-31 Location: Bridge Name:\u2026",
+      "status": "ACTIVE",
+      "since": "2026-06-17",
+      "location": "Ambrose Channel - Coney Island Marine Events"
+    },
+    {
+      "chart": null,
+      "summary": "2026-06-15 To: 2027-01-01 Location: 40-48-01..420W Bridge Name: 125th Lat::00 a.m. and 4:00 p.m., a barge with manlift will be operated under 125th St. (RFK) Bridge over Harlem River at mile 1.3 to perform inspections. Mariners requiring full horizontal clearance Lon:\ncan contact the contractor via marine radio VHF-FM Ch.. The barge with manlift will be moved -out of the navigable channel after\u2026",
+      "status": "ACTIVE",
+      "since": "2026-06-15",
       "location": "Main Channel - East River Main Bridges"
     },
     {
@@ -42,80 +56,59 @@
     },
     {
       "chart": null,
-      "summary": "2024-09-25 To: 2028-01-20 Location: Bridge Name: Westerly Lat:\u2013 Installation of temporary trestle at the New Jersey Turnpike Bridge across the Hackensack River at mile 11.8 will commence on July 1, 2024. Hours of operation are from 6 am to 4 pm. 6 Lon:\nShugart sectional barges will be installed at piers 15 and 18 outside navigation channel. A barge will be operating in the navigation -channel for\u2026",
-      "status": "TEMPORARY",
-      "since": "2024-09-25",
+      "summary": "2026-04-20 To: 2026-07-20 Location: 40-47-17..650W In order to facilitate the Lat:.7 across the Hackensack River Deviation NJ, will not open for marine traffic during the following time periods: From 5:00 a.m. Saturday, June 13, 2026, to 1:00 a.m. Sunday, June Lon:\n14, 2026. From 5:00 a.m. Sunday, June 14, 2026, to 1:00 a.m. Monday, June 15, 2026. From 5:00 a.m. Tuesday, June 16, 2026, to 1:00\u2026",
+      "status": "ACTIVE",
+      "since": "2026-04-20",
       "location": "Newark Bay - Hackensack Bridges"
     },
     {
       "chart": null,
-      "summary": "2026-06-13 To: 2026-07-21 Location: 40-44-35..337W Bridge Name: Lower Lat:\u00b0 Deviation Hack Bridge, mile 3.48 across the Hackensack River. In order to facilitate the transportation of spectators attending regional FIFA World Lon:\nCup matches, NJ, will not open for marine traffic during the following time periods: From 5:00 a.m. Saturday, June 13, 2026, to 1:00 a.m. -unday, June 14, 2026. From 5:00\u2026",
+      "summary": "2024-05-01 To: 2029-12-31 Location: Bridge Name: George Lat:\u2013 Construction to the rehabilitation at the George Washington Bridge across the Hudson River at mile 11.0 will commence on May 1, 2024. Lon:\nTemporary work platform will be installed under the entire length of the bridge. The temporary work platform will reduce the vertical -clearance by 3ft 9in plus 2ft sag max. below the low steel.\u2026",
       "status": "TEMPORARY",
-      "since": "2026-06-13",
-      "location": "Newark Bay - Hackensack Bridges"
-    },
-    {
-      "chart": null,
-      "summary": "2024-09-03 To: 2027-06-30 Location: 42-30-33..340W Bridge Name: Castleton Lat:\u2013 Construction to the Castleton Highway Bridge across Hudson River at mile 135.7 is extended from June 30, 2026 to June 30, 2027. Hours of operation are from 7 a.m. and 7 p.m. Temporary safe span platforms will be installed Lon:\nunder the tram rail steel (over navigation channel) which will reduce vertical clearance by\u2026",
-      "status": "TEMPORARY",
-      "since": "2024-09-03",
+      "since": "2024-05-01",
       "location": "Main Channel - Hudson Bridges"
     },
     {
       "chart": null,
-      "summary": "\u00a7 165.T01-0336 Safety Zone; Hudson River, Manhattan, NY (a) Location.: All waters of the Hudson River from surface to bottom, encompassed by a line connecting the following points beginning at\n45\u203220.32\u2033 N, 00\u203223.84\u2033 W; thence to 45\u203223.34\u2033 N, 00\u203230.60\u2033 W; thence to 45\u203224.03\u2033 N, 00\u203240.85\u2033 W; thence to\n45\u203218.89\u2033 N, 00\u203248.18\u2033 W; thence to 45\u203213.80\u2033 N, 00\u2032thence to 45\u203208.03\u2033 N, 00\u203246.44\u2033 W; thence\u2026",
+      "summary": "2026-0-01 T8o: 2026-10-31 Location: 40-38- Lat:\nConstruction (Excluding (Excluding Bridges) operations scheduled from August 1, 2026, to October 31, 2026, in Newark Bay and Kill Van Kull, New Jersey, near the Bayonne Bridge at Lon:\u00b0. The work will be conducted using barge-mounted sediment drilling equipment and -amples samplers, operating five days per week from 7 am to 5 pm. Vessels involved can\u2026",
       "status": "ACTIVE",
-      "since": "2025-06-16",
-      "location": "Main Channel - Hudson"
+      "since": "2024-10-02",
+      "location": "Main Channel - Kill Van"
     },
     {
       "chart": null,
-      "summary": "Main Channel - Hudson Marine Events LNM NY - EAST RIVER - HARLEM RIVER - HUDSON RIVER \u2013. Approximately two to five\nparticipating swimmers will be assisted by a lead safety vessel in addition to one escort vessel and one escort kayak per every one to\ntwo swimmers. The swim events will start at either Pier A in Battery Park or Mill Rock, near East 90th St., Manhattan. They will proceed\nup the East\u2026",
-      "status": "ACTIVE",
-      "since": "2026-06-24",
-      "location": "Main Channel - Hudson Marine Events LNM NY - EAST RIVER - HA"
-    },
-    {
-      "chart": "13221",
-      "summary": "2026-06-30 To: 2026-07-05 Location: 40-51-47..430W Bridge Lat:: Pelham Bay Rail Rd Bridge New York- Hutchinson River \u2013 Notice of Temporary Deviation - The Coast Guard has issued a (Scheduled Or Emergency) temporary deviation from the regulation governing the operation of the Pelham Bay railroad Bridge, mile 0.5, over the Hutchinson River Lon:\nin Bronx, NY. Under this temporary deviation, the\u2026",
-      "status": "ACTIVE",
-      "since": "2026-06-30",
-      "location": "Hutchinson Bridges"
-    },
-    {
-      "chart": null,
-      "summary": "2026-07-01 To:.. Installation will\noccur during daylight hours from June 17 to June 30, 2026;;. The specific coordinates for the mooring\nlocations are: A1 (N 40-40.302, W 074-01.938), A2 (N 40-40.046, W 074-02.108), A3 (N 40-40.178, W 074-02.447), A4 (N 40-40.433,\nW 074-02.275), B1 (N 40-39.960, W 074-02.167), B2 (N 40-39.704, W 074-02.336), B3 (N 40-39.835, W 074-02.676), and B4 (N 40-\n40.090, W\u2026",
+      "summary": "Pier 9 Northeast Lighted Hazard Buoy null MISSING PA\nEllis Island Security Zone Buoy ELSZ1 35006 MISSING PA\nEllis Island Security Zone Buoy ELSZ10 35006.9 MISSING PA\nEllis Island Security Zone Buoy ELSZ7 35006.6 MISSING PA\nEllis Island Security Zone Buoy ELSZ2 35006.1 MISSING PA\nLiberty Island Security Zone Buoy LISZ2 37247.1 MISSING PA\nLiberty Island Security Zone Buoy LISZ3 37247.200000000004\u2026",
       "status": "TEMPORARY",
-      "since": "2026-07-01",
-      "location": "Ambrose Channel"
+      "since": "2026-06-01",
+      "location": "Pier 9 Northeast Lighted Hazard Buoy null MISSING PA"
     },
     {
       "chart": null,
-      "summary": "2026-06-27 To: 2026-07-06 Location: NEW YORK \u2013\u2013 EAST RIVER \u2013 SPECIAL LOCAL REGULATION AND SAFETY ZONES \u2013 FIREWORKS DISPLAYS Details:.T0199-1120 will be enforced on the East river and portions of Upper New York\nBay for the annual Macy\u2019s 4th of July Fireworks Display on July 4, 2026, from approximately 4:00 p.m. until 11:30 p.m. and a Safety\nZone will be enforced on the Hudson River for the Jersey\u2026",
+      "summary": "2026-04-29 To: 2026-10-18 New York, NY \u2013 UPPER BAY \u2013:00 p.m. to 9:00 p.m., on\nSaturdays between the hours of 12:00 p.m. to 5:00 p.m., and on Sunday October 18, 2026 between the hours of 12:00 p.m. to 5:00\np.m. Approximately 13 sailboats, 24-26 feet in length, with multiple motorized support vessels will participate. Interested mariners\nmay contact the Executive Director on marine band radio\u2026",
       "status": "ACTIVE",
-      "since": "2026-06-27",
+      "since": "2026-04-29",
       "location": "Ambrose Channel - Main Marine Events"
     },
     {
       "chart": null,
-      "summary": "2026-06-26 To: 2026-07-10 Location: NEW YORK, NY \u2013 LOWER BAY \u2013 SANDY HOOK BAY \u2013\u2013 REGULATED AREA \u2018A\u2019 1. Mariners are advised that Regulated Area \u2018A\u2019 will be enforced from 6 a.m. on July 2, 2026, until 4\np.m. on July 4, 2026. Regulated Area \u2018A\u2019 includes all waters of New York Harbor, Lower Bay, and Sandy Hook Bay within the following\nboundaries: south of the Verrazano-Narrows Bridge; west of a line\u2026",
+      "summary": "2026-06-25 To: 2026-07-10 Location: NEW YORK, NY \u2013 UPPER BAY \u2013 HUDSON RIVER \u2013\u2013 REGULATED AREA \u2018B\u2019 1. Mariners are advised that Regulated Area \u2018B\u2019 will be enforced from 10 a.m. on July 1, 2026, until\n11:59 P.M. on July 9, 2026. Regulated Area \u2018B\u2019 All waters of New York Harbor, Upper Bay, the Hudson, and East Rivers, and the Kill\nVan Kull Channel within the following boundaries: south of 52\u203237.26\u2033,\u2026",
       "status": "ACTIVE",
-      "since": "2026-06-26",
+      "since": "2026-06-25",
       "location": "Ambrose Channel - Main Marine Events"
     },
     {
-      "chart": "13275",
-      "summary": "2026-07-01 To: 2026-07-09 NEW YORK, NY \u2013 SECTOR NEW YORK COTP ZONE \u2013\u2013 FOREIGN NAVAL VESSEL SECURITY ZONES Mariners are advised that a 100-yard security zone is being enforced\nOperations around all Foreign Naval Vessels from July 1, 2026, through July 9, 2026 within the Sector New York Captain of the Port Zone in\nsupport of Sail 4th 250 and the International Naval Review 250. Listed below are the\u2026",
+      "chart": null,
+      "summary": "2026-03-20 To: 2026-08-01 Gahagan &. (GBA) will be conducting Geotechnical surveys from approximately April 10, 2026, through July 31st, 2026, in Newark\nConstruction (Excluding (Excluding Bridges) Bay and Elizabeth Channels off Port Newark, NJ. Operations will be conducted during daylight hours only, 7 days a week.& ARGONAUT and will be conducted during daylight hours only, 7 days a\u2026",
       "status": "ACTIVE",
-      "since": "2026-07-01",
-      "location": "Ambrose Channel - Main Naval Activity"
+      "since": "2026-03-20",
+      "location": "Newark Bay - Newark Bay"
     },
     {
       "chart": null,
-      "summary": "point 4.6 in Newark Bay NJ. This deviation will test a change to the drawbridge operation procedures to determine whether a permanent change to the procedures is needed. Under this test deviation, from 8:00 a.m. on January 16, 2026, through 8:00 a.m. on July 16, 2026, Lon:\nthe Lehigh Valley Lift Bridge will be remotely operated from the Conrail North Jersey Dispatch Center, in Mount Laurel, NJ.\u2026",
-      "status": "TEMPORARY",
-      "since": "2026-04-27",
-      "location": "Newark Bay"
+      "summary": "2026-05-06 To: 2026-11-02 NY/NJ\u2013 LOWER NY BAY \u2013 RARITAN BAY \u2013.. Approximately 30 sailboats\n12-45 feet in length will participate in short-distance courses. Interested mariners may contact the Principal Race Officer on marine band\nradio channel 9 or 71 VHF-FM or via telephone at 203-509-1469.. NARRATIVE:. THESE REGATTAS WILL INCLUDE APPROXIMATELY 30 SAILBOATS 15-45 FEET IN LENGTH.. NEW JERSEY -\u2026",
+      "status": "ACTIVE",
+      "since": "2026-05-06",
+      "location": "Swash Channel - Raritan Marine Events"
     },
     {
       "chart": null,
@@ -126,17 +119,24 @@
     },
     {
       "chart": "13281",
-      "summary": "2026-06-24 To::30 p.m. until 10:30 p.m29\u2019 44.1\u201d N, 15\u2019 46.1\u201d W (NAD 83) and the Safety Zone encompass all waters within a 800 foot radius from the\nbarge. Vessels may not enter, remain in, or transit through the Safety Zone during the enforcement period unless authorized by the Coast\nGuard Captain of the Port. Other Federal, State and local agencies may assist these personnel in the enforcement of\u2026",
+      "summary": "\u2013 HENDRIC CREEK - Bridge Maintenance \u2013 From July 10, 2026 to July 25, 2027, NYSDOT Lat:.1. During this time work platforms will be installed decreasing the vertical clearance to 20\u2019-7\u201d. Contractor will also be utilizing barges in the waterway. Lon:\nMariners with any questions or concerns may contact Antonio Donato at (646) 703-2644. -: 2026-07-10 To: 2026-07-12 Location: 40-35-43..912W Bridge\u2026",
       "status": "ACTIVE",
-      "since": "2026-06-24",
-      "location": "Raritan Bay - Raritan River Marine Events"
+      "since": "2026-07-10",
+      "location": "Reynolds Channel Lighted Buoy 3 31575 OFF STATION FD"
     },
     {
       "chart": null,
-      "summary": "196N, .103W. THE VESSEL IS REPORTED TO BE WOODEN, 80 FEET LONG, WITH A BLACK TOP AND WHITE HULL. CURRENTLY NOT Lon:\nMARKED. ALL MARINERS ADVISED TO TRANSIT THE AREA WITH EXTREME CAUTION. -: 2026-05-01 To: Lat:: 40-18-11..384W J.T. C;eary Inc. will be conducting pile driving operations in Long Branch, NJ, Construction (Excluding (Excluding in position 40-18-11.6N, 073-58-33.4W, from May 1, 2026,\u2026",
+      "summary": "2026-07-08 To::00am, July 08, 2026, to 8:00am, July 15, 2026, Mariners are to avoid transiting within 500-meters of the following\nRestriction positions: C09: 20\u203225.307N, 26\u203250.160W; E08: 18\u203257.671N, 27\u203243.888W; D11: 19\u203224.606N, 25\u203208.100W; F17:\n17\u203203.018N, 20\u203201.227W; D10: 19\u203234.629N, 25\u203259.594W; B05: 21\u203245.973N, 30\u203215.333W; D03: 20\u203250.352N,\n32\u203200.051W; H15: 16\u203219.659N, 21\u203245.664W; F11:\u2026",
       "status": "ACTIVE",
-      "since": "2026-05-01",
+      "since": "2026-07-08",
       "location": "Sector New York"
+    },
+    {
+      "chart": null,
+      "summary": "2026-06-12 To: 2026-07-20 Location: 40-19-07..240W Bridge Name: NJ Transit SwingLat:\u00b0 Deviation Oceanport Drawbridge, mile 19.8 across Oceanport Creek NJ, will not open for marine traffic during the following time periods: From 2:00 Lon:\np.m. Saturday, June 13, 2026, to 6:00 p.m. Saturday, June 13, 2026. From 8:00 p.m. Saturday, June 13, 2026, to 12:00 a.m. Sunday, June 14, -2026. From 11:00 a.m.\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-06-12",
+      "location": "Raritan Bay - Shrewsbury Bridges"
     }
   ],
   "disclaimer": "Extracted from USCG D1 LNM via keyword filtering. Verify against source PDF before underway."
