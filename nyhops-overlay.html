@@ -20,8 +20,8 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .hdr-meta{font-size:10px;color:var(--fnt);margin-top:6px}
 .hdr-links{display:flex;gap:6px;flex-shrink:0}
 .back-btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;font-weight:600;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
-.slots{display:flex;gap:5px;padding:10px 10px 6px;flex-shrink:0;overflow-x:auto}
-.slot-btn{flex:1;min-width:0;padding:7px 4px;background:var(--card);border:1px solid var(--bdr);border-radius:8px;color:var(--mut);font-size:10px;font-weight:600;font-family:var(--mono);cursor:pointer;text-align:center;line-height:1.3;white-space:nowrap}
+.slots{display:flex;gap:4px;padding:10px 8px 6px;flex-shrink:0}
+.slot-btn{flex:1;min-width:0;padding:6px 2px;background:var(--card);border:1px solid var(--bdr);border-radius:7px;color:var(--mut);font-size:11px;font-weight:600;font-family:var(--mono);cursor:pointer;text-align:center;line-height:1.3;white-space:nowrap;display:flex;flex-direction:column;justify-content:flex-end}
 .slot-btn.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
 .slot-btn:active{opacity:.7}
 .slot-now{font-size:8px;font-weight:700;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:1px}
@@ -85,13 +85,14 @@ function etNow() {
   return new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
 }
 
+// Compact hour-to-hour label, e.g. "9–10", "11–12", "12–1"
 function fmtRange(baseDate, offsetHours) {
   const base = new Date(baseDate);
   base.setMinutes(0, 0, 0);
+  const hr12 = d => { const h = d.getHours() % 12; return h === 0 ? 12 : h; };
   const start = new Date(base.getTime() + offsetHours * 3600000);
   const end   = new Date(base.getTime() + (offsetHours + 1) * 3600000);
-  const fmt = d => d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', hour12:true});
-  return `${fmt(start)}\n${fmt(end)}`;
+  return `${hr12(start)}–${hr12(end)}`;
 }
 
 function imgUrl(dateStr, frame) {
@@ -209,14 +210,12 @@ async function init() {
   // Build time-slot buttons
   const slotsEl = document.getElementById('slots');
   const buttons = [];
-  [0,1,2,3,4,5].forEach(offset => {
+  [0,1,2,3,4,5,6,7].forEach(offset => {
     const frame = BASE_FRAME + currentHour + offset;
-    const range = fmtRange(etDate, offset);
-    const [line1, line2] = range.split('\n');
     const btn = document.createElement('button');
     btn.className = 'slot-btn';
     btn.innerHTML = (offset === 0 ? '<span class="slot-now">NOW</span>' : '') +
-      `<span>${line1}</span><br><span>${line2}</span>`;
+      `<span>${fmtRange(etDate, offset)}</span>`;
     btn.onclick = () => showSlot(dateStr, frame, btn);
     slotsEl.appendChild(btn);
     buttons.push({btn, frame});

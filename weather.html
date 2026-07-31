@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#080e18">
 <title>Weather Forecast — NYC Harbor</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌦</text></svg>">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{--bg:#080e18;--card:#131f2e;--card2:#0c1520;--bdr:#1a2d42;--bdr2:#2a4060;--txt:#f0f4f8;--dim:#c4d0de;--mut:#8fa3b8;--fnt:#6b8299;--accent:#4fd1c5;--blue:#63b3ed;--orange:#ed8936;--green:#48bb78;--red:#f56565;--yellow:#ecc94b;--purple:#9f7aea;--mono:'SF Mono','Cascadia Code','JetBrains Mono','Fira Code',monospace}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -63,18 +62,18 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .marine-note{margin-top:8px;padding:7px 10px;background:rgba(236,201,75,.07);border:1px solid rgba(236,201,75,.15);border-radius:6px;font-size:11px;color:var(--yellow);line-height:1.5;font-style:italic}
 .marine-meta{margin-top:10px;padding:7px 10px;background:rgba(12,21,32,.6);border:1px solid var(--bdr);border-radius:6px;font-size:10px;color:var(--fnt)}
 
-/* Radar map */
-#radar-map{width:100%;height:320px;border-radius:8px;overflow:hidden;background:var(--card2)}
-.radar-controls{display:flex;align-items:center;gap:8px;margin-top:10px}
-.radar-btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:7px;color:var(--accent);padding:6px 12px;font-size:14px;cursor:pointer;font-family:inherit;font-weight:600}
-.radar-btn:active{opacity:.7}
-.radar-ts{font-size:12px;font-family:var(--mono);color:var(--dim);margin-left:auto}
-.radar-ctr{font-size:11px;color:var(--fnt)}
-.radar-note{margin-top:8px;font-size:10px;color:var(--fnt);text-align:center}
+/* Synoptic image zoom modal */
+.zoom-wrap{position:relative;cursor:zoom-in}
+.zoom-hint{position:absolute;bottom:6px;right:8px;font-size:9px;color:rgba(255,255,255,.55);pointer-events:none;background:rgba(0,0,0,.4);border-radius:4px;padding:2px 5px}
+.zoom-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;flex-direction:column;touch-action:none}
+.zoom-modal.open{display:flex}
+.zoom-img-wrap{overflow:hidden;width:100vw;height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center}
+.zoom-img-wrap img{max-width:none;transform-origin:var(--zo-x,50%) var(--zo-y,50%);transition:transform .25s ease;will-change:transform;display:block}
+.zoom-controls{height:56px;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0;padding:0 16px;width:100%}
+.zoom-ctrl{background:#1a2d42;border:1px solid #2a4060;border-radius:8px;color:#4fd1c5;font-size:14px;font-weight:700;padding:8px 18px;cursor:pointer;font-family:inherit}
+.zoom-ctrl:active{opacity:.7}
+.zoom-close{background:rgba(245,101,101,.15);border-color:rgba(245,101,101,.4);color:#f56565}
 
-/* Leaflet overrides */
-.leaflet-control-attribution{background:rgba(8,14,24,.8)!important;color:var(--fnt)!important;font-size:9px!important}
-.leaflet-control-attribution a{color:var(--accent)!important}
 
 @media(max-width:360px){.wx-hdr,.wx-row{grid-template-columns:44px 54px 1fr 32px 32px 46px;font-size:11px}}
 .alert-banner{border-radius:10px;padding:11px 14px;margin-bottom:10px;border-left:4px solid}
@@ -145,36 +144,59 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     <div class="card-body" id="marine-ext-body" style="display:none"></div>
   </div>
 
-  <!-- CARD 3: RADAR -->
-  <div class="card">
+  <!-- CARD 3: RADAR — moved to radar.html -->
+  <a class="card" href="radar.html" style="display:block;text-decoration:none">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
     <div class="card-hdr">
-      <div class="card-t">📡 Observed Radar</div>
-      <div style="font-size:10px;color:var(--fnt)">Last 2 hours · 10-min steps</div>
+      <div class="card-t">📡 Observed Radar &amp; Forecast</div>
+      <div style="font-size:12px;color:var(--accent);font-weight:600">Open →</div>
     </div>
-    <div class="card-body" id="radar-body">
-      <div id="radar-map"></div>
-      <div class="radar-controls">
-        <button class="radar-btn" onclick="radarPrev()">◀</button>
-        <button class="radar-btn" id="radar-play" onclick="toggleRadar()">⏸</button>
-        <button class="radar-btn" onclick="radarNext()">▶</button>
-        <span class="radar-ctr" id="radar-ctr"></span>
-        <span class="radar-ts" id="radar-ts"></span>
+    <div class="card-body" style="font-size:11px;color:var(--mut);line-height:1.6">RainViewer loop, Windy forecast layer, and the NBC 4 Storm Team 4-hour outlook — now on their own page.</div>
+  </a>
+
+  <!-- CARD 4: SYNOPTIC ANALYSIS -->
+  <div class="card">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
+    <div class="card-hdr">
+      <div class="card-t">🗺️ Synoptic Analysis</div>
+      <div style="font-size:10px;color:var(--fnt)">Every 3 hrs</div>
+    </div>
+    <div style="padding:0 8px">
+      <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Northeast</div>
+      <div class="zoom-wrap" onclick="openZoom('ne')">
+        <img id="wpc-chart-ne" style="width:100%;border-radius:8px;display:block" alt="NWS WPC Northeast Surface Analysis">
+        <span class="zoom-hint">tap to zoom</span>
       </div>
-      <div class="radar-note" id="radar-note">Observed past precipitation only — not a future forecast · Radar visible at zoom ≤ 7</div>
+      <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:10px 0 4px">CONUS</div>
+      <div class="zoom-wrap" onclick="openZoom('conus')">
+        <img id="wpc-chart-conus" style="width:100%;border-radius:8px;display:block" alt="NWS WPC CONUS Surface Analysis">
+        <span class="zoom-hint">tap to zoom</span>
+      </div>
     </div>
+    <div style="font-size:9px;color:var(--fnt);text-align:center;padding:8px 10px 12px">NWS Weather Prediction Center · Surface Analysis · <a href="https://www.wpc.ncep.noaa.gov/html/sfc2.shtml" target="_blank" style="color:var(--accent)">wpc.ncep.noaa.gov</a></div>
   </div>
 
   <div class="footer">
     Forecast: <a href="https://open-meteo.com" target="_blank">Open-Meteo HRRR</a> ·
     Marine: <a href="https://www.weather.gov" target="_blank">NWS OKX</a> ·
-    Radar: <a href="https://www.rainviewer.com" target="_blank">RainViewer</a><br>
+    Synoptic: <a href="https://www.wpc.ncep.noaa.gov" target="_blank">NWS WPC</a><br>
     Personal, experimental project · Not for navigation · Use at your own risk · Data from public sources, verify all data independently · No liability for accuracy, completeness, or timeliness
   </div>
 
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Synoptic zoom modal -->
+<div class="zoom-modal" id="zoom-modal" onclick="handleModalTap(event)">
+  <div class="zoom-img-wrap" id="zoom-img-wrap">
+    <img id="zoom-modal-img" src="" alt="">
+  </div>
+  <div class="zoom-controls">
+    <button class="zoom-ctrl" onclick="event.stopPropagation();zoomStep(-1)">− Out</button>
+    <button class="zoom-ctrl" onclick="event.stopPropagation();zoomStep(1)">+ In</button>
+    <button class="zoom-ctrl zoom-close" onclick="event.stopPropagation();closeZoom()">✕ Close</button>
+  </div>
+</div>
+
 <script>
 const LAT = 40.6797;
 const LON = -74.0288;
@@ -182,12 +204,6 @@ const LON = -74.0288;
 let forecastData = null;
 let selectedHours = 4;
 let marineData = null;
-let radarFrames = [];
-let radarLayers = [];
-let radarMap = null;
-let radarIdx = 0;
-let radarTimer = null;
-let radarPlaying = true;
 
 const $ = id => document.getElementById(id);
 
@@ -462,99 +478,6 @@ function toggleMarineExt() {
   caret.textContent   = show ? '▼ Hide' : '▶ Show';
 }
 
-// ── RAINVIEWER RADAR ─────────────────────────────────────────────────────────
-
-const RADAR_MAX_ZOOM = 7;
-
-function initMap() {
-  radarMap = L.map('radar-map', {center: [40.72, -74.05], zoom: 7, zoomControl: true});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
-    maxZoom: 18
-  }).addTo(radarMap);
-
-  // RainViewer free tier only serves radar tiles at zoom ≤ 7.
-  // Remove the overlay when user zooms in past that and restore when they zoom back out.
-  radarMap.on('zoomend', () => {
-    const z = radarMap.getZoom();
-    const note = $('radar-note');
-    if (z > RADAR_MAX_ZOOM) {
-      radarLayers.forEach(l => { try { radarMap.removeLayer(l); } catch(_){} });
-      note.textContent = 'Zoom ≤ 7 to see radar overlay · Observed past precipitation only';
-      note.style.color = 'var(--yellow)';
-    } else {
-      showFrame(radarIdx);
-      note.textContent = 'Observed past precipitation only — not a future forecast · Radar visible at zoom ≤ 7';
-      note.style.color = '';
-    }
-  });
-}
-
-async function loadRadar() {
-  if (!radarMap) initMap();
-  try {
-    const r = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-    if (!r.ok) throw new Error(r.status);
-    const data = await r.json();
-    const frames = data.radar?.past || [];
-    if (frames.length === 0) throw new Error('No radar frames');
-
-    // Remove old overlay layers
-    radarLayers.forEach(l => { try { radarMap.removeLayer(l); } catch(_){} });
-    radarLayers = frames.map(f =>
-      L.tileLayer(`https://tilecache.rainviewer.com${f.path}/256/{z}/{x}/{y}/2/1_1.png`, {
-        opacity: 0.6, tileSize: 256, zIndex: 10,
-        attribution: '© <a href="https://rainviewer.com">RainViewer</a>'
-      })
-    );
-    radarFrames = frames;
-    radarIdx = frames.length - 1;
-    showFrame(radarIdx);
-    startAnim();
-  } catch(e) {
-    console.error('Radar:', e);
-    if (radarLayers.length === 0) {
-      $('radar-body').innerHTML = '<div class="state-box">Radar temporarily unavailable</div>';
-    }
-  }
-}
-
-function showFrame(idx) {
-  if (!radarMap || radarLayers.length === 0) return;
-  radarLayers.forEach(l => { try { radarMap.removeLayer(l); } catch(_){} });
-  if (radarMap.getZoom() > RADAR_MAX_ZOOM) return;
-  radarLayers[idx].addTo(radarMap);
-  const ts = new Date(radarFrames[idx].time * 1000);
-  $('radar-ts').textContent = fmtT(ts) + ' ET';
-  $('radar-ctr').textContent = `${idx + 1}/${radarFrames.length}`;
-}
-
-function startAnim() {
-  if (radarTimer) clearInterval(radarTimer);
-  radarTimer = setInterval(() => {
-    if (!radarPlaying || radarLayers.length === 0) return;
-    radarIdx = (radarIdx + 1) % radarLayers.length;
-    showFrame(radarIdx);
-  }, 700);
-}
-
-function radarPrev() {
-  radarIdx = (radarIdx - 1 + radarLayers.length) % radarLayers.length;
-  showFrame(radarIdx);
-}
-
-function radarNext() {
-  radarIdx = (radarIdx + 1) % radarLayers.length;
-  showFrame(radarIdx);
-}
-
-function toggleRadar() {
-  radarPlaying = !radarPlaying;
-  $('radar-play').textContent = radarPlaying ? '⏸' : '▶';
-}
-
-// ── ALERTS ───────────────────────────────────────────────────────────────────
-
 async function loadAlerts() {
   try {
     const r = await fetch('https://api.weather.gov/alerts/active?zone=ANZ338',
@@ -588,17 +511,59 @@ function fmtAlertTime(iso) {
   } catch(_) { return ''; }
 }
 
+// ── SYNOPTIC SURFACE ANALYSIS ────────────────────────────────────────────────
+// NY-region transform origins (x% y%) so zooming lands on the harbor, not the
+// middle of the chart: NE chart NY ~38% 28%, CONUS NY ~72% 22%
+const ZOOM_CFG = {
+  ne:    { x: '38%', y: '28%' },
+  conus: { x: '72%', y: '22%' }
+};
+const ZOOM_LEVELS = [1, 1.9, 3.2];
+let zoomIdx = 0;
+
+function loadSynoptic() {
+  const t = Date.now();
+  $('wpc-chart-ne').src    = 'https://www.wpc.ncep.noaa.gov/sfc/namnesfcwbg.gif?t=' + t;
+  $('wpc-chart-conus').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + t;
+}
+
+function openZoom(chart) {
+  zoomIdx = 0;
+  const img = $('zoom-modal-img');
+  img.src = $('wpc-chart-' + chart).src;
+  const cfg = ZOOM_CFG[chart];
+  img.style.setProperty('--zo-x', cfg.x);
+  img.style.setProperty('--zo-y', cfg.y);
+  img.style.transform = 'scale(1)';
+  $('zoom-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeZoom() {
+  $('zoom-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function zoomStep(dir) {
+  zoomIdx = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, zoomIdx + dir));
+  $('zoom-modal-img').style.transform = 'scale(' + ZOOM_LEVELS[zoomIdx] + ')';
+}
+
+function handleModalTap(e) {
+  if (e.target === $('zoom-modal') || e.target === $('zoom-img-wrap')) closeZoom();
+}
+
 // ── INIT ─────────────────────────────────────────────────────────────────────
 
 loadAlerts();
 loadForecast();
 loadMarineForecast();
-loadRadar();
+loadSynoptic();
 
 setInterval(loadAlerts,        10 * 60 * 1000);   // 10 min
 setInterval(loadForecast,      30 * 60 * 1000);   // 30 min
 setInterval(loadMarineForecast, 60 * 60 * 1000);  // 60 min
-setInterval(loadRadar,          10 * 60 * 1000);  // 10 min
+setInterval(loadSynoptic,       30 * 60 * 1000);  // 30 min
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){loadAlerts();loadForecast();loadMarineForecast();}});
 </script>
 </body>

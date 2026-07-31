@@ -39,14 +39,7 @@ canvas{display:block;border-radius:6px}
 .stat-box{background:var(--card2);border:1px solid var(--bdr);border-radius:8px;padding:10px;text-align:center}
 .stat-val{font-size:16px;font-weight:800;font-family:var(--mono);margin-top:2px}
 .stat-label{font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.stat-sub{font-size:10px;color:var(--fnt);margin-top:2px}
 .stat-meta{font-size:9px;color:var(--fnt);margin-top:6px;text-align:right}
-.compare-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px}
-.compare-col{background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:12px 8px;text-align:center}
-.compare-vsep{font-size:11px;color:var(--fnt);font-weight:700;text-align:center}
-.compare-val{font-size:22px;font-weight:800;font-family:var(--mono);margin:4px 0 2px}
-.interp-text{font-size:12px;color:var(--dim);line-height:1.55;margin-top:8px}
-.diff-row{display:flex;gap:16px;font-size:10px;color:var(--mut);margin-bottom:8px}
 .footer{text-align:center;padding:14px 0;font-size:10px;color:var(--fnt);border-top:1px solid var(--bdr);margin-top:6px}
 .sec-lbl{font-size:9px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:10px 2px 4px;margin-top:2px}
 </style>
@@ -91,6 +84,53 @@ canvas{display:block;border-radius:6px}
 
   <div class="sec-lbl">Recent Behavior</div>
 
+  <!-- CARD 1a: B&G WINDPLOT — 2 HR -->
+  <div class="card">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,#8bc34a,transparent)"></div>
+    <div class="card-hdr" onclick="toggle(this)">
+      <div class="card-t">📟 B&amp;G WindPlot — 2 hr</div>
+      <span class="caret">▼</span>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;gap:12px;margin-bottom:6px">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em">TWD</div>
+          <div style="font-size:13px;font-weight:800;color:#63b3ed;font-family:var(--mono)" id="bg2-dir">—</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em">TWS / GUST</div>
+          <div style="font-size:13px;font-weight:800;color:#48bb78;font-family:var(--mono)" id="bg2-spd">—</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div style="display:flex;gap:4px">
+          <div style="flex:1"><canvas id="cvBG2dir" style="width:100%;height:340px"></canvas></div>
+          <div style="flex:1"><canvas id="cvBG2spd" style="width:100%;height:340px"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-meta">Top = NOW · Bottom = 2h ago · <span style="color:#ecc94b;opacity:.6">┈</span> rolling avg · <span style="color:#ed893660">━</span> gusts</div>
+    </div>
+  </div>
+
+  <!-- CARD 1b: 6H WIND HISTORY -->
+  <div class="card">
+    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
+    <div class="card-hdr" onclick="toggle(this)">
+      <div class="card-t">📉 6h Wind History</div>
+      <span class="caret">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap">
+        <div style="display:flex;gap:4px">
+          <div style="flex:1"><canvas id="cvDir6" style="width:100%;height:380px"></canvas></div>
+          <div style="flex:1"><canvas id="cvSpd6" style="width:100%;height:380px"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-meta">Top = NOW · Bottom = 6h ago · <span style="color:#ecc94b;opacity:.6">┈</span> rolling avg · <span style="color:#ed893660">━</span> gusts</div>
+      <div style="font-size:9px;color:var(--fnt);margin-top:5px;line-height:1.6">Daylight-scale view — the same window the Shift Analysis below runs on. Excludes the overnight regime that dominates the 12h chart.</div>
+    </div>
+  </div>
+
   <!-- CARD 1: 12H WIND HISTORY -->
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--green),transparent)"></div>
@@ -126,7 +166,7 @@ canvas{display:block;border-radius:6px}
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)">
-      <div class="card-t">📊 Shift Analysis</div>
+      <div class="card-t">📊 Shift Analysis — 6h</div>
       <span class="caret">▼</span>
     </div>
     <div class="card-body" id="card2-body">
@@ -135,18 +175,7 @@ canvas{display:block;border-radius:6px}
   </div>
 
   <div class="sec-lbl">Background Context</div>
-
-  <!-- CARD 3: GRADIENT vs SURFACE -->
-  <div class="card">
-    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
-    <div class="card-hdr" onclick="toggle(this)">
-      <div class="card-t">🌬️ Gradient vs. Surface</div>
-      <span class="caret">▼</span>
-    </div>
-    <div class="card-body" id="card3-body">
-      <div class="state-box"><div class="spinner"></div><br>Loading gradient data…</div>
-    </div>
-  </div>
+  <a class="back-btn" href="harbor-context.html" style="display:block;text-align:center;margin-bottom:10px">🌬️ Gradient → Surface wind by height — Pressure page →</a>
 
   <div class="footer">Wind: NOAA Robbins Reef (8530973) · Gradient: Open-Meteo 850 hPa<br>Personal, experimental project · Not for navigation · Use at your own risk · Data from public sources, verify all data independently · No liability for accuracy, completeness, or timeliness · Heuristic reference only — not a forecast · Thresholds are local rules of thumb</div>
 </div>
@@ -155,11 +184,7 @@ canvas{display:block;border-radius:6px}
 const LAT = 40.6797, LON = -74.0288, ROB = '8530973';
 const $ = id => document.getElementById(id);
 
-// Wind shear: Robbins Reef anemometer at 54 ft (16.46 m), J/80 mast 37 ft (11.28 m)
-// Power law: v(z) = v_ref * (z/z_ref)^0.11  (open water exponent)
-const ROB_ANE_M = 16.46, MAST_J80_M = 11.28, MAST_M24_M = 8.81, SHEAR_ALPHA = 0.11;
-const MAST_FACTOR_J80 = Math.pow(MAST_J80_M / ROB_ANE_M, SHEAR_ALPHA); // ≈ 0.959
-const MAST_FACTOR_M24 = Math.pow(MAST_M24_M / ROB_ANE_M, SHEAR_ALPHA); // ≈ 0.934
+// Wind-by-height (gradient → surface) now lives on harbor-context.html
 
 let windEvening = null;
 let gradientData = null;
@@ -213,7 +238,8 @@ function drawTacticsV(cv, data, opt) {
   const { ctx, w: W, h: H } = s;
 
   const anchorMs = opt.anchor ? opt.anchor.getTime() : data[data.length-1].time.getTime();
-  const winMs = 720 * 60000;
+  const winMin = opt.winMin || 720;
+  const winMs = winMin * 60000;
   const pts = data.filter(d => d.time.getTime() >= anchorMs - winMs && d.time.getTime() <= anchorMs + 60000);
   if (pts.length < 2) return;
 
@@ -243,8 +269,12 @@ function drawTacticsV(cv, data, opt) {
 
   ctx.fillStyle = '#060b12'; ctx.beginPath(); ctx.roundRect(0,0,W,H,8); ctx.fill();
 
+  // Pick a tick step that leaves room for the labels — these panels are ~150px
+  // wide, so a fixed step smears the numbers together on wide-range directions
   const rng = mx-mn;
-  const step = opt.unwrap ? (rng>40?10:rng>15?5:2) : (rng>15?5:rng>6?2:1);
+  const maxLabels = Math.max(3, Math.floor(cw / 32));
+  const nice = opt.unwrap ? [2,5,10,20,30,45,60,90,120] : [1,2,5,10,20,50];
+  const step = nice.find(v => v >= rng/maxLabels) || nice[nice.length-1];
   ctx.strokeStyle='#1a2d4260'; ctx.lineWidth=.5; ctx.fillStyle='#6b829990'; ctx.font='9px system-ui'; ctx.textAlign='center';
   for (let v = Math.ceil(mn/step)*step; v <= mx; v += step) {
     const x = xS(v); ctx.beginPath(); ctx.moveTo(x,P.t); ctx.lineTo(x,H-P.b); ctx.stroke();
@@ -252,15 +282,16 @@ function drawTacticsV(cv, data, opt) {
     ctx.fillText(lbl, x, P.t-4);
   }
 
+  // Time gridlines — tick spacing scales with the window (12h→2h, 6h→1h, 2h→30min)
+  const gridMin = opt.gridMin || (winMin >= 720 ? 120 : winMin >= 360 ? 60 : 30);
   ctx.strokeStyle='#1a2d4240'; ctx.fillStyle='#6b829980'; ctx.font='9px system-ui'; ctx.textAlign='left';
-  [0,2,4,6,8,10,12].forEach(h => {
-    const t = anchorMs - h*3600000;
-    const y = yS(t);
-    if (y < P.t || y > H-P.b) return;
+  for (let m = 0; m <= winMin; m += gridMin) {
+    const y = yS(anchorMs - m*60000);
+    if (y < P.t || y > H-P.b) continue;
     ctx.beginPath(); ctx.moveTo(P.l,y); ctx.lineTo(W-P.r,y); ctx.stroke();
-    const lbl = h === 0 ? fmtHM(new Date(anchorMs)) : '-'+h+'h';
-    ctx.fillText(lbl, P.l+2, h===0 ? y+11 : y-3);
-  });
+    const lbl = m === 0 ? fmtHM(new Date(anchorMs)) : (m % 60 === 0 ? '-'+(m/60)+'h' : '-'+m+'m');
+    ctx.fillText(lbl, P.l+2, m===0 ? y+11 : y-3);
+  }
 
   ctx.strokeStyle='#ecc94b40'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
   ctx.beginPath(); ctx.moveTo(xS(avg),P.t); ctx.lineTo(xS(avg),H-P.b); ctx.stroke(); ctx.setLineDash([]);
@@ -414,20 +445,33 @@ async function fetchGradient() {
 
 // ── RENDERERS ─────────────────────────────────────────────────
 
+// Last 6h of the 12h dataset — 6-min samples, so 60 points
+const last6h = () => windEvening ? windEvening.slice(-60) : null;
+
 function renderEveningCharts() {
   if (!windEvening?.length) return;
   const last=windEvening[windEvening.length-1];
   $('ev-dir').textContent=cardinal(last.dir)+' '+last.dir.toFixed(0)+'°';
   $('ev-spd').textContent=last.speed.toFixed(1)+' kt  G'+last.gusts.toFixed(1);
   $('ev-time').textContent='NOAA 6-min · Latest: '+fmtT(last.time);
+  $('bg2-dir').textContent=cardinal(last.dir)+' ('+last.dir.toFixed(0)+'°)';
+  $('bg2-spd').textContent=last.speed.toFixed(1)+' kt  G'+last.gusts.toFixed(1);
   $('obs-dir').textContent=cardinal(last.dir)+' '+last.dir.toFixed(0)+'°';
   $('obs-spd').textContent=last.speed.toFixed(1)+' kt';
   $('obs-spd').style.color=wCSS(last.speed);
   $('obs-gst').textContent=last.gusts.toFixed(1)+' kt';
   $('obs-gst').style.color=wCSS(last.gusts);
   $('obs-meta').textContent='Robbins Reef · Latest '+fmtT(last.time)+' · NOAA 6-min avg';
-  drawTacticsV($('cvDir'),windEvening,{key:'dir',unwrap:true,color:'#63b3ed',fill:'rgba(99,179,237,.12)',minM:5});
-  drawTacticsV($('cvSpd'),windEvening,{key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2});
+
+  const dirOpt={key:'dir',unwrap:true,color:'#63b3ed',fill:'rgba(99,179,237,.12)',minM:5};
+  const spdOpt={key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2};
+
+  drawTacticsV($('cvBG2dir'),windEvening,{...dirOpt,winMin:120});
+  drawTacticsV($('cvBG2spd'),windEvening,{...spdOpt,winMin:120});
+  drawTacticsV($('cvDir6'),windEvening,{...dirOpt,winMin:360});
+  drawTacticsV($('cvSpd6'),windEvening,{...spdOpt,winMin:360});
+  drawTacticsV($('cvDir'),windEvening,dirOpt);
+  drawTacticsV($('cvSpd'),windEvening,spdOpt);
 }
 
 function renderShiftCard(data, gData, bodyId) {
@@ -445,7 +489,8 @@ function renderShiftCard(data, gData, bodyId) {
   el.innerHTML=`
     <div class="regime-badge" style="background:${regColor}18;border-color:${regColor};color:${regColor}">${a.regime}</div>
     <div style="font-size:13px;font-weight:600;color:var(--txt);line-height:1.5;margin:6px 0 6px">${a.interpretation}</div>
-    <div style="font-size:10px;color:var(--fnt);font-style:italic;margin-bottom:10px;line-height:1.5">Heuristic — single sensor, 6-min data. Use as a decision aid, not a forecast.</div>
+    <div style="font-size:10px;color:var(--fnt);font-style:italic;margin-bottom:10px;line-height:1.5">Heuristic — single sensor, 6-min reporting interval. Use as a decision aid, not a forecast.</div>
+    <div style="font-size:10px;color:var(--orange);background:rgba(237,137,54,.07);border:1px solid rgba(237,137,54,.2);border-radius:6px;padding:7px 9px;margin-bottom:10px;line-height:1.55"><strong>Resolution limit:</strong> CO-OPS reports every 6 minutes, but each value covers only a <em>2-minute</em> window ending at the tick — speed is a 2-min scalar average of 1-second samples, direction a 2-min unit-vector average. <strong>Four of every six minutes are never observed.</strong> So a 2–5 minute shift can land entirely in the gap, and anything under ~2 min is averaged away inside the sample. Osc Period below needs two samples, so it can never read under 12 min. This card describes the 15-min-to-2-hour band — mean direction, phase, trend — not puff-to-puff shifts.<br><span style="color:var(--mut)">Gust is the exception: it's the max 5-second moving average across the <em>full</em> 6 minutes, so a brief puff often shows in the gust trace when the sustained trace misses it entirely.</span><br><a href="https://tidesandcurrents.noaa.gov/publications/CO-OPS_Measurement_Spec.pdf" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Source: CO-OPS Sensor Specifications &amp; Measurement Algorithms ↗</a></div>
     <div class="r-meta">r = ${a.r.toFixed(2)} · ${rCtx}${sigNote}</div>
     <div class="stat-grid">
       <div class="stat-box"><div class="stat-label">Mean Direction</div><div class="stat-val">${a.meanDir.toFixed(0)}° ${cardinal(a.meanDir)}</div></div>
@@ -453,85 +498,7 @@ function renderShiftCard(data, gData, bodyId) {
       <div class="stat-box"><div class="stat-label">Osc Period</div><div class="stat-val">${a.period?a.period+' min':'—'}</div></div>
       <div class="stat-box"><div class="stat-label">Port / Stbd Lifts</div><div class="stat-val">${a.lifts.port}% · ${a.lifts.starboard}%</div></div>
     </div>
-    <div class="stat-meta">n = ${a.n} observations · 6-min intervals · Robbins Reef</div>`;
-}
-
-function renderContextCard(windData, gData) {
-  const el=$('card3-body');
-  const surface=windData?.length?windData[windData.length-1]:null;
-  const grad=getGradientAt(gData,new Date());
-  if(!surface&&!grad.spd){el.innerHTML='<div class="state-box">Context unavailable — both data sources offline</div>';return;}
-  if(!grad.spd){
-    const mastSpd=surface?(surface.speed*MAST_FACTOR_J80).toFixed(1):'—';
-    el.innerHTML=`<div style="padding:12px 0"><div class="compare-col"><div class="stat-label">Robbins Reef<br><span style="font-size:9px;opacity:.7">54 ft sensor</span></div><div class="compare-val" style="color:${surface?wCSS(surface.speed):'var(--mut)'}">${surface?surface.speed.toFixed(1):'—'} kt</div><div class="stat-sub">${surface?cardinal(surface.dir)+' '+surface.dir.toFixed(0)+'°':'—'}</div></div><div style="margin-top:10px;font-size:11px;color:var(--fnt)">Gradient data unavailable — classification deferred</div></div>`;
-    return;
-  }
-  if(!surface){
-    el.innerHTML=`<div class="state-box">Surface wind unavailable<br><span style="font-size:11px">Gradient: ${grad.spd.toFixed(1)} kt ${cardinal(grad.dir)} ${grad.dir.toFixed(0)}°</span></div>`;
-    return;
-  }
-  const mastSpdJ80 = surface.speed * MAST_FACTOR_J80;
-  const mastSpdM24 = surface.speed * MAST_FACTOR_M24;
-  let dirDiff=Math.abs(surface.dir-grad.dir);
-  if(dirDiff>180)dirDiff=360-dirDiff;
-  const ratio=grad.spd>0?surface.speed/grad.spd:0;
-  const mastRatio=grad.spd>0?mastSpdJ80/grad.spd:0;
-  const spds=windData.map(d=>d.speed);
-  const last30slope=linRegSlope(spds.slice(-30));
-  const dirStdAll=circularStd(windData.map(d=>d.dir));
-  let regime,regColor,interp;
-  if(dirDiff<=20&&ratio>0.6){
-    regime='Likely Gradient-Driven';regColor='var(--blue)';
-    interp='Aloft flow appears materially stronger than the surface layer — shifts may track synoptic pressure patterns. Percentage sailing may apply.';
-  } else if(dirDiff>40&&last30slope<-0.1&&dirStdAll>10){
-    regime='Possible Dying Thermal';regColor='var(--orange)';
-    interp='Surface layer appears decoupled from aloft flow; speed declining. Local thermal may be weakening — gradient influence possible as thermal dies.';
-  } else if(dirDiff>40&&ratio>=0.4){
-    regime='Thermal Likely Active';regColor='var(--yellow)';
-    interp='Local thermal/sea-breeze effects likely shaping the surface wind. Direction clocking pattern consistent with sea breeze — speed may build then ease at sunset.';
-  } else if(ratio<0.4){
-    regime='Gradient Likely Weak at Surface';regColor='var(--mut)';
-    interp='Conditions may be light and variable. Aloft flow does not appear to be reaching the surface strongly.';
-  } else {
-    regime='Mixed / Transitional';regColor='var(--dim)';
-    interp='Surface and aloft flows partially coupled — monitor for regime shift.';
-  }
-  const gradTs=grad.time?fmtT(grad.time):'';
-  const dColor=dirDiff>40?'var(--yellow)':dirDiff>20?'var(--accent)':'var(--green)';
-  const rColor=ratio<0.4?'var(--orange)':ratio>0.6?'var(--green)':'var(--yellow)';
-  const diffRange=dirDiff<20?'low decoupling':dirDiff<40?'moderate decoupling':'high decoupling';
-  const ratioRange=ratio>0.6?'strong coupling':ratio>0.4?'moderate coupling':'weak coupling';
-  el.innerHTML=`
-    <div class="regime-badge" style="background:${regColor}18;border-color:${regColor};color:${regColor}">${regime}</div>
-    <div style="font-size:13px;font-weight:600;color:var(--txt);line-height:1.5;margin:6px 0 12px">${interp}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:10px">
-      <div class="compare-col" style="padding:7px 4px;border-color:var(--accent)40">
-        <div class="stat-label" style="font-size:8px">Melges 24<br><span style="opacity:.7">29 ft mast</span></div>
-        <div style="font-size:14px;font-weight:800;font-family:var(--mono);margin:3px 0 2px;color:${wCSS(mastSpdM24)}">${mastSpdM24.toFixed(1)} kt</div>
-        <div class="stat-sub" style="font-size:9px">est.</div>
-      </div>
-      <div class="compare-col" style="padding:7px 4px;border-color:var(--accent)40">
-        <div class="stat-label" style="font-size:8px">J/80<br><span style="opacity:.7">37 ft mast</span></div>
-        <div style="font-size:14px;font-weight:800;font-family:var(--mono);margin:3px 0 2px;color:${wCSS(mastSpdJ80)}">${mastSpdJ80.toFixed(1)} kt</div>
-        <div class="stat-sub" style="font-size:9px">est.</div>
-      </div>
-      <div class="compare-col" style="padding:7px 4px">
-        <div class="stat-label" style="font-size:8px">Robbins Reef<br><span style="opacity:.7">54 ft sensor</span></div>
-        <div style="font-size:14px;font-weight:800;font-family:var(--mono);margin:3px 0 2px;color:${wCSS(surface.speed)}">${surface.speed.toFixed(1)} kt</div>
-        <div class="stat-sub" style="font-size:9px">${cardinal(surface.dir)} ${surface.dir.toFixed(0)}°</div>
-      </div>
-      <div class="compare-col" style="padding:7px 4px">
-        <div class="stat-label" style="font-size:8px">Gradient<br><span style="opacity:.7">850 hPa</span></div>
-        <div style="font-size:14px;font-weight:800;font-family:var(--mono);margin:3px 0 2px;color:${wCSS(grad.spd)}">${grad.spd.toFixed(1)} kt</div>
-        <div class="stat-sub" style="font-size:9px">${cardinal(grad.dir)} ${grad.dir.toFixed(0)}°</div>
-      </div>
-    </div>
-    <div class="diff-row" style="align-items:flex-start;flex-direction:column;gap:4px">
-      <span style="font-size:11px">Dir differential: <strong style="color:${dColor}">${dirDiff.toFixed(0)}°</strong> <span style="color:var(--fnt);font-size:10px">surface vs. aloft · ${diffRange} (rule of thumb: &lt;20° low, 20–40° moderate, &gt;40° high)</span></span>
-      <span style="font-size:11px">Speed ratio: <strong style="color:${rColor}">${(ratio*100).toFixed(0)}%</strong> <span style="color:var(--fnt);font-size:10px">Robbins Reef ÷ aloft · ${ratioRange} (rule of thumb: &gt;60% strong, &lt;40% weak) · J/80 mast: ${(mastRatio*100).toFixed(0)}%</span></span>
-    </div>
-    <div style="font-size:9px;color:var(--fnt);margin-top:8px;line-height:1.5">Mast estimates: power law α=0.11 from 54 ft sensor · Open-Meteo 850 hPa ${gradTs}</div>
-    <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:4px;line-height:1.5">Interpretive view — single aloft reference, one surface sensor. Use as sailing context, not a verdict.</div>`;
+    <div class="stat-meta">n = ${a.n} observations · 6-min intervals · last 6h · Robbins Reef</div>`;
 }
 
 // ── MAIN LOADER ───────────────────────────────────────────────
@@ -550,8 +517,7 @@ async function loadAll() {
     $('card2-body').innerHTML='<div class="state-box">Analysis unavailable — wind data offline</div>';
   }
 
-  if(windEvening) renderShiftCard(windEvening,gradientData,'card2-body');
-  renderContextCard(windEvening,gradientData);
+  if(windEvening) renderShiftCard(last6h(),gradientData,'card2-body');
 
   $('hdr-updated').textContent='Updated '+fmtT(new Date());
 }
@@ -560,7 +526,7 @@ async function refreshWind() {
   try {
     windEvening=await fetchEvening();
     renderEveningCharts();
-    renderShiftCard(windEvening,gradientData,'card2-body');
+    renderShiftCard(last6h(),gradientData,'card2-body');
     $('hdr-updated').textContent='Updated '+fmtT(new Date());
   } catch(e){ console.error('Wind refresh:',e); }
 }
@@ -568,8 +534,7 @@ async function refreshWind() {
 async function refreshGradient() {
   try {
     gradientData=await fetchGradient();
-    renderContextCard(windEvening,gradientData);
-    if(windEvening) renderShiftCard(windEvening,gradientData,'card2-body');
+    if(windEvening) renderShiftCard(last6h(),gradientData,'card2-body');
   } catch(e){ console.error('Gradient refresh:',e); }
 }
 

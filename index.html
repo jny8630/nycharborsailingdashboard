@@ -78,6 +78,18 @@ canvas{display:block;border-radius:8px}
 .alert-event{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .alert-hl{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.5}
 .alert-exp{font-size:10px;color:var(--fnt);margin-top:3px}
+/* Forecast wind map */
+#fc-map{width:100%;height:330px;border-radius:8px;overflow:hidden;background:var(--card2)}
+.fc-hours{display:flex;gap:4px;margin-bottom:8px}
+.fc-hbtn{flex:1;min-width:0;padding:6px 2px;background:var(--card2);border:1px solid var(--bdr);border-radius:7px;color:var(--mut);font-size:11px;font-weight:600;font-family:var(--mono);cursor:pointer;text-align:center;line-height:1.3;white-space:nowrap;display:flex;flex-direction:column;justify-content:flex-end}
+.fc-hbtn.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
+.fc-hbtn:active{opacity:.7}
+.fc-now{font-size:8px;font-weight:700;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:1px}
+.fc-legend{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:10px;color:var(--mut);font-family:var(--mono)}
+.buoy-dot{display:flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid rgba(0,0,0,.5);font-size:9px;font-weight:800;color:#000;font-family:var(--mono);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.wind-arrow{display:flex;align-items:center;justify-content:center;font-weight:900;text-shadow:0 0 4px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9);pointer-events:none}
+.leaflet-control-attribution{background:rgba(8,14,24,.8)!important;color:var(--fnt)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--accent)!important}
 </style>
 </head>
 <body>
@@ -96,6 +108,7 @@ canvas{display:block;border-radius:8px}
     <a href="harbor-context.html" class="btn" style="text-align:center;text-decoration:none">Pressure</a>
     <a href="nyhops-overlay.html" class="btn" style="text-align:center;text-decoration:none">Currents</a>
     <a href="nyhops.html" class="btn" style="text-align:center;text-decoration:none">nyhops</a>
+    <a href="radar.html" class="btn" style="text-align:center;text-decoration:none">Radar</a>
     <a href="lnm.html" class="btn" style="text-align:center;text-decoration:none">LNM</a>
   </div>
 </div>
@@ -129,24 +142,6 @@ canvas{display:block;border-radius:8px}
     </div>
   </div>
 
-  <!-- B&G VERTICAL WIND PLOT -->
-  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,#8bc34a,transparent)"></div>
-    <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>📟</span> B&G WindPlot — 2 hr</div><span class="caret">▼</span></div>
-    <div class="card-body">
-      <div style="display:flex;gap:8px;margin-bottom:6px">
-        <div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em">TWD</div><div style="font-size:13px;font-weight:800;color:#63b3ed;font-family:var(--mono)" id="bgd-val">—</div></div>
-        <div style="flex:1;text-align:center"><div style="font-size:9px;color:var(--mut);font-weight:700;letter-spacing:.08em">TWS / GUST</div><div style="font-size:13px;font-weight:800;color:#48bb78;font-family:var(--mono)" id="bgs-val">—</div></div>
-      </div>
-      <div style="display:flex;gap:4px">
-        <div style="flex:1"><canvas id="cvBGdir" style="width:100%;height:340px"></canvas></div>
-        <div style="flex:1"><canvas id="cvBGspd" style="width:100%;height:340px"></canvas></div>
-      </div>
-      <div style="font-size:9px;color:var(--fnt);text-align:center;margin-top:6px">
-        Top = now · Bottom = 2 hr ago · <span style="color:#ecc94b;opacity:.5">┈</span> rolling avg · <span style="color:#ed893680">━</span> gusts (TWS)
-      </div>
-    </div>
-  </div>
-
   <!-- FORECAST -->
   <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--purple),transparent)"></div>
     <div class="card-hdr" onclick="toggle(this)"><div class="card-t"><span>📊</span> Wind Forecast — HRRR (3km)</div><span class="caret">▼</span></div>
@@ -154,6 +149,20 @@ canvas{display:block;border-radius:8px}
       <div class="fc-hdr"><span>Time</span><span>Wind</span><span>Gust</span><span>Dir</span><span>Deg</span><span>Temp</span><span>Rain</span></div>
       <div id="fcrows"></div>
       <div style="font-size:9px;color:var(--fnt);margin-top:8px;text-align:right">Open-Meteo HRRR (3km) · Updated hourly</div>
+    </div>
+  </div>
+
+  <!-- FORECAST WIND MAP -->
+  <div class="card"><div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--accent),transparent)"></div>
+    <div class="card-hdr" onclick="toggle(this);initFcWind()"><div class="card-t"><span>🧭</span> Forecast Wind — Harbor Map</div><span class="caret">▲</span></div>
+    <div class="card-body collapsed">
+      <div class="fc-hours" id="fc-hours"></div>
+      <div id="fc-map"></div>
+      <div id="fc-legend" class="fc-legend"></div>
+      <div style="font-size:9px;color:var(--fnt);margin-top:7px;line-height:1.6">
+        Arrow points the way the wind is <strong>blowing</strong>; length and colour scale with speed. Six HRRR (3&nbsp;km) grid cells across the harbour, hourly.
+        Cell-to-cell spread is usually small — the point is the wind's angle against the shoreline and the buoys, not a fine-grained field.
+      </div>
     </div>
   </div>
 
@@ -249,6 +258,9 @@ const fmtHM=d=>d?d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',h
 const c2f=c=>(c*9/5+32).toFixed(0);
 const mUntil=(f,n)=>{const m=(f-n)/6e4;if(m<1)return'now';if(m<60)return Math.round(m)+'m';const h=Math.floor(m/60),r=Math.round(m%60);return r>0?h+'h '+r+'m':h+'h'};
 const wCSS=k=>k>=25?'var(--red)':k>=18?'var(--orange)':k>=12?'var(--yellow)':k>=6?'var(--green)':'var(--dim)';
+// Same scale as wCSS, but literal hex — Leaflet divIcons are built outside the
+// stylesheet's scope, so CSS custom properties don't resolve there
+const wHex=k=>k>=25?'#f56565':k>=18?'#ed8936':k>=12?'#ecc94b':k>=6?'#48bb78':'#c4d0de';
 const fColor=f=>f==='flooding'?'var(--blue)':f==='ebbing'?'var(--orange)':'var(--dim)';
 const wxI=c=>{if(c<=1)return'☀️';if(c<=3)return'⛅';if(c<=48)return'🌫️';if(c<=67)return'🌧️';if(c>=95)return'⛈️';return'🌤️'};
 const wxD=c=>({0:'Clear',1:'Mostly Clear',2:'Partly Cloudy',3:'Overcast',45:'Fog',51:'Lt Drizzle',61:'Lt Rain',63:'Rain',65:'Heavy Rain',80:'Showers',95:'Thunderstorm',96:'T-Storm+Hail'})[c]||'—';
@@ -404,59 +416,6 @@ function drawSpeedH(cv,data){
   const li=data.length-1;ctx.beginPath();ctx.arc(xS(li),yS(data[li].speed),5,0,Math.PI*2);ctx.fillStyle='#48bb78';ctx.fill();ctx.strokeStyle='#0c1520';ctx.lineWidth=2;ctx.stroke();
 }
 
-function drawDirH(cv,data){
-  if(!data||data.length<2)return;const{ctx,w:W,h:H}=setupCanvas(cv);
-  const dirs=[data[0].dir];for(let i=1;i<data.length;i++){let d=data[i].dir,p=dirs[i-1];while(d-p>180)d-=360;while(p-d>180)d+=360;dirs.push(d)}
-  const aW=10,avgs=dirs.map((_,i)=>{const s=Math.max(0,i-aW+1);return dirs.slice(s,i+1).reduce((a,v)=>a+v,0)/(i-s+1)});
-  const allD=[...dirs,...avgs];const mn=Math.min(...allD)-5,mx=Math.max(...allD)+5;
-  const P={t:10,b:22,l:36,r:10},cw=W-P.l-P.r,ch=H-P.t-P.b;
-  const xS=i=>(i/(data.length-1))*cw+P.l,yS=v=>P.t+ch-((v-mn)/(mx-mn))*ch;
-  const rng=mx-mn,step=rng>60?20:rng>30?10:5;
-  ctx.strokeStyle='#1a2d42';ctx.lineWidth=.5;
-  for(let v=Math.ceil(mn/step)*step;v<=mx;v+=step){const y=yS(v);ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillStyle='#6b8299';ctx.font='10px system-ui';ctx.textAlign='right';ctx.fillText((((v%360)+360)%360).toFixed(0)+'°',P.l-5,y+4)}
-  ctx.fillStyle='#6b8299';ctx.font='10px system-ui';ctx.textAlign='center';const le=Math.max(1,Math.floor(data.length/5));for(let i=0;i<data.length;i+=le)ctx.fillText(fmtHM(data[i].time),xS(i),H-4);
-  ctx.beginPath();for(let i=0;i<dirs.length;i++){let x=xS(i),y=yS(dirs[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}for(let i=dirs.length-1;i>=0;i--)ctx.lineTo(xS(i),yS(avgs[i]));ctx.closePath();ctx.fillStyle='rgba(99,179,237,.1)';ctx.fill();
-  ctx.beginPath();ctx.strokeStyle='#ecc94b55';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);for(let i=0;i<avgs.length;i++){let x=xS(i),y=yS(avgs[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();ctx.setLineDash([]);
-  ctx.beginPath();ctx.strokeStyle='#63b3ed';ctx.lineWidth=2;for(let i=0;i<dirs.length;i++){let x=xS(i),y=yS(dirs[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
-  const li=dirs.length-1;ctx.beginPath();ctx.arc(xS(li),yS(dirs[li]),5,0,Math.PI*2);ctx.fillStyle='#63b3ed';ctx.fill();ctx.strokeStyle='#0c1520';ctx.lineWidth=2;ctx.stroke();
-}
-
-// ═══════════════════════════════════
-// B&G VERTICAL WIND PLOTS
-// ═══════════════════════════════════
-
-function drawBGV(cv,data,opt){
-  if(!data||data.length<2)return;const{ctx,w:W,h:H}=setupCanvas(cv);
-  const now=data[data.length-1].time.getTime(),winMs=120*60000,cut=now-winMs;
-  const pts=data.filter(d=>d.time.getTime()>=cut);if(pts.length<2)return;
-  let vals=pts.map(d=>d[opt.key]);
-  if(opt.unwrap){const uw=[vals[0]];for(let i=1;i<vals.length;i++){let v=vals[i],p=uw[i-1];while(v-p>180)v-=360;while(p-v>180)v+=360;uw.push(v)}vals=uw}
-  const aW=5,avgs=vals.map((_,i)=>{const s=Math.max(0,i-aW+1);return vals.slice(s,i+1).reduce((a,v)=>a+v,0)/(i-s+1)});
-  const avg=vals.reduce((a,v)=>a+v,0)/vals.length;
-  let gVals=opt.gustKey?pts.map(d=>d[opt.gustKey]):null;
-  const allV=[...vals,...avgs];if(gVals)allV.push(...gVals);
-  const spread=Math.max(...allV)-Math.min(...allV);const margin=Math.max(spread*.15,opt.minM||2);
-  const mn=Math.min(...allV)-margin,mx=Math.max(...allV)+margin;
-  const P={t:16,b:16,l:8,r:8},cw=W-P.l-P.r,ch=H-P.t-P.b;
-  const xS=v=>P.l+((v-mn)/(mx-mn))*cw,yS=t=>P.t+((now-t)/winMs)*ch;
-  ctx.fillStyle='#060b12';ctx.beginPath();ctx.roundRect(0,0,W,H,8);ctx.fill();
-  const rng=mx-mn;const step=opt.unwrap?(rng>40?10:rng>15?5:2):(rng>15?5:rng>6?2:1);
-  ctx.strokeStyle='#1a2d4260';ctx.lineWidth=.5;ctx.fillStyle='#6b829990';ctx.font='9px system-ui';ctx.textAlign='center';
-  for(let v=Math.ceil(mn/step)*step;v<=mx;v+=step){const x=xS(v);ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();const lbl=opt.unwrap?(((v%360)+360)%360).toFixed(0):v.toFixed(0);ctx.fillText(lbl,x,P.t-4)}
-  ctx.strokeStyle='#1a2d4240';ctx.fillStyle='#6b829980';ctx.font='9px system-ui';ctx.textAlign='left';
-  [0,30,60,90,120].forEach(m=>{const y=yS(now-m*60000);if(y>=P.t&&y<=H-P.b){ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillText(m===0?'NOW':'-'+m+'m',P.l+2,m===0?y+11:y-3)}});
-  ctx.strokeStyle='#ecc94b40';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(xS(avg),P.t);ctx.lineTo(xS(avg),H-P.b);ctx.stroke();ctx.setLineDash([]);
-  ctx.beginPath();for(let i=0;i<pts.length;i++){const x=xS(vals[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}
-  for(let i=pts.length-1;i>=0;i--)ctx.lineTo(xS(avgs[i]),yS(pts[i].time.getTime()));ctx.closePath();ctx.fillStyle=opt.fill;ctx.fill();
-  ctx.beginPath();ctx.strokeStyle='#ecc94b45';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
-  for(let i=0;i<pts.length;i++){const x=xS(avgs[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();ctx.setLineDash([]);
-  if(gVals){ctx.beginPath();ctx.strokeStyle='rgba(237,137,54,.4)';ctx.lineWidth=1;for(let i=0;i<pts.length;i++){const x=xS(gVals[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()}
-  ctx.beginPath();ctx.strokeStyle=opt.color;ctx.lineWidth=2.5;
-  for(let i=0;i<pts.length;i++){const x=xS(vals[i]),y=yS(pts[i].time.getTime());i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
-  const lx=xS(vals[vals.length-1]),ly=yS(pts[pts.length-1].time.getTime());
-  ctx.beginPath();ctx.arc(lx,ly,5,0,Math.PI*2);ctx.fillStyle=opt.color;ctx.fill();ctx.strokeStyle='#060b12';ctx.lineWidth=2;ctx.stroke();
-}
-
 // ═══════════════════════════════════
 // BAROMETRIC PRESSURE
 // ═══════════════════════════════════
@@ -486,11 +445,7 @@ function renderWind(h){
   $('wdeg').textContent=isNaN(l.dir)?'':'('+l.dir.toFixed(0)+'°)';
   $('wtime').textContent=l.time?'NOAA 6-min data · Latest: '+fmtT(l.time):'';
   $('gw').textContent=s;$('gw').style.color=wCSS(l.speed);$('gwd').textContent='kt '+cardinal(l.dir);
-  $('bgd-val').textContent=cardinal(l.dir)+' ('+l.dir.toFixed(0)+'°)';
-  $('bgs-val').textContent=s+' kt  G'+g;
   drawSpeedH($('cvSpeed'),h);
-  drawBGV($('cvBGdir'),h,{key:'dir',unwrap:true,color:'#63b3ed',fill:'rgba(99,179,237,.12)',minM:5});
-  drawBGV($('cvBGspd'),h,{key:'speed',gustKey:'gusts',unwrap:false,color:'#48bb78',fill:'rgba(72,187,120,.12)',minM:2});
 }
 
 function renderPressure(p){
@@ -566,6 +521,142 @@ function renderForecast(hr){
     const isN=diff>=-.25&&diff<.75,w=m.wind_speed_10m?.[i],g=m.wind_gusts_10m?.[i],d=m.wind_direction_10m?.[i],tp=m.temperature_2m?.[i],pr=m.precipitation?.[i];
     rows+='<div class="fc-row'+(isN?' now':'')+'"><span style="font-weight:'+(isN?700:400)+';color:'+(isN?'var(--accent)':'var(--mut)')+';font-size:11px">'+fmtT(t)+'</span><span style="color:'+(w!=null?wCSS(w):'var(--mut)')+';font-weight:700">'+(w!=null?w.toFixed(0):'—')+' kt</span><span style="color:var(--mut)">G'+(g!=null?g.toFixed(0):'—')+'</span><span>'+cardinal(d)+'</span><span style="color:var(--mut)">'+(d!=null?d.toFixed(0):'—')+'°</span><span>'+(tp!=null?tp.toFixed(0):'—')+'°</span><span style="text-align:center">'+(pr>0?'💧':'·')+'</span></div>';cnt++}
   $('fcrows').innerHTML=rows||'<div style="padding:8px;color:var(--mut)">No HRRR data</div>';
+}
+
+// ═══════════════════════════════════
+// FORECAST WIND MAP
+// Leaflet is loaded on first expand only — the dashboard's first paint
+// shouldn't pay for a map most sessions never open.
+// ═══════════════════════════════════
+
+// HRRR is 3 km, so these six points land in distinct grid cells across the harbor
+const FC_GRID=[
+  {lat:40.60,lon:-74.10,name:'Lower Bay W'},
+  {lat:40.64,lon:-74.05,name:'Narrows'},
+  {lat:40.68,lon:-74.02,name:'Upper Bay'},
+  {lat:40.72,lon:-74.01,name:'North River'},
+  {lat:40.64,lon:-73.96,name:'Lower Bay E'},
+  {lat:40.70,lon:-74.12,name:'Kill Van Kull'},
+];
+const FC_BUOYS=[
+  {name:'G1', lat:40.67970, lon:-74.02875, color:'#48bb78'},
+  {name:'G5', lat:40.64571, lon:-74.04124, color:'#48bb78'},
+  {name:'G7', lat:40.65467, lon:-74.03187, color:'#48bb78'},
+  {name:'G9', lat:40.66357, lon:-74.02244, color:'#48bb78'},
+  {name:'G11',lat:40.67216, lon:-74.02401, color:'#48bb78'},
+  {name:'33', lat:40.68392, lon:-74.04020, color:'#48bb78'},
+  {name:'31', lat:40.66503, lon:-74.05259, color:'#48bb78'},
+  {name:'Y-A',lat:40.66661, lon:-74.02943, color:'#ecc94b'},
+  {name:'Y-C',lat:40.65095, lon:-74.04014, color:'#ecc94b'},
+  {name:'R26',lat:40.63427, lon:-74.05054, color:'#f56565'},
+  {name:'R28',lat:40.64411, lon:-74.05389, color:'#f56565'},
+  {name:'R30',lat:40.65547, lon:-74.05051, color:'#f56565'},
+  {name:'R32',lat:40.67164, lon:-74.04026, color:'#f56565'},
+];
+const FC_HOURS=6;
+
+let fcMap=null,fcArrows=[],fcData=null,fcHour=0,fcInit=false;
+
+function loadLeaflet(){
+  if(window.L)return Promise.resolve();
+  if(window._leafletP)return window._leafletP;
+  window._leafletP=new Promise((res,rej)=>{
+    const css=document.createElement('link');
+    css.rel='stylesheet';css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+    const js=document.createElement('script');
+    js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    js.onload=res;js.onerror=()=>rej(new Error('Leaflet failed to load'));
+    document.head.appendChild(js);
+  });
+  return window._leafletP;
+}
+
+async function fetchFcWind(){
+  const lats=FC_GRID.map(p=>p.lat).join(','),lons=FC_GRID.map(p=>p.lon).join(',');
+  const d=await getJ(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&models=gfs_hrrr&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&timezone=America%2FNew_York&forecast_hours=${FC_HOURS}`);
+  const locs=Array.isArray(d)?d:[d];
+  if(!locs[0]?.hourly?.time?.length)throw new Error('No HRRR grid data');
+  return{
+    times:locs[0].hourly.time.map(t=>new Date(t)),
+    pts:locs.map((l,i)=>({
+      lat:l.latitude,lon:l.longitude,name:FC_GRID[i]?.name||'',
+      spd:l.hourly.wind_speed_10m,dir:l.hourly.wind_direction_10m,gst:l.hourly.wind_gusts_10m
+    }))
+  };
+}
+
+function renderFcHours(){
+  const el=$('fc-hours');el.innerHTML='';
+  const hr12=d=>{const h=d.getHours()%12;return h===0?12:h};
+  fcData.times.forEach((t,i)=>{
+    const end=new Date(t.getTime()+3600000);
+    const b=document.createElement('button');
+    b.className='fc-hbtn'+(i===fcHour?' active':'');
+    b.innerHTML=(i===0?'<span class="fc-now">NOW</span>':'')+`<span>${hr12(t)}–${hr12(end)}</span>`;
+    b.onclick=()=>{fcHour=i;renderFcHours();drawFcArrows()};
+    el.appendChild(b);
+  });
+}
+
+function drawFcArrows(){
+  if(!fcMap||!fcData)return;
+  fcArrows.forEach(a=>{try{fcMap.removeLayer(a)}catch(_){}});
+  fcArrows=fcData.pts.map(p=>{
+    const spd=p.spd[fcHour],dir=p.dir[fcHour];
+    if(spd==null||dir==null)return null;
+    // Bigger glyph in more wind, so strength reads at a glance
+    const size=Math.round(22+Math.min(spd,25)*0.9);
+    const col=wHex(spd);
+    // '↓' at 0° points south, so rotating by `dir` gives the direction the wind blows TOWARD
+    return L.marker([p.lat,p.lon],{
+      icon:L.divIcon({
+        className:'',
+        html:`<div class="wind-arrow" style="width:${size}px;height:${size}px;color:${col};font-size:${size}px;transform:rotate(${dir}deg)">↓</div>`,
+        iconSize:[size,size],iconAnchor:[size/2,size/2]
+      }),
+      interactive:false
+    });
+  }).filter(Boolean);
+  fcArrows.forEach(a=>a.addTo(fcMap));
+
+  const spds=fcData.pts.map(p=>p.spd[fcHour]).filter(v=>v!=null);
+  const gsts=fcData.pts.map(p=>p.gst?.[fcHour]).filter(v=>v!=null);
+  const mid=fcData.pts[2]||fcData.pts[0];
+  const d=mid.dir[fcHour];
+  $('fc-legend').innerHTML=
+    `<span>${fmtT(fcData.times[fcHour])}</span>`+
+    `<span style="color:${wHex(Math.max(...spds))}">${Math.min(...spds).toFixed(0)}–${Math.max(...spds).toFixed(0)} kt`+
+    (gsts.length?` · G${Math.max(...gsts).toFixed(0)}`:'')+`</span>`+
+    `<span>${cardinal(d)} ${d.toFixed(0)}°</span>`;
+}
+
+async function initFcWind(){
+  if(fcInit)return;fcInit=true;
+  try{
+    await loadLeaflet();
+    fcData=await fetchFcWind();
+    fcMap=L.map('fc-map',{zoomControl:true,scrollWheelZoom:false,attributionControl:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains:'abcd',maxZoom:19
+    }).addTo(fcMap);
+    FC_BUOYS.forEach(b=>{
+      const label=b.name.replace(/^[GRY]-?/,'');
+      const size=label.length>2?24:20;
+      L.marker([b.lat,b.lon],{
+        icon:L.divIcon({className:'',html:`<div class="buoy-dot" style="background:${b.color};width:${size}px;height:${size}px">${label}</div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]}),
+        interactive:false
+      }).addTo(fcMap);
+    });
+    fcMap.fitBounds(fcData.pts.map(p=>[p.lat,p.lon]),{padding:[26,26]});
+    renderFcHours();
+    drawFcArrows();
+  }catch(e){
+    console.error('Forecast wind map:',e);
+    fcInit=false;
+    $('fc-map').innerHTML='<div style="padding:24px;text-align:center;color:var(--mut);font-size:12px">Forecast wind map unavailable — tap the header to retry</div>';
+  }
 }
 
 // ═══════════════════════════════════
