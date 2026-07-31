@@ -25,6 +25,8 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .slot-btn.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
 .slot-btn:active{opacity:.7}
 .slot-now{font-size:8px;font-weight:700;letter-spacing:.06em;color:var(--accent);display:block;margin-bottom:1px}
+.slot-mer{font-size:8px;font-weight:600;letter-spacing:.04em;color:var(--fnt);display:block;margin-top:1px}
+.slot-btn.active .slot-mer{color:var(--accent)}
 #map{flex:1;min-height:0}
 .cb-wrap{padding:8px 12px 10px;flex-shrink:0;border-top:1px solid var(--bdr);background:var(--bg)}
 .cb-bar{height:10px;border-radius:4px;background:linear-gradient(to right,#5500bb,#0055ff,#00ffcc,#ffdd00,#ff6600,#ff0000,#8b0000)}
@@ -85,14 +87,17 @@ function etNow() {
   return new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
 }
 
-// Compact hour-to-hour label, e.g. "9–10", "11–12", "12–1"
+// Compact hour-to-hour label plus meridiem, e.g. "9–10" / "AM", "11–12" / "AM–PM".
+// Eight buttons share the width, so the AM/PM goes on its own line rather than inline.
 function fmtRange(baseDate, offsetHours) {
   const base = new Date(baseDate);
   base.setMinutes(0, 0, 0);
   const hr12 = d => { const h = d.getHours() % 12; return h === 0 ? 12 : h; };
+  const mer  = d => d.getHours() < 12 ? 'AM' : 'PM';
   const start = new Date(base.getTime() + offsetHours * 3600000);
   const end   = new Date(base.getTime() + (offsetHours + 1) * 3600000);
-  return `${hr12(start)}–${hr12(end)}`;
+  const m = mer(start) === mer(end) ? mer(start) : `${mer(start)}–${mer(end)}`;
+  return { range: `${hr12(start)}–${hr12(end)}`, mer: m };
 }
 
 function imgUrl(dateStr, frame) {
@@ -214,8 +219,9 @@ async function init() {
     const frame = BASE_FRAME + currentHour + offset;
     const btn = document.createElement('button');
     btn.className = 'slot-btn';
+    const lbl = fmtRange(etDate, offset);
     btn.innerHTML = (offset === 0 ? '<span class="slot-now">NOW</span>' : '') +
-      `<span>${fmtRange(etDate, offset)}</span>`;
+      `<span>${lbl.range}</span><span class="slot-mer">${lbl.mer}</span>`;
     btn.onclick = () => showSlot(dateStr, frame, btn);
     slotsEl.appendChild(btn);
     buttons.push({btn, frame});
