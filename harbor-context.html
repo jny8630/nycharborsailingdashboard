@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#080e18">
 <title>Pressure — NYC Harbor</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root{--bg:#080e18;--card:#131f2e;--card2:#0c1520;--bdr:#1a2d42;--bdr2:#2a4060;--txt:#f0f4f8;--dim:#c4d0de;--mut:#8fa3b8;--fnt:#6b8299;--accent:#4fd1c5;--blue:#63b3ed;--orange:#ed8936;--green:#48bb78;--red:#f56565;--yellow:#ecc94b;--purple:#9f7aea;--mono:'SF Mono','Cascadia Code','JetBrains Mono','Fira Code',monospace}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -37,25 +36,18 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .stn-note{font-size:9px;color:var(--fnt);margin-left:6px}
 .stn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
 .stn-cell{text-align:center}
-/* Synoptic image zoom modal */
-.zoom-wrap{position:relative;cursor:zoom-in}
-.zoom-hint{position:absolute;bottom:6px;right:8px;font-size:9px;color:rgba(255,255,255,.55);pointer-events:none;background:rgba(0,0,0,.4);border-radius:4px;padding:2px 5px}
-.zoom-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;flex-direction:column;touch-action:none}
-.zoom-modal.open{display:flex}
-.zoom-img-wrap{overflow:hidden;width:100vw;height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center}
-.zoom-img-wrap img{max-width:none;transform-origin:var(--zo-x,50%) var(--zo-y,50%);transition:transform .25s ease;will-change:transform;display:block}
-.zoom-controls{height:56px;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0;padding:0 16px;width:100%}
-.zoom-ctrl{background:#1a2d42;border:1px solid #2a4060;border-radius:8px;color:#4fd1c5;font-size:14px;font-weight:700;padding:8px 18px;cursor:pointer;font-family:inherit}
-.zoom-ctrl:active{opacity:.7}
-.zoom-close{background:rgba(245,101,101,.15);border-color:rgba(245,101,101,.4);color:#f56565}
-/* Leaflet dark theme */
-.leaflet-container{background:#080e18!important}
-.leaflet-control-zoom a{background:#131f2e!important;color:var(--accent)!important;border-color:var(--bdr)!important}
-.leaflet-control-attribution{background:rgba(8,14,24,.85)!important;color:var(--fnt)!important;font-size:8px!important}
-.leaflet-control-attribution a{color:var(--accent)!important}
-.leaflet-popup-content-wrapper{background:#131f2e;border:1px solid var(--bdr2);border-radius:10px;color:var(--txt);box-shadow:0 4px 16px rgba(0,0,0,.6)}
-.leaflet-popup-tip{background:#131f2e}
-.leaflet-popup-content{margin:10px 14px}
+.regime-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:6px;border:1px solid}
+.diff-row{display:flex;flex-direction:column;align-items:flex-start;gap:4px;color:var(--mut);margin-bottom:8px}
+/* Wind-by-height ladder: one row per level, tallest at top */
+.ht-row{display:grid;grid-template-columns:88px 1fr auto;gap:8px;align-items:center;background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:8px 10px;margin-bottom:5px}
+.ht-row.measured{border-color:var(--bdr2);background:rgba(99,179,237,.06)}
+.ht-name{font-size:11px;font-weight:700;color:var(--dim);line-height:1.25}
+.ht-ht{font-size:9px;color:var(--fnt);font-family:var(--mono)}
+.ht-spd{font-size:17px;font-weight:800;font-family:var(--mono);text-align:right}
+.ht-sub{font-size:9px;color:var(--fnt);font-family:var(--mono);text-align:right;margin-top:1px}
+.ht-tag{font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap}
+.ht-tag.meas{background:rgba(99,179,237,.16);color:var(--blue)}
+.ht-tag.est{background:rgba(143,163,184,.13);color:var(--mut)}
 </style>
 </head>
 <body>
@@ -75,13 +67,12 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 
 <div class="cnt">
 
-  <div class="sec-lbl">Harbor Map</div>
-  <div class="card">
+  <div class="sec-lbl">Wind by Height — Gradient → Surface</div>
+  <div id="context-card" class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
-    <div style="padding:8px 8px 0">
-      <div id="harbor-map" style="height:300px;border-radius:8px"></div>
+    <div class="card-body" style="padding-top:14px">
+      <div class="state-box" style="padding:10px 0"><div class="spinner"></div><br>Loading gradient data…</div>
     </div>
-    <div class="chart-meta" style="padding:6px 10px 10px">Arrow = wind FROM direction · Tap marker for details · Static view</div>
   </div>
 
   <div class="sec-lbl">Pressure Gradient</div>
@@ -100,24 +91,6 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
     </div>
   </div>
 
-  <div class="sec-lbl">Synoptic Analysis</div>
-  <div class="card">
-    <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
-    <div style="padding:8px 8px 0">
-      <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Northeast</div>
-      <div class="zoom-wrap" onclick="openZoom('ne')">
-        <img id="wpc-chart-ne" style="width:100%;border-radius:8px;display:block" alt="NWS WPC Northeast Surface Analysis">
-        <span class="zoom-hint">tap to zoom</span>
-      </div>
-      <div style="font-size:9px;color:var(--fnt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:10px 0 4px">CONUS</div>
-      <div class="zoom-wrap" onclick="openZoom('conus')">
-        <img id="wpc-chart-conus" style="width:100%;border-radius:8px;display:block" alt="NWS WPC CONUS Surface Analysis">
-        <span class="zoom-hint">tap to zoom</span>
-      </div>
-    </div>
-    <div class="chart-meta" style="padding:6px 10px 10px">NWS Weather Prediction Center · Surface Analysis · Updated every 3 hrs · <a href="https://www.wpc.ncep.noaa.gov/html/sfc2.shtml" target="_blank" style="color:var(--accent)">wpc.ncep.noaa.gov</a></div>
-  </div>
-
   <div onclick="toggleStnGrid()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:10px 2px 4px;margin-top:2px">
     <span class="sec-lbl" style="padding:0;margin:0">Current Conditions</span>
     <span id="stn-caret" style="font-size:10px;color:var(--fnt)">▲ show</span>
@@ -130,19 +103,6 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
   </div>
 </div>
 
-<!-- Synoptic zoom modal -->
-<div class="zoom-modal" id="zoom-modal" onclick="handleModalTap(event)">
-  <div class="zoom-img-wrap" id="zoom-img-wrap">
-    <img id="zoom-modal-img" src="" alt="">
-  </div>
-  <div class="zoom-controls">
-    <button class="zoom-ctrl" onclick="event.stopPropagation();zoomStep(-1)">− Out</button>
-    <button class="zoom-ctrl" onclick="event.stopPropagation();zoomStep(1)">+ In</button>
-    <button class="zoom-ctrl zoom-close" onclick="event.stopPropagation();closeZoom()">✕ Close</button>
-  </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const STATIONS = [
   // Geographic order S→N (coastal), then inland — drives pressure chart display order
@@ -163,9 +123,34 @@ const cardinal = d => {
 };
 const fmtT = d => d ? d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/New_York'}) : '—';
 const wCSS = k => k >= 25 ? '#f56565' : k >= 18 ? '#ed8936' : k >= 12 ? '#ecc94b' : k >= 6 ? '#48bb78' : '#8fa3b8';
+const tempCol = f => f >= 86 ? '#f56565' : f >= 76 ? '#ed8936' : f >= 66 ? '#ecc94b' : '#48bb78';
+
+const ROB = '8530973';
+const LAT = 40.6797, LON = -74.0288;
+
+// ── WIND BY HEIGHT ────────────────────────────────────────────
+// Robbins Reef anemometer sits 69.0 ft above MLLW — 54 ft above the platform
+// deck, which itself stands 15 ft above chart datum (Robbins Reef Met Station.pdf).
+// Above mean sea level that's ~66.4 ft, and the tide moves it ±2.5 ft; both are
+// under 1% on the derived speeds, so we use the chart-datum figure throughout.
+// Power law: v(z) = v_rob * (z / z_rob)^α   (Wind Spd at Ht Conversion.xlsx)
+const ROB_ANE_M = 21.03;                  // 69.0 ft
+const ALPHA = 0.135, ALPHA_LO = 0.11, ALPHA_HI = 0.16;
+
+// Tallest first — the ladder renders in this order
+const LEVELS = [
+  {name:'Robbins Reef', sub:'anemometer',    m:21.03, ft:69,   measured:true},
+  {name:'J/80',         sub:'masthead',      m:11.28, ft:37},
+  {name:'Melges 24',    sub:'masthead',      m:8.81,  ft:29},
+  {name:'6 m',          sub:'above surface', m:6.00,  ft:19.7},
+  {name:'Surface',      sub:'2 m — on deck', m:2.00,  ft:6.6},
+];
+
+const shearFactor = (z, a) => Math.pow(z / ROB_ANE_M, a);
 
 let stationData = {};
-let map, markers = {};
+let gradientData = null;
+let robWindHistory = null;
 
 // ── FETCHERS ─────────────────────────────────────────────────
 
@@ -224,71 +209,33 @@ async function fetchStationData(station) {
   return station.src === 'nws' ? fetchNWSStation(station) : fetchCOOPSStation(station);
 }
 
-// ── MAP ───────────────────────────────────────────────────────
-
-function makeIcon(data, shortName) {
-  const hasWind = data?.wind != null;
-  const spd = hasWind ? data.wind.speed.toFixed(0) : '—';
-  const dir = hasWind ? data.wind.dir : 0;
-  const col = hasWind ? wCSS(data.wind.speed) : '#6b8299';
-  // Arrow points upward at 0°; rotate by dir so it points toward wind source (FROM)
-  const arrow = hasWind
-    ? `<svg viewBox="0 0 20 24" width="22" height="26" style="display:block;margin:0 auto;transform:rotate(${dir}deg);transform-origin:10px 13px"><polygon points="10,2 6,18 10,14 14,18" fill="${col}" stroke="#060b12" stroke-width="1.2"/></svg>`
-    : `<div style="width:22px;height:26px;line-height:26px;text-align:center;color:#6b8299;font-size:14px">?</div>`;
-  return L.divIcon({
-    className: '',
-    html: `<div style="text-align:center;filter:drop-shadow(0 1px 4px rgba(0,0,0,.9))">
-      ${arrow}
-      <div style="font-size:10px;font-weight:800;font-family:monospace;color:${col};margin-top:1px;white-space:nowrap;text-shadow:0 1px 3px #000">${spd} kt</div>
-      <div style="font-size:8px;color:#8fa3b8;white-space:nowrap;text-shadow:0 1px 2px #000">${shortName}</div>
-    </div>`,
-    iconSize: [60, 62],
-    iconAnchor: [30, 20],
-    popupAnchor: [0, -22],
-  });
+// 850 hPa (~1500 m) flow — the "gradient" reference above the boundary layer
+async function fetchGradient() {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=windspeed_850hPa,winddirection_850hPa&wind_speed_unit=kn&timezone=auto&timeformat=unixtime&past_hours=12&forecast_hours=12`;
+  const r = await fetch(url); if (!r.ok) throw new Error(`OM ${r.status}`);
+  const d = await r.json(); if (!d.hourly?.time?.length) throw new Error('No OM data');
+  return {times: d.hourly.time.map(t => new Date(t*1000)), spds: d.hourly.windspeed_850hPa, dirs: d.hourly.winddirection_850hPa};
 }
 
-const tempCol = f => f >= 86 ? '#f56565' : f >= 76 ? '#ed8936' : f >= 66 ? '#ecc94b' : '#48bb78';
-
-function popupHtml(d) {
-  const w = d.wind, p = d.pressure;
-  const src = d.station.src === 'nws' ? 'NWS ASOS' : 'NOAA CO-OPS';
-  return `<div style="font-size:12px;line-height:1.7;min-width:140px">
-    <strong style="font-size:13px;color:#f0f4f8">${d.station.name}</strong><br>
-    <span style="color:#6b8299;font-size:10px">${d.station.note} · ${src}</span><br>
-    ${w
-      ? `<span style="color:${wCSS(w.speed)}">${w.speed.toFixed(1)} kt${w.gusts ? ' G'+w.gusts.toFixed(1) : ''}</span> · ${cardinal(w.dir)} ${w.dir.toFixed(0)}°`
-      : '<span style="color:#6b8299">Wind unavailable</span>'
-    }<br>
-    ${p != null ? `${p.toFixed(1)} hPa` : '<span style="color:#6b8299">Pressure N/A</span>'}
-    ${d.tempF != null ? `<br><span style="color:${tempCol(d.tempF)}">${d.tempF.toFixed(0)}°F</span> / ${d.tempC.toFixed(0)}°C` : ''}
-  </div>`;
+// Last ~3h of Robbins Reef 6-min wind — the regime test needs a speed trend,
+// not just the latest reading
+async function fetchRobWindHistory() {
+  const start = new Date(Date.now() - 3*3600000);
+  const p = n => String(n).padStart(2,'0');
+  const bd = `${start.getFullYear()}${p(start.getMonth()+1)}${p(start.getDate())} ${p(start.getHours())}:${p(start.getMinutes())}`;
+  const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(bd)}&range=4&station=${ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`;
+  const r = await fetch(url); if (!r.ok) throw new Error(`NOAA ${r.status}`);
+  const d = await r.json(); if (!d.data?.length) throw new Error('No NOAA wind data');
+  return d.data.map(w => ({speed:parseFloat(w.s), gusts:parseFloat(w.g), dir:parseFloat(w.d)}))
+               .filter(w => !isNaN(w.speed) && !isNaN(w.dir));
 }
 
-function initMap() {
-  map = L.map('harbor-map', {
-    zoomControl:false, scrollWheelZoom:false, doubleClickZoom:false,
-    touchZoom:false, boxZoom:false, dragging:false, keyboard:false,
-    attributionControl:true
-  });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains:'abcd', maxZoom:19
-  }).addTo(map);
-  map.fitBounds(STATIONS.map(s=>[s.lat,s.lon]), {padding:[24,24]});
-  STATIONS.forEach(s => {
-    const m = L.marker([s.lat, s.lon], {icon: makeIcon(null, s.short)})
-      .addTo(map)
-      .bindPopup(`<div style="font-size:12px;color:#f0f4f8"><strong>${s.name}</strong><br><span style="color:#6b8299">${s.note}</span><br>Loading…</div>`);
-    markers[s.id] = m;
-  });
-}
-
-function updateMarker(d) {
-  const m = markers[d.station.id];
-  if (!m) return;
-  m.setIcon(makeIcon(d, d.station.short));
-  m.setPopupContent(popupHtml(d));
+function getGradientAt(gData, targetTime) {
+  if (!gData?.times?.length) return {dir:null, spd:null, time:null};
+  const t = targetTime.getTime();
+  let best = 0, bestDiff = Infinity;
+  gData.times.forEach((d,i) => { const diff = Math.abs(d.getTime()-t); if (diff < bestDiff) { bestDiff = diff; best = i; } });
+  return {dir: gData.dirs[best], spd: gData.spds[best], time: gData.times[best]};
 }
 
 // ── STATION GRID ──────────────────────────────────────────────
@@ -399,6 +346,123 @@ function renderPressureCard() {
       </div>
       <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:8px;line-height:1.5">Sparse surface stations — directional context only. Not a measured pressure field.</div>
     </div>`;
+}
+
+// ── WIND-BY-HEIGHT CARD ───────────────────────────────────────
+
+function linRegSlope(y) {
+  const n = y.length; if (n < 2) return 0;
+  const xm = (n-1)/2, ym = y.reduce((a,v)=>a+v,0)/n;
+  let num = 0, den = 0;
+  for (let i=0;i<n;i++) { num += (i-xm)*(y[i]-ym); den += (i-xm)*(i-xm); }
+  return den === 0 ? 0 : num/den;
+}
+
+function circularStd(dirs) {
+  const n = dirs.length;
+  const s = dirs.reduce((a,d)=>a+Math.sin(d*Math.PI/180),0)/n;
+  const c = dirs.reduce((a,d)=>a+Math.cos(d*Math.PI/180),0)/n;
+  const R = Math.sqrt(s*s+c*c); if (R >= 1) return 0;
+  return Math.sqrt(-2*Math.log(R))*180/Math.PI;
+}
+
+function htRow({name, sub, htLabel, spd, detail, tag, tagCls, measured}) {
+  return `<div class="ht-row${measured ? ' measured' : ''}">
+    <div><div class="ht-name">${name}</div><div class="ht-ht">${htLabel}</div></div>
+    <div><span class="ht-tag ${tagCls}">${tag}</span><div class="ht-ht" style="margin-top:3px">${sub}</div></div>
+    <div><div class="ht-spd" style="color:${spd == null ? 'var(--mut)' : wCSS(spd)}">${spd == null ? '—' : spd.toFixed(1)}<span style="font-size:10px;color:var(--fnt);font-weight:600"> kt</span></div><div class="ht-sub">${detail}</div></div>
+  </div>`;
+}
+
+function renderContextCard() {
+  const el = $('context-card').querySelector('.card-body');
+  const rob = stationData[ROB]?.wind || null;
+  const grad = getGradientAt(gradientData, new Date());
+
+  if (!rob && grad.spd == null) {
+    el.innerHTML = '<div class="state-box">Context unavailable — both data sources offline</div>';
+    return;
+  }
+  if (!rob) {
+    el.innerHTML = `<div class="state-box">Robbins Reef wind unavailable<br><span style="font-size:11px">Gradient: ${grad.spd.toFixed(1)} kt ${cardinal(grad.dir)} ${grad.dir.toFixed(0)}°</span></div>`;
+    return;
+  }
+
+  // Ladder: gradient on top, then each height derived from the Robbins Reef reading
+  let ladder = '';
+  if (grad.spd != null) {
+    ladder += htRow({
+      name:'Gradient', sub:'850 hPa flow', htLabel:'~1500 m', spd:grad.spd,
+      detail:`${cardinal(grad.dir)} ${grad.dir.toFixed(0)}°`, tag:'Model', tagCls:'meas'
+    });
+  }
+  ladder += LEVELS.map(L => {
+    if (L.measured) {
+      return htRow({
+        name:L.name, sub:L.sub, htLabel:`${L.m.toFixed(2)} m · ${L.ft} ft`, spd:rob.speed,
+        detail:`${cardinal(rob.dir)} ${rob.dir.toFixed(0)}°`, tag:'Measured', tagCls:'meas', measured:true
+      });
+    }
+    const mid = rob.speed * shearFactor(L.m, ALPHA);
+    const hi  = rob.speed * shearFactor(L.m, ALPHA_LO);  // less shear → closer to sensor speed
+    const lo  = rob.speed * shearFactor(L.m, ALPHA_HI);
+    return htRow({
+      name:L.name, sub:L.sub, htLabel:`${L.m.toFixed(2)} m · ${L.ft} ft`, spd:mid,
+      detail:`${lo.toFixed(1)}–${hi.toFixed(1)} kt`, tag:'Est.', tagCls:'est'
+    });
+  }).join('');
+
+  // Regime: how well is the aloft flow reaching the surface?
+  let regimeBlock = '';
+  if (grad.spd != null) {
+    let dirDiff = Math.abs(rob.dir - grad.dir);
+    if (dirDiff > 180) dirDiff = 360 - dirDiff;
+    const ratio = grad.spd > 0 ? rob.speed / grad.spd : 0;
+    const hist = robWindHistory || [];
+    const last30slope = hist.length ? linRegSlope(hist.slice(-30).map(d=>d.speed)) : 0;
+    const dirStdAll = hist.length ? circularStd(hist.map(d=>d.dir)) : 0;
+
+    let regime, regColor, interp;
+    if (dirDiff <= 20 && ratio > 0.6) {
+      regime='Likely Gradient-Driven'; regColor='var(--blue)';
+      interp='Aloft flow appears materially stronger than the surface layer — shifts may track synoptic pressure patterns. Percentage sailing may apply.';
+    } else if (dirDiff > 40 && last30slope < -0.1 && dirStdAll > 10) {
+      regime='Possible Dying Thermal'; regColor='var(--orange)';
+      interp='Surface layer appears decoupled from aloft flow; speed declining. Local thermal may be weakening — gradient influence possible as thermal dies.';
+    } else if (dirDiff > 40 && ratio >= 0.4) {
+      regime='Thermal Likely Active'; regColor='var(--yellow)';
+      interp='Local thermal/sea-breeze effects likely shaping the surface wind. Direction clocking pattern consistent with sea breeze — speed may build then ease at sunset.';
+    } else if (ratio < 0.4) {
+      regime='Gradient Likely Weak at Surface'; regColor='var(--mut)';
+      interp='Conditions may be light and variable. Aloft flow does not appear to be reaching the surface strongly.';
+    } else {
+      regime='Mixed / Transitional'; regColor='var(--dim)';
+      interp='Surface and aloft flows partially coupled — monitor for regime shift.';
+    }
+
+    const dColor = dirDiff>40 ? 'var(--yellow)' : dirDiff>20 ? 'var(--accent)' : 'var(--green)';
+    const rColor = ratio<0.4 ? 'var(--orange)' : ratio>0.6 ? 'var(--green)' : 'var(--yellow)';
+    const diffRange = dirDiff<20 ? 'low decoupling' : dirDiff<40 ? 'moderate decoupling' : 'high decoupling';
+    const ratioRange = ratio>0.6 ? 'strong coupling' : ratio>0.4 ? 'moderate coupling' : 'weak coupling';
+    regimeBlock = `
+      <div class="regime-badge" style="background:${regColor}18;border-color:${regColor};color:${regColor}">${regime}</div>
+      <div style="font-size:13px;font-weight:600;color:var(--txt);line-height:1.5;margin:6px 0 12px">${interp}</div>
+      <div class="diff-row">
+        <span style="font-size:11px">Dir differential: <strong style="color:${dColor}">${dirDiff.toFixed(0)}°</strong> <span style="color:var(--fnt);font-size:10px">surface vs. aloft · ${diffRange} (rule of thumb: &lt;20° low, 20–40° moderate, &gt;40° high)</span></span>
+        <span style="font-size:11px">Speed ratio: <strong style="color:${rColor}">${(ratio*100).toFixed(0)}%</strong> <span style="color:var(--fnt);font-size:10px">Robbins Reef ÷ aloft · ${ratioRange} (rule of thumb: &gt;60% strong, &lt;40% weak)</span></span>
+      </div>`;
+  } else {
+    regimeBlock = '<div style="font-size:11px;color:var(--fnt);margin-bottom:10px">Gradient data unavailable — regime classification deferred</div>';
+  }
+
+  const gradTs = grad.time ? fmtT(grad.time) : '';
+  el.innerHTML = regimeBlock + ladder + `
+    <div style="font-size:9px;color:var(--fnt);margin-top:8px;line-height:1.6">
+      Derived from the Robbins Reef reading by power law <em>v(z) = v<sub>ref</sub> · (z/21.03 m)<sup>α</sup></em>, α = ${ALPHA} (range shows α = ${ALPHA_LO}–${ALPHA_HI}).
+      Sensor height 69.0 ft above chart datum — 54 ft above the platform deck, which stands 15 ft above MLLW. Above mean sea level ~66.4 ft; tide moves it ±2.5 ft, under 1% on these numbers.
+      Direction is assumed constant with height (no Ekman veer applied). Gradient: Open-Meteo 850 hPa ${gradTs}.
+    </div>
+    <div style="font-size:9px;color:var(--fnt);font-style:italic;margin-top:4px;line-height:1.5">Interpretive view — one surface sensor, one aloft reference. Use as sailing context, not a verdict.</div>`;
 }
 
 // ── INTERPRETATION ────────────────────────────────────────────
@@ -516,92 +580,41 @@ function renderInterpCard() {
 
 // ── MAIN LOAD ─────────────────────────────────────────────────
 
-async function loadAll() {
-  $('hdr-updated').textContent = 'Loading…';
-  initMap();
+async function fetchAndRender() {
+  const [stnRes, gradRes, histRes] = await Promise.allSettled([
+    Promise.allSettled(STATIONS.map(s => fetchStationData(s))),
+    fetchGradient(),
+    fetchRobWindHistory(),
+  ]);
 
-  const results = await Promise.allSettled(STATIONS.map(s => fetchStationData(s)));
-  results.forEach(r => {
-    if (r.status === 'fulfilled') {
-      const d = r.value;
-      stationData[d.station.id] = d;
-      updateMarker(d);
-    }
-  });
+  if (stnRes.status === 'fulfilled') {
+    stnRes.value.forEach(r => {
+      if (r.status === 'fulfilled') stationData[r.value.station.id] = r.value;
+    });
+  }
+  if (gradRes.status === 'fulfilled') gradientData = gradRes.value;
+  if (histRes.status === 'fulfilled') robWindHistory = histRes.value;
 
+  renderContextCard();
   renderStationGrid();
   renderPressureCard();
   renderInterpCard();
-  const t = Date.now();
-  $('wpc-chart-ne').src = 'https://www.wpc.ncep.noaa.gov/sfc/namnesfcwbg.gif?t=' + t;
-  $('wpc-chart-conus').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + t;
   $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
 }
 
+async function loadAll() {
+  $('hdr-updated').textContent = 'Loading…';
+  await fetchAndRender();
+}
+
 async function refreshAll() {
-  try {
-    const results = await Promise.allSettled(STATIONS.map(s => fetchStationData(s)));
-    results.forEach(r => {
-      if (r.status === 'fulfilled') {
-        const d = r.value;
-        stationData[d.station.id] = d;
-        updateMarker(d);
-      }
-    });
-    renderStationGrid();
-    renderPressureCard();
-    renderInterpCard();
-    const t = Date.now();
-  $('wpc-chart-ne').src = 'https://www.wpc.ncep.noaa.gov/sfc/namnesfcwbg.gif?t=' + t;
-  $('wpc-chart-conus').src = 'https://www.wpc.ncep.noaa.gov/noaa/noaa.gif?t=' + t;
-    $('hdr-updated').textContent = 'Updated ' + fmtT(new Date());
-  } catch(e) { console.error('Refresh error:', e); }
+  try { await fetchAndRender(); }
+  catch(e) { console.error('Refresh error:', e); }
 }
 
 loadAll();
 setInterval(refreshAll, 10 * 60 * 1000);
 
-// ── Synoptic zoom ──────────────────────────────────────────────────────────────
-// NY region transform-origins (x% y%): NE chart NY ~38% 28%, CONUS NY ~72% 22%
-const ZOOM_CFG = {
-  ne:    { x: '38%', y: '28%' },
-  conus: { x: '72%', y: '22%' }
-};
-const ZOOM_LEVELS = [1, 1.9, 3.2];
-let zoomIdx = 0;
-let activeChart = null;
-
-function openZoom(chart) {
-  activeChart = chart;
-  zoomIdx = 0;
-  const src = $('wpc-chart-' + chart).src;
-  const img = document.getElementById('zoom-modal-img');
-  img.src = src;
-  const cfg = ZOOM_CFG[chart];
-  img.style.setProperty('--zo-x', cfg.x);
-  img.style.setProperty('--zo-y', cfg.y);
-  img.style.transform = 'scale(1)';
-  document.getElementById('zoom-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeZoom() {
-  document.getElementById('zoom-modal').classList.remove('open');
-  document.body.style.overflow = '';
-  activeChart = null;
-}
-
-function zoomStep(dir) {
-  zoomIdx = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, zoomIdx + dir));
-  document.getElementById('zoom-modal-img').style.transform = 'scale(' + ZOOM_LEVELS[zoomIdx] + ')';
-}
-
-function handleModalTap(e) {
-  if (e.target === document.getElementById('zoom-modal') ||
-      e.target === document.getElementById('zoom-img-wrap')) {
-    closeZoom();
-  }
-}
 </script>
 </body>
 </html>
