@@ -243,20 +243,51 @@ const visFmt = v => {
   return Math.round(nm) + 'nm';
 };
 
-function makeSummary(hrs) {
-  const maxThunder = Math.max(...hrs.map(h => h.thunder ?? 0));
+function makeSummary(hrs, maxThunder) {
   const maxPrecipP = Math.max(...hrs.map(h => h.precipProb));
   const minVis     = Math.min(...hrs.map(h => h.vis));
   const avgCloud   = hrs.reduce((s, h) => s + h.cloud, 0) / hrs.length;
-  const hasThunder = hrs.some(h => h.thunder != null);
 
-  if (hasThunder && maxThunder >= 30) return {t: 'Thunderstorm caution',     c: 'var(--red)'};
+  if (maxThunder != null && maxThunder >= 30) return {t: 'Thunderstorm caution', c: 'var(--red)'};
   if (maxPrecipP >= 70)               return {t: 'Rain likely',               c: 'var(--orange)'};
   if (maxPrecipP >= 40)               return {t: 'Rain possible',             c: 'var(--yellow)'};
   if (minVis < 1852)                  return {t: 'Reduced visibility',        c: 'var(--yellow)'};
   if (avgCloud < 25)                  return {t: 'Generally fair conditions', c: 'var(--green)'};
   if (avgCloud < 60)                  return {t: 'Partly cloudy',             c: 'var(--accent)'};
   return                                     {t: 'Mostly cloudy, likely dry', c: 'var(--dim)'};
+}
+
+// ── NWS THUNDER PROBABILITY ──────────────────────────────────────────────────
+// Open-Meteo's thunderstorm_probability is an ICON-D2 field and returns null
+// everywhere in the US, so thunder risk comes from the NWS OKX forecaster grid.
+
+let nwsThunder = null;
+
+async function loadThunder() {
+  try {
+    const r = await fetch('https://api.weather.gov/gridpoints/OKX/33,41',
+      {headers:{'User-Agent':'(NYC Harbor Sailing Dashboard, jens.nachtigal@gmail.com)','Accept':'application/geo+json'}});
+    if (!r.ok) return;
+    nwsThunder = (await r.json()).properties?.probabilityOfThunder?.values || null;
+    if (forecastData) renderForecast();
+  } catch(e) { console.error('Thunder:', e); }
+}
+
+// NWS grid values are ISO intervals that can span many hours, so take the max
+// over every block overlapping the next `hours` hours.
+function nwsMaxWithin(values, hours) {
+  if (!Array.isArray(values)) return null;
+  const now = Date.now(), until = now + hours * 3600000;
+  let max = null;
+  for (const v of values) {
+    const [startS, durS] = v.validTime.split('/');
+    const start = new Date(startS).getTime();
+    const m = /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?/.exec(durS) || [];
+    const end = start + ((+m[1]||0)*1440 + (+m[2]||0)*60 + (+m[3]||0)) * 60000;
+    if (end <= now || start >= until) continue;
+    if (v.value != null && (max == null || v.value > max)) max = v.value;
+  }
+  return max;
 }
 
 // ── OPEN-METEO FORECAST ──────────────────────────────────────────────────────
@@ -266,7 +297,7 @@ async function loadForecast() {
     const url = `https://api.open-meteo.com/v1/forecast`
       + `?latitude=${LAT}&longitude=${LON}`
       + `&hourly=temperature_2m,precipitation,precipitation_probability,`
-      + `thunderstorm_probability,cloud_cover,visibility,weather_code`
+      + `cloud_cover,visibility,weather_code`
       + `&forecast_hours=12&timezone=auto&timeformat=unixtime`;
     const r = await fetch(url);
     if (!r.ok) throw new Error(r.status);
@@ -285,8 +316,6 @@ async function loadForecast() {
 function renderForecast() {
   if (!forecastData) return;
   const h = forecastData.hourly;
-  const hasThunder = Array.isArray(h.thunderstorm_probability)
-    && h.thunderstorm_probability.some(v => v != null);
   const now = Date.now();
 
   const hours = h.time.map((t, i) => ({
@@ -294,14 +323,14 @@ function renderForecast() {
     temp:       h.temperature_2m[i],
     precip:     h.precipitation[i] ?? 0,
     precipProb: h.precipitation_probability[i] ?? 0,
-    thunder:    hasThunder ? (h.thunderstorm_probability[i] ?? 0) : null,
     cloud:      h.cloud_cover[i] ?? 0,
     vis:        h.visibility[i] ?? 10000,
     wx:         h.weather_code[i] ?? 0
   }));
 
   const slice = hours.slice(0, selectedHours);
-  const summary = makeSummary(slice);
+  const maxThunder = nwsMaxWithin(nwsThunder, selectedHours);
+  const summary = makeSummary(slice, maxThunder);
 
   let html = `
     <div class="fc-summary" style="background:${summary.c}18;border-color:${summary.c};color:${summary.c}">${summary.t}</div>
@@ -323,10 +352,9 @@ function renderForecast() {
     </div>`;
   }
 
-  if (hasThunder) {
-    const maxT = Math.max(...slice.map(h => h.thunder ?? 0));
-    const tc = maxT >= 30 ? 'var(--red)' : maxT >= 15 ? 'var(--orange)' : 'var(--yellow)';
-    html += `<div class="fc-thunder">⚡ Max thunder risk this window: <strong style="color:${tc}">${maxT}%</strong></div>`;
+  if (maxThunder != null) {
+    const tc = maxThunder >= 30 ? 'var(--red)' : maxThunder >= 15 ? 'var(--orange)' : 'var(--yellow)';
+    html += `<div class="fc-thunder">⚡ Max thunder risk this window: <strong style="color:${tc}">${maxThunder}%</strong> <span style="color:var(--fnt);font-size:10px">· NWS OKX</span></div>`;
   }
 
   // Freshness: HRRR runs hourly; estimate next update at next top-of-hour + 10min buffer
@@ -557,14 +585,16 @@ function handleModalTap(e) {
 
 loadAlerts();
 loadForecast();
+loadThunder();
 loadMarineForecast();
 loadSynoptic();
 
 setInterval(loadAlerts,        10 * 60 * 1000);   // 10 min
 setInterval(loadForecast,      30 * 60 * 1000);   // 30 min
+setInterval(loadThunder,       30 * 60 * 1000);   // 30 min
 setInterval(loadMarineForecast, 60 * 60 * 1000);  // 60 min
 setInterval(loadSynoptic,       30 * 60 * 1000);  // 30 min
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){loadAlerts();loadForecast();loadMarineForecast();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){loadAlerts();loadForecast();loadThunder();loadMarineForecast();}});
 </script>
 </body>
 </html>

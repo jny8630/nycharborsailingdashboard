@@ -105,7 +105,7 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
   <div class="card">
     <div class="card-bar" style="background:linear-gradient(90deg,transparent,var(--orange),transparent)"></div>
     <div class="card-hdr">
-      <div class="card-t">🔗 Forecast Radar — Elsewhere</div>
+      <div class="card-t">🔗 Forecast Radar — Other Sources</div>
     </div>
     <div class="card-body">
       <a class="ext-link" href="https://www.nbcnewyork.com/weather/" target="_blank" rel="noopener">
@@ -116,13 +116,6 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
         <div class="ext-n">NWS KOKX Upton — single-site radar ↗</div>
         <div class="ext-d">The National Weather Service radar that actually covers the harbor. Observed only, but it's the raw source.</div>
       </a>
-      <div class="note-box">
-        <strong>Why the 4-hour forecast isn't embedded here:</strong> NBC's radar widget is rendered
-        entirely in-browser — their pages expose no embed URL and no public API, so there's nothing
-        to legitimately pull in. Scraping their tiles would be a terms-of-service and copyright
-        problem for a page published to the open web. RainViewer's free API is currently serving
-        only past frames as well, so the loop above stops at now.
-      </div>
     </div>
   </div>
 
