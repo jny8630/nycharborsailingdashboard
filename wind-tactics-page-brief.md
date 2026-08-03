@@ -1,5 +1,18 @@
 # Builder Brief: Wind Tactics Analysis Page
 
+> **HISTORICAL — build-time spec, superseded by the code.**
+> Written 2026-05-10 to brief the build of `wind-tactics.html`. It records *why*
+> the page exists and which sources it was designed around; it is not maintained
+> and does not describe the page as it stands. **`wind-tactics.html` is the
+> authority** — do not treat anything below as current.
+>
+> Known drift since writing: Card 2 "Shift Correlation Analysis" was renamed
+> Wind Context and its verdict language deliberately softened (2026-05-17); the
+> Melges 24 mast box was added and later removed; the nav and card layouts were
+> reworked repeatedly; the resolution-limit copy was cut down (2026-07-31).
+> Still accurate: the data sources (Robbins Reef 8530973, Open-Meteo 850 hPa
+> gradient proxy) and the three-card skeleton.
+
 ## Context
 
 This page is an extension of the NYC Harbor Sailing Dashboard, built for a racing team that sails Wednesday and Thursday evenings, 6–8 PM, in NYC Harbor. The racing window is a classic dying thermal / evening sea breeze scenario. The page should help answer one practical pre-race question: **what kind of breeze are we sailing in tonight, and which way do the lifts come?**
