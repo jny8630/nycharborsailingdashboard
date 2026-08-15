@@ -219,11 +219,11 @@ async function fetchGradient() {
 
 // Last ~3h of Robbins Reef 6-min wind — the regime test needs a speed trend,
 // not just the latest reading
+// `range` alone means "last N hours, ending now" on NOAA's clock. A begin_date
+// built from the device clock is sent as station-local (ET), so any viewer
+// outside Eastern silently gets a window shifted by their UTC offset.
 async function fetchRobWindHistory() {
-  const start = new Date(Date.now() - 3*3600000);
-  const p = n => String(n).padStart(2,'0');
-  const bd = `${start.getFullYear()}${p(start.getMonth()+1)}${p(start.getDate())} ${p(start.getHours())}:${p(start.getMinutes())}`;
-  const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(bd)}&range=4&station=${ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`;
+  const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?range=4&station=${ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`;
   const r = await fetch(url); if (!r.ok) throw new Error(`NOAA ${r.status}`);
   const d = await r.json(); if (!d.data?.length) throw new Error('No NOAA wind data');
   return d.data.map(w => ({speed:parseFloat(w.s), gusts:parseFloat(w.g), dir:parseFloat(w.d)}))
