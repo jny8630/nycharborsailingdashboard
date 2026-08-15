@@ -129,10 +129,38 @@ All charts use `devicePixelRatio`-aware canvas setup for crisp rendering on Reti
 The vertical plots mirror the B&G Advanced WindPlot paradigm where time flows top-to-bottom. A rolling average line provides the reference — deviation from the average is shown as a shaded area, making wind shifts immediately visible.
 
 ### Timezone Handling
-NOAA returns timestamps in local time without timezone info. The app dynamically detects the current Eastern Time UTC offset using `Intl.DateTimeFormat` and appends it before parsing.
+The dashboard reports Eastern Time regardless of where it is viewed from. Both
+directions of the exchange have to be handled, and getting either wrong breaks
+the page for anyone outside ET.
+
+**Responses.** NOAA returns timestamps in station-local time with no timezone
+info. `parseNOAA` detects the current Eastern UTC offset via `Intl.DateTimeFormat`
+and appends it before parsing, so DST is handled automatically. All display
+formatting passes `timeZone:'America/New_York'` explicitly.
+
+**Requests — never send a device-derived timestamp.** Two rules:
+
+- **NOAA CO-OPS:** do not build `begin_date` from the browser clock. It is sent
+  with `time_zone=lst_ldt` and read as station-local ET, so a viewer in the UK
+  asking for "2 hours ago" requests a window hours in the future and gets zero
+  rows. Pass `range=<hours>` alone and let NOAA derive the window from its own
+  clock.
+- **Open-Meteo:** always request `timeformat=unixtime`. The default with
+  `timezone=America/New_York` is a naive local string (`"2026-08-15T19:54"`),
+  which `new Date()` resolves in the *device's* zone — silently shifting
+  forecast rows and sunset by the viewer's UTC offset.
+
+The second failure mode is the dangerous one: it produces plausible-looking
+wrong values rather than a visible error. When changing any fetch, test with the
+browser forced to a non-ET zone (`TZ=Europe/Berlin`), not just locally.
 
 ### HRRR vs GFS
-The forecast uses Open-Meteo's `minutely_15` endpoint sourced from NOAA HRRR (3km, hourly refresh) rather than GFS (22km). HRRR is far more useful for local harbor conditions.
+The forecast table uses Open-Meteo's `minutely_15` endpoint pinned to
+`models=gfs_hrrr` (3km, hourly refresh) rather than GFS (13km). HRRR is far more
+useful for local harbor conditions. The pin is required — without it the
+`/v1/gfs` endpoint may serve GFS, and the "HRRR (3km)" card header becomes a
+lie. The separate `fetchWeather` call deliberately stays on plain GFS, since the
+weather card labels its CAPE figure as GFS 13km.
 
 ---
 
