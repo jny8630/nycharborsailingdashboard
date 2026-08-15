@@ -125,7 +125,7 @@ canvas{display:block;border-radius:8px}
         <div class="chart-legend"><span style="color:#48bb78">━</span> Sustained &nbsp;<span style="color:#ed893680">━</span> Gusts &nbsp;<span style="color:#ecc94b60">┈</span> Avg</div>
       </div>
       <div style="font-size:10px;color:var(--fnt);text-align:right;margin-top:6px" id="wtime"></div>
-      <a class="tbtn" href="https://forecast.weather.gov/MapClick.php?x=258&y=69&site=phi&zmx=1&zmy=1&map_x=257.5&map_y=69.13333129882812" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;margin-bottom:6px;background:rgba(245,101,101,.08);border-color:rgba(245,101,101,.3);color:var(--red)">⚠ NWS Harbor Forecast &amp; Warnings ↗</a>
+      <a class="tbtn" href="https://forecast.weather.gov/shmrn.php?mz=anz338" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;margin-bottom:6px;background:rgba(245,101,101,.08);border-color:rgba(245,101,101,.3);color:var(--red)">⚠ NWS Harbor Forecast &amp; Warnings ↗</a>
       <a class="tbtn" href="https://tidesandcurrents.noaa.gov/stationhome.html?id=8530973" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">View Full NOAA Station ↗</a>
     </div>
   </div>
@@ -216,7 +216,7 @@ canvas{display:block;border-radius:8px}
         <a href="https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8518750" target="_blank" class="link-c"><div class="link-n">NOAA Tides</div><div class="link-d">The Battery</div></a>
         <a href="https://www.usharbors.com/harbor/new-york/new-york-the-battery-ny/tides/" target="_blank" class="link-c"><div class="link-n">Battery Tides</div><div class="link-d">US Harbors</div></a>
         <a href="https://tidesandcurrents.noaa.gov/noaacurrents/Predictions?id=NYH1905_6&d=2025-02-09&r=1&tz=LST%2FLDT" target="_blank" class="link-c"><div class="link-n">Currents Map</div><div class="link-d">NYC Harbor</div></a>
-        <a href="https://forecast.weather.gov/MapClick.php?x=258&y=69&site=phi&zmx=1&zmy=1&map_x=257.5&map_y=69.13333129882812" target="_blank" class="link-c"><div class="link-n">NOAA Marine</div><div class="link-d">Harbor forecast</div></a>
+        <a href="https://forecast.weather.gov/shmrn.php?mz=anz338" target="_blank" class="link-c"><div class="link-n">NOAA Marine</div><div class="link-d">Harbor forecast</div></a>
         <a href="https://tidesandcurrents.noaa.gov/stationhome.html?id=8530973" target="_blank" class="link-c"><div class="link-n">Robbins Reef</div><div class="link-d">NOAA station</div></a>
         <a href="nyhops.html" class="link-c"><div class="link-n">NYHOPS Currents</div><div class="link-d">Manhattan Waters</div></a>
         <a href="lnm.html" class="link-c"><div class="link-n">LNM Digest</div><div class="link-d">Notice to Mariners</div></a>
@@ -281,7 +281,7 @@ async function loadAlerts() {
       const evtLC = evt.toLowerCase();
       const cls = evtLC.includes('warning') ? 'alert-warning' : evtLC.includes('watch') ? 'alert-watch' : 'alert-advisory';
       const col = evtLC.includes('warning') ? 'var(--red)' : evtLC.includes('watch') ? 'var(--orange)' : 'var(--yellow)';
-      const alertUrl = 'https://forecast.weather.gov/MapClick.php?x=258&y=69&site=phi&zmx=1&zmy=1&map_x=257.5&map_y=69.13333129882812';
+      const alertUrl = 'https://forecast.weather.gov/shmrn.php?mz=anz338';
       return `<a href="${alertUrl}" target="_blank" rel="noopener" style="display:block;text-decoration:none"><div class="alert-banner ${cls}"><div class="alert-event" style="color:${col}">⚠ ${evt} ↗</div>${hl?`<div class="alert-hl">${hl}</div>`:''}${exp?`<div class="alert-exp">${exp}</div>`:''}</div></a>`;
     }).join('');
   } catch(e) { console.warn('Alerts:', e); }
@@ -300,18 +300,17 @@ function toggleRadar(){radarOn=!radarOn;$('radar-wrap').classList.toggle('hidden
 
 async function getJ(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
 
+// `range` alone means "last N hours, ending now" as computed by NOAA's own clock.
+// Never build begin_date from the device clock: it is sent as station-local (ET)
+// time, so any viewer outside Eastern asks for a window that doesn't exist yet.
 async function fetchWindHistory(){
-  const now=new Date(),start=new Date(now.getTime()-2*3600000);
-  const bd=fmt2(start)+' '+String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
-  const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(bd)}&range=3&station=${ST.ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`);
+  const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?range=3&station=${ST.ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`);
   if(!d.data?.length)return null;
   return d.data.map(w=>({time:parseNOAA(w.t),speed:parseFloat(w.s),gusts:parseFloat(w.g),dir:parseFloat(w.d)})).filter(w=>w.time);
 }
 
 async function fetchPressure(){
-  const now=new Date(),start=new Date(now.getTime()-6.5*3600000);
-  const bd=fmt2(start)+' '+String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
-  const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(bd)}&range=7&station=${ST.ROB}&product=air_pressure&units=metric&time_zone=lst_ldt&format=json`);
+  const d=await getJ(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?range=7&station=${ST.ROB}&product=air_pressure&units=metric&time_zone=lst_ldt&format=json`);
   if(!d.data?.length)return null;
   return d.data.map(p=>({time:parseNOAA(p.t),val:parseFloat(p.v)})).filter(p=>p.time&&!isNaN(p.val));
 }
@@ -337,10 +336,13 @@ async function fetchTides(){
   return{prev,next,following,status,flow,allFuture:future.slice(0,6),allTides:tides};
 }
 
+// timeformat=unixtime returns UTC epochs. Open-Meteo's default is a naive local
+// string ("2026-08-15T19:54") which new Date() resolves in the *device's* zone —
+// so a viewer in Berlin saw sunset at 1:54 PM instead of 7:54 PM.
 async function fetchSunset(){
-  const d=await getJ(`https://api.open-meteo.com/v1/forecast?latitude=${NYC.lat}&longitude=${NYC.lon}&daily=sunrise,sunset&timezone=America/New_York&forecast_days=1`);
+  const d=await getJ(`https://api.open-meteo.com/v1/forecast?latitude=${NYC.lat}&longitude=${NYC.lon}&daily=sunrise,sunset&timezone=America/New_York&timeformat=unixtime&forecast_days=1`);
   if(!d.daily?.sunset?.[0])return null;
-  return{sunset:new Date(d.daily.sunset[0]),sunrise:new Date(d.daily.sunrise[0])};
+  return{sunset:new Date(d.daily.sunset[0]*1000),sunrise:new Date(d.daily.sunrise[0]*1000)};
 }
 
 async function fetchWeather(){return await getJ(`https://api.open-meteo.com/v1/gfs?latitude=${NYC.lat}&longitude=${NYC.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=cape&wind_speed_unit=kn&temperature_unit=celsius&timezone=America/New_York&forecast_hours=6&past_hours=0`)}
@@ -370,7 +372,10 @@ function nwsMaxWithin(values,hours){
   }
   return max;
 }
-async function fetchHRRR(){return await getJ(`https://api.open-meteo.com/v1/gfs?latitude=${NYC.lat}&longitude=${NYC.lon}&minutely_15=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&temperature_unit=celsius&timezone=America/New_York&forecast_minutely_15=72&past_minutely_15=4`)}
+// models=gfs_hrrr pins this to the 3km HRRR the card claims. Without it the
+// /v1/gfs endpoint is free to serve 13km GFS, and the "HRRR (3km)" header lies.
+// fetchWeather deliberately stays on plain GFS — the CAPE line is labelled as GFS.
+async function fetchHRRR(){return await getJ(`https://api.open-meteo.com/v1/gfs?latitude=${NYC.lat}&longitude=${NYC.lon}&minutely_15=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=gfs_hrrr&wind_speed_unit=kn&temperature_unit=celsius&timezone=America/New_York&timeformat=unixtime&forecast_minutely_15=72&past_minutely_15=4`)}
 
 // ═══════════════════════════════════
 // RULE OF TWELFTHS
@@ -440,8 +445,12 @@ function drawBaroChart(cv,data){
 // RENDERERS
 // ═══════════════════════════════════
 
+// An empty response used to return silently, leaving stale dashes that look
+// identical to a broken page. Say so instead.
 function renderWind(h){
-  if(!h?.length)return;const l=h[h.length-1],s=l.speed.toFixed(1),g=l.gusts.toFixed(1);
+  if(!h?.length){$('wtime').textContent='⚠ NOAA wind data unavailable · checked '+fmtT(new Date());$('wtime').style.color='var(--orange)';return}
+  $('wtime').style.color='var(--fnt)';
+  const l=h[h.length-1],s=l.speed.toFixed(1),g=l.gusts.toFixed(1);
   $('ws').textContent=s;$('ws').style.color=wCSS(l.speed);$('wg').textContent=g<.1?'—':g;
   $('wdir').innerHTML='<span style="display:inline-block;transform:rotate('+l.dir+'deg);margin-right:4px">↓</span>'+cardinal(l.dir);
   $('wdeg').textContent=isNaN(l.dir)?'':'('+l.dir.toFixed(0)+'°)';
@@ -451,7 +460,9 @@ function renderWind(h){
 }
 
 function renderPressure(p){
-  if(!p?.length)return;const l=p[p.length-1],nv=l.val,nt=l.time.getTime();
+  if(!p?.length){$('baro-sub').textContent='⚠ NOAA pressure data unavailable · checked '+fmtT(new Date());$('baro-sub').style.color='var(--orange)';return}
+  $('baro-sub').style.color='var(--mut)';
+  const l=p[p.length-1],nv=l.val,nt=l.time.getTime();
   $('baro-now').textContent=nv.toFixed(1)+' mbar';
   function vAt(ms){let c=p[0];for(const x of p)if(Math.abs(x.time.getTime()-(nt-ms))<Math.abs(c.time.getTime()-(nt-ms)))c=x;return c.val}
   const d3=nv-vAt(3*36e5),d6=nv-vAt(6*36e5);
@@ -463,7 +474,8 @@ function renderPressure(p){
 }
 
 function renderTides(t,sunData){
-  if(!t)return;const fc=fColor(t.flow),now=new Date();
+  if(!t){$('tstat').textContent='NOAA tide predictions unavailable';$('tstat').style.color='var(--orange)';return}
+  const fc=fColor(t.flow),now=new Date();
   $('tstat').textContent=t.status;$('tstat').style.color=fc;$('tdot').style.background=fc;$('tdot').style.boxShadow='0 0 8px '+fc;
   $('gtd').textContent=t.status;$('gtd').style.color=fc;$('gtn').textContent=t.next?'Next: '+fmtT(t.next.time):'';
 
@@ -519,7 +531,9 @@ function thunderWord(p){
 }
 
 function renderWeather(wx,wt){
-  if(!wx?.current)return;const c=wx.current,tc=c.temperature_2m,tf=c2f(tc),code=c.weather_code;
+  if(!wx?.current){$('wxd').textContent='⚠ Open-Meteo unavailable · checked '+fmtT(new Date());$('wxd').style.color='var(--orange)';return}
+  $('wxd').style.color='var(--mut)';
+  const c=wx.current,tc=c.temperature_2m,tf=c2f(tc),code=c.weather_code;
   $('wxi').textContent=wxI(code);$('wxt').textContent=tc.toFixed(1)+'°C / '+tf+'°F';$('wxd').textContent=wxD(code)+' · Feels '+c.apparent_temperature.toFixed(0)+'°C';
   $('gt').textContent=tc.toFixed(0)+'°C';$('gts').textContent=tf+'°F';$('gtwx').textContent=wxI(code);
   if(wt)$('wtemp').textContent='🌊 Water: '+wt.f+'°F / '+wt.c+'°C';
@@ -540,11 +554,12 @@ function renderStorm(wx,th){
 }
 
 function renderForecast(hr){
-  if(!hr?.minutely_15?.time)return;const m=hr.minutely_15,now=Date.now();let rows='',cnt=0;
-  for(let i=0;i<m.time.length;i+=4){const t=new Date(m.time[i]),diff=(t-now)/36e5;if(diff<-.5)continue;if(cnt>=10)break;
+  if(!hr?.minutely_15?.time){$('fcrows').innerHTML='<div style="padding:8px;color:var(--orange)">⚠ HRRR forecast unavailable</div>';return}
+  const m=hr.minutely_15,now=Date.now();let rows='',cnt=0;
+  for(let i=0;i<m.time.length;i+=4){const t=new Date(m.time[i]*1000),diff=(t-now)/36e5;if(diff<-.5)continue;if(cnt>=10)break;
     const isN=diff>=-.25&&diff<.75,w=m.wind_speed_10m?.[i],g=m.wind_gusts_10m?.[i],d=m.wind_direction_10m?.[i],tp=m.temperature_2m?.[i],pr=m.precipitation?.[i];
     rows+='<div class="fc-row'+(isN?' now':'')+'"><span style="font-weight:'+(isN?700:400)+';color:'+(isN?'var(--accent)':'var(--mut)')+';font-size:11px">'+fmtT(t)+'</span><span style="color:'+(w!=null?wCSS(w):'var(--mut)')+';font-weight:700">'+(w!=null?w.toFixed(0):'—')+' kt</span><span style="color:var(--mut)">G'+(g!=null?g.toFixed(0):'—')+'</span><span>'+cardinal(d)+'</span><span style="color:var(--mut)">'+(d!=null?d.toFixed(0):'—')+'°</span><span>'+(tp!=null?tp.toFixed(0):'—')+'°</span><span style="text-align:center">'+(pr>0?'💧':'·')+'</span></div>';cnt++}
-  $('fcrows').innerHTML=rows||'<div style="padding:8px;color:var(--mut)">No HRRR data</div>';
+  $('fcrows').innerHTML=rows||'<div style="padding:8px;color:var(--orange)">⚠ HRRR forecast unavailable</div>';
 }
 
 // ═══════════════════════════════════
@@ -557,12 +572,16 @@ async function loadAll(){
     const[wh,wt,td,wx,hr,pr,ss,th]=await Promise.allSettled([
       fetchWindHistory(),fetchWaterTemp(),fetchTides(),fetchWeather(),fetchHRRR(),fetchPressure(),fetchSunset(),fetchThunder()
     ]);
-    if(wh.status==='fulfilled')renderWind(wh.value);
-    if(td.status==='fulfilled')renderTides(td.value,ss.status==='fulfilled'?ss.value:null);
-    if(wx.status==='fulfilled')renderWeather(wx.value,wt.status==='fulfilled'?wt.value:null);
-    renderStorm(wx.status==='fulfilled'?wx.value:null,th.status==='fulfilled'?th.value:null);
-    if(hr.status==='fulfilled')renderForecast(hr.value);
-    if(pr.status==='fulfilled')renderPressure(pr.value);
+    // Pass null through on rejection rather than skipping the renderer, so a
+    // failed fetch shows its "unavailable" state instead of stale placeholders.
+    const val=x=>x.status==='fulfilled'?x.value:null;
+    [wh,wt,td,wx,hr,pr,ss,th].filter(x=>x.status==='rejected').forEach(x=>console.warn('fetch failed:',x.reason));
+    renderWind(val(wh));
+    renderTides(val(td),val(ss));
+    renderWeather(val(wx),val(wt));
+    renderStorm(val(wx),val(th));
+    renderForecast(val(hr));
+    renderPressure(val(pr));
     const now=new Date();$('meta').textContent='Updated '+fmtT(now)+' · '+now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'America/New_York'});
   }catch(e){console.error(e)}$('ri').textContent='↻';
 }

@@ -197,7 +197,6 @@ const cardinal = d => {
 };
 const fmtT = d => d ? d.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/New_York'}) : '—';
 const fmtHM = d => d ? d.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/New_York'}) : '—';
-const fmt2 = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
 const wCSS = k => k >= 25 ? 'var(--red)' : k >= 18 ? 'var(--orange)' : k >= 12 ? 'var(--yellow)' : k >= 6 ? 'var(--green)' : 'var(--dim)';
 
 function parseNOAA(ts) {
@@ -422,17 +421,18 @@ function analyzeWind(data, gradDir, gradSpd) {
 
 // ── FETCHERS ─────────────────────────────────────────────────
 
-async function fetchWindNOAA(beginDateStr, rangeH) {
-  const url=`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${encodeURIComponent(beginDateStr)}&range=${rangeH}&station=${ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`;
+// `range` alone means "last N hours, ending now" on NOAA's clock. A begin_date
+// built from the device clock is sent as station-local (ET), so any viewer
+// outside Eastern silently gets a window shifted by their UTC offset.
+async function fetchWindNOAA(rangeH) {
+  const url=`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?range=${rangeH}&station=${ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`;
   const r=await fetch(url); if(!r.ok)throw new Error(`NOAA ${r.status}`);
   const d=await r.json(); if(!d.data?.length)throw new Error('No NOAA wind data');
   return d.data.map(w=>({time:parseNOAA(w.t),speed:parseFloat(w.s),gusts:parseFloat(w.g),dir:parseFloat(w.d)})).filter(w=>w.time&&!isNaN(w.speed)&&!isNaN(w.dir));
 }
 
 async function fetchEvening() {
-  const now=new Date(), start=new Date(now.getTime()-12.5*3600000);
-  const bd=fmt2(start)+' '+String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
-  const data=await fetchWindNOAA(bd,13);
+  const data=await fetchWindNOAA(13);
   return data.slice(-120);
 }
 
