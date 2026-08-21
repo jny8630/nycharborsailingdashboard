@@ -1,93 +1,107 @@
 {
-  "week": 32,
+  "week": 33,
   "year": 2026,
-  "generated_utc": "2026-08-14T16:39:32Z",
-  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01322026.pdf",
+  "generated_utc": "2026-08-21T16:19:35Z",
+  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01332026.pdf",
   "model": "text-parser",
   "skipped": [
     {
-      "week": 33,
+      "week": 34,
       "year": 2026,
       "reason": "not_posted"
     }
   ],
   "notices": [
     {
-      "chart": "13269",
-      "summary": "Cobscook Bay\nPrivate Discrepancies\nORPC Cobscook Bay Lighted Buoy A 1013 MISSING PA\nCohasset Channel\nCohasset Harbor - Cohasset Marine Events MA \u2013 COHASSET \u2013 SANDY BEACH TO MINOT\u2019S LIGHT \u2013 MINOT LIGHT ROUNDABOUT \u2013 ROW \u2013:00 AM to 2:00 PM (Rain date of September 13, 2026)..5 mile row from Sandy Beach, Cohasset out and around Minot\u2019s Light and returning. The event will have approximately 30\u2026",
+      "chart": null,
+      "summary": "Providence River Approach - Bristol Marine Events RI \u2013 BRISTOL HARBOR \u2013 BYC A-CLASS CATAMARAN REGATTA \u2013. The event will take place from August\n(Race) 21 through August 23, 2026, from 11:00 a.m. to 6:00 p.m. each day. Expect up to 20 sailing vessels, 18 ft in length. Mariners are\nadvised to transit the area with extreme caution. Mariners may contact the person in charge by phone at (516) 287-0164\u2026",
       "status": "ACTIVE",
-      "since": "2026-06-17",
-      "location": "Cobscook Bay"
+      "since": "2025-11-14",
+      "location": "Providence River Approach - Bristol Marine Events RI \u2013 BRIST"
     },
     {
       "chart": null,
-      "summary": "Main Channel - East River Main Bridges From May 1, 2026 \u2013 December 31, 2026, Monday-Friday, with occasional Saturdays and Sundays, between 8:00 a.m. and Lat::00 p.m., a biennial bridge inspection using a traveler and rigging will be conducted on the Manhattan Bridge, mile 1.1 in the East River, New York City. The safety boat Kylie Anne (CT8893BM) will be on scene during inspection operations.\u2026",
+      "summary": "2026-06-17 To: 2026-09-26 Location: BROOKLYN, NY \u2013 LOWER BAY \u2013\u2013:15 p.m. until 10:45 p.m. The fireworks launch site will be near the waters of the Lower\nBay of New York Harbor in approximate position 34\u2019 20\u201d N, 58\u2019 43\u201d W (NAD 83). Mariners are advised to keep a minimum safe\ndistance of 450 feet from the shoreline to avoid pyrotechnic fallout.: 2025-05-08 To: 2029-12-31 Location: Bridge Name:\u2026",
       "status": "ACTIVE",
-      "since": "2026-06-15",
+      "since": "2026-06-17",
+      "location": "Coney Island Channel"
+    },
+    {
+      "chart": null,
+      "summary": "Main Channel - East River Main Bridges From August 17, 2026, to August 21, 2026, between 10:00 a.m. and 2:00 p.m., a bridge traveler will be operated under the Lat:.3 to perform a bridge inspection. Mariners requiring full vertical clearance can contact the contractor via marine radio VHF-FM Ch.. The traveler platform will Lon:\nbe moved out of the navigable channel after work hours or when not in\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-08-18",
       "location": "Main Channel - East River Main Bridges"
     },
     {
       "chart": null,
-      "summary": "2026-08-03 Lat:: 2026-10-05 Location: 40-41-48..920W Trevcon Construction Company LLC submitted a Local Notice to .S. Coast Guard First District for a marine construction project in New York\u2019s East Lon:. The project, scheduled from August 3 to October 5, 2026, involves the removal of the BBP Pier 4 Marine -Transfer Bridge, including steel structure removal, timber pile removal, and diver\u2026",
+      "summary": "2022-01-03 To: 2026-12-30 Location: IPCP will be conducting esplanade, bulkhead, and park reconstruction, on the East River, Montgomery St to East 14th Street,\nfrom January 2022 to December 2026, 5-7 days a week, between 6:00am to 6:00pm. Equipment on scene will be Tugboat\nDEBRA QUINN, Inspection Boat, 290 x 40 Mooring Barges, 250 x 62 Gantry Crane Barge, Crawler Crane Barge, 150 x 60\u2026",
       "status": "ACTIVE",
-      "since": "2026-08-03",
+      "since": "2022-01-03",
       "location": "Main Channel - East River"
     },
     {
-      "chart": null,
-      "summary": "2026-02-12 To: 2027-01-01 Location: 40-47-15..504W On February 16, 2026, between 7:00 am Lat::30 pm on weekdays and weekends, bridge maintenance will be performed on the New Jersey Turnpike (W111.48) over Berry Creek Canal, mile .1 in Lyndhurst, Bergen County, New Jersey. This work will be completed in 3 stages in approximately 3 non- Lon:\nconsecutive weeks. A 15 ft skiff and a 60 ft X 160 ft\u2026",
+      "chart": "13281",
+      "summary": "2026-07-23 To: 2026-12-01 Location: 40-35-09..320W Bridge Name: Belt Pkwy Lat:\u2019 manlift will be utilized to inspect the Belt Parkway across Hendrix Creek at mile 0. Mariners requiring full vertical and horizontal clearance can contact the contractor Lon:. Mariners are advised to exercise caution and -reduce wake when transiting the area. : 2026-04-07 To: 2026-10-04 Location: 40-35-12..364W A\u2026",
       "status": "ACTIVE",
-      "since": "2026-02-12",
+      "since": "2026-07-23",
+      "location": "Gerritsen Inlet"
+    },
+    {
+      "chart": null,
+      "summary": "2024-05-24 To: 2027-10-22 Location: Bridge Name: Portal (N) Bridge Lat:.04 is in progress. Hours of operations are from Monday to Friday between 6:30 a.m. to midnight. There will be waterborne equipment blocking one draw of a Lon:\nswing bridge at a time and the other draw will be free and clear of any equipment for the passage of vessels. Mariners can contact one -\"\n(including possible return\u2026",
+      "status": "ACTIVE",
+      "since": "2024-05-24",
       "location": "Newark Bay - Hackensack Bridges"
     },
     {
       "chart": null,
-      "summary": "2024-09-12 To: 2039-12-01 Location: . In Esopus Creek, shoaling has occurred faster than anticipated at the\nmouth of the creek when passing between Saugerties Lighthouse and Hudson River Lighted Buoy 93. In Roundout Creek, there is\nshoaling at the mouth of the creek. Mariners should exercise caution when navigating these areas.\u00a7 165.T01-0336 Safety Zone; Hudson River, Manhattan, NY (a) Location.:\u2026",
-      "status": "ACTIVE",
+      "summary": "Main Channel - Hudson Bridges Cable anchorage retrofits of the Governor Mario M. Cuomo Bridge across the Hudson River at mile 27.0 will commence on March 15, Lat:. Temporary work platform will be installed in four locations underneath the bridge. The temporary work platform will extend 6 feet beneath the deck girders but remain above the traveler handrails, not impacting the vertical clearance of\u2026",
+      "status": "TEMPORARY",
       "since": "2024-09-12",
+      "location": "Main Channel - Hudson Bridges Cable anchorage retrofits of t"
+    },
+    {
+      "chart": null,
+      "summary": "2026-01-06 To:.: 40-45-20.32N 074-00-23.84W; 40-45-18.89N, 074-00-48.18W; 40-45-13.80N 074-00-48.64W;\n40-45-12.40N. 074-00-28.47W. The USCG has established a Safety Zone, 33 CFR 165.T01-0336 Safety Zone; Hudson River,\nManhattan, NY. Mariners transiting west of the safety zone should proceed at a speed to minimize potential wake or surge damage\nto the vessels working the construction area. There\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-01-06",
       "location": "Main Channel - Hudson"
     },
     {
-      "chart": null,
-      "summary": "Main Channel - Hudson Marine Events LNM NY - EAST RIVER - HARLEM RIVER - HUDSON RIVER \u2013. Approximately two to five\nparticipating swimmers will be assisted by a lead safety vessel in addition to one escort vessel and one escort kayak per every one to\ntwo swimmers. The swim events will start at either Pier A in Battery Park or Mill Rock, near East 90th St., Manhattan. They will proceed\nup the East\u2026",
-      "status": "ACTIVE",
-      "since": "2026-08-05",
-      "location": "Main Channel - Hudson Marine Events LNM NY - EAST RIVER - HA"
-    },
-    {
       "chart": "13221",
-      "summary": "Bridge across Reynolds Channel at mile 8.2. Work hours are 7:00 a.m. to 4:00 p.m. Monday through Friday. During work hours, a 20-foot by 40-foot work barge will be deployed in the navigable channel. Mariners requiring full Lon:. -Mariners are advised to exercise caution when transiting this area. :\nMeadowbrook Parkway Bridge across False Channel at mile 0.7. Work hours are 7:00 a.m. to 4:00 p.m.\u2026",
-      "status": "ACTIVE",
-      "since": "2024-09-12",
-      "location": "Jones Inlet Lighted Buoy 16 30975 MISSING FD"
+      "summary": "2026-08-31To: 2026-09-04 Location: 40.885567, -73.820306 Bridge Name: I 95 Bridge From Lat:\u00b0 across Hutchinson River at mile 2.2, in Bronx, NY. The contractor will be utilizing a 16 foot duck boat for this inspection. Mariners Lon:\u00b0 988-3963. Mariners are advised to exercise caution and reduce wake when transiting the area. : 2026-08-18 To: 2026-08-20 Location: 40.868975, -73.821092 Bridge Name:\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-08-31",
+      "location": "Hutchinson Bridges Hutchinson"
     },
     {
       "chart": null,
-      "summary": "2026-08-12 To: 2026-08-17 Location:\u2013 UPPER BAY - SAFETY ZONE \u2013: Mariners are advised that a safety zone will be enforced on the New York Harbor, Upper Bay and Lower Hudson River on\nAugust 15, 2026, from 8:00 a.m. until 12:00 p.m., with a rain date of August 16, 2026. Approximately 200 swimmers and various\nsupport vessels will transit from the southern portion of Liberty State Park, NJ, to a barge\u2026",
+      "summary": "2026-0-01 T8o: 2026-10-31 Location: 40-38-37.:\nConstruction (Excluding (Excluding from August 1, 2026, to October 31, 2026, in Newark Bay and Kill Van Kull, New Jersey, near the Bayonne Bridge at coordinates Lon:\u00b0. The work will be conducted using barge-mounted sediment drilling equipment and samplers, operating five days per week from -amples 7 am to 5 pm. Vessels involved can be contacted on\u2026",
       "status": "ACTIVE",
-      "since": "2026-08-12",
-      "location": "Ambrose Channel"
+      "since": "2026-07-27",
+      "location": "Main Channel - Kill Van"
+    },
+    {
+      "chart": "13275",
+      "summary": "2026-08-22 To: 2026-08-24 Brooklyn, NY \u2013 Upper Bay \u2013:00 a.m. and 12:00 p.m. Approximately 6 swimmers will transit\nfrom south of the Verrazano Bridge and proceed south to Swinburne Island escorted by two safety vessels. Interested mariners\nmay contact the Event Coordinator on marine band radio channel 6 VHF-FM or via telephone at 646-436-3277.\u2013 LAKE CHAMPLAIN \u2013 BURLINGTON \u2013.:00 p.m. to 8:00 p.m.,\u2026",
+      "status": "ACTIVE",
+      "since": "2026-08-22",
+      "location": "Ambrose Channel - Main Marine Events"
     },
     {
       "chart": null,
-      "summary": "2026-07-16 To: 2026-12-01 Location: 40-38-31..254W Bridge Name: Cross Lat:\u2013 JAMAICA BAY - Bridge Inspections \u2013 From July 28, 2026 to November 30, 2026, a barge will be performing underdeck bridge inspections at the Cross Bay Blvd Bridge across Jamaica Bay at mile 10.0. Mariners requiring Lon:\u00b0 (646) 460-3880 or Minas Lyristis at (863) 326-3750. Mariners are advised to exercise caution and reduce\u2026",
-      "status": "ACTIVE",
-      "since": "2026-07-16",
-      "location": "Beach Channel - North Bridges"
+      "summary": "To: 2030-01- Lat:\nRaritan 18T23:59:59.000Z Location: 40.49632, -74.28037 Bridge Name: Raritan River Railroad Bridge Construction and demolition operations to . Operations through Lon:\nAugust 2026 include Perth Amboy Pier Concrete Operations followed by counterweight Installation at the South Amboy Pier. A number -of barges and support vessels will be moored outside the navigational channel. Due\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-03-10",
+      "location": "Raritan River"
     },
     {
       "chart": null,
-      "summary": "Raritan River Cutoff Channel - Bridges The TIR published in the Federal Register at https://www.govinfo..pdf.. This establishes a RNA from 12:01 a.m. on April 15,\nNotice 2026, until 11:59 p.m. on June 30, 2030. ADDRESSES: You may submit comments at https://www.regulations.gov. See the \u2018\u2018Public\nParticipation and Request for Comments\u2019\u2019 portion of the SUPPLEMENTARY INFORMATION section for further\u2026",
+      "summary": "2026-08-17 To: 2026-09-16 Location: 41-49-09..815W Bridge Name: Washington Lat::30 a.m. and 5:00 p.m., the Tug mily B Casey with a barge will be operated under Washington Bridge over Seekonk River at mile 0.6 to perform bridge inspection. Lon:\nMariners requiring full horizontal clearance can contact the contractor via marine radio VHF-FM Ch309-989-1623. Mariners are advised to exercise caution\u2026",
       "status": "ACTIVE",
-      "since": "2026-05-05",
-      "location": "Raritan River Cutoff Channel - Bridges The TIR published in "
-    },
-    {
-      "chart": null,
-      "summary": "2024-09-13 To: 2039-12-21 Location: : 2026-05-21 To: 2027-10-03 Location: 40-34-38....424W 40-34-30..672W 40-34-37..868W 40-34-38... Mariners report that only two feet of water at low tide and five feet of water at high tide when\ntransiting around the buoys 6 and 7 buoys at the southern entrance to Sheepshead Bay NY. Mariners are advice to transit the area with\nextreme caution.: 2026-03-13 To:\u2026",
-      "status": "ACTIVE",
-      "since": "2024-09-13",
-      "location": "Sheepshead Bay"
+      "since": "2026-08-17",
+      "location": "Providence River - Seekonk Bridges"
     }
   ],
   "disclaimer": "Extracted from USCG D1 LNM via keyword filtering. Verify against source PDF before underway."
