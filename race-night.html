@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080e18">
+<title>Race Night — Currents, Depth &amp; Course</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛵</text></svg>">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#080e18;--card:#131f2e;--card2:#0c1520;--bdr:#1a2d42;--bdr2:#2a4060;--txt:#f0f4f8;--dim:#c4d0de;--mut:#8fa3b8;--fnt:#6b8299;--accent:#4fd1c5;--blue:#63b3ed;--orange:#ed8936;--green:#48bb78;--red:#f56565;--yellow:#ecc94b;--mono:'SF Mono','Cascadia Code','JetBrains Mono','Fira Code',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);max-width:440px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+.hdr{background:linear-gradient(135deg,#0e1f30,#162d46);padding:16px 14px 12px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.hdr-label{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.hdr-title{font-size:20px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
+.hdr-meta{font-size:10px;color:var(--fnt);margin-top:6px}
+.back-btn{background:var(--bdr);border:1px solid var(--bdr2);border-radius:8px;color:var(--accent);padding:6px 12px;font-size:12px;font-weight:600;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
+
+.daybar{display:flex;gap:6px;padding:8px 10px 0;flex-shrink:0}
+.day-btn{flex:1;padding:6px 4px;background:var(--card);border:1px solid var(--bdr);border-radius:7px;color:var(--mut);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:.04em}
+.day-btn.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
+.day-btn:disabled{opacity:.35;cursor:default}
+
+.slots{display:flex;gap:5px;padding:8px 10px 6px;flex-shrink:0}
+.slot-btn{flex:1;min-width:0;padding:7px 2px;background:var(--card);border:1px solid var(--bdr);border-radius:7px;color:var(--mut);font-size:13px;font-weight:700;font-family:var(--mono);cursor:pointer;text-align:center;line-height:1.25}
+.slot-btn.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
+.slot-btn:active{opacity:.7}
+.slot-sub{display:block;font-size:8px;font-weight:600;letter-spacing:.06em;color:var(--fnt)}
+.slot-btn.active .slot-sub{color:var(--accent)}
+
+#map{flex:1;min-height:300px}
+
+.wind{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:8px 10px 4px;flex-shrink:0}
+.wcell{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--bdr);border-radius:9px;padding:7px 8px;text-align:center}
+.wlab{font-size:8px;color:var(--fnt);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.wval{font-size:17px;font-weight:800;font-family:var(--mono);line-height:1.25;margin-top:1px}
+.wsub{font-size:9px;color:var(--mut);font-family:var(--mono)}
+
+.panel{padding:2px 10px 8px;flex-shrink:0}
+.ctl{display:flex;align-items:center;gap:8px;margin-top:7px}
+.ctl-lab{font-size:10px;color:var(--mut);font-weight:600;width:96px;flex-shrink:0;letter-spacing:.02em}
+.ctl-val{font-size:10px;color:var(--accent);font-family:var(--mono);width:46px;text-align:right;flex-shrink:0}
+input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
+.seg{display:flex;gap:4px;flex:1}
+.seg button{flex:1;padding:4px 2px;background:var(--card);border:1px solid var(--bdr);border-radius:6px;color:var(--mut);font-size:10px;font-weight:700;font-family:var(--mono);cursor:pointer}
+.seg button.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
+.toggles{display:flex;gap:5px;margin-top:8px}
+.tg{flex:1;padding:5px 2px;background:var(--card);border:1px solid var(--bdr);border-radius:7px;color:var(--mut);font-size:10px;font-weight:700;font-family:inherit;cursor:pointer}
+.tg.active{background:rgba(99,179,237,.15);border-color:var(--blue);color:var(--blue)}
+
+.legend{display:flex;gap:10px;padding:6px 10px 0;flex-shrink:0;align-items:flex-start}
+.legend>div{flex:1;min-width:0}
+.cb-bar{height:8px;border-radius:4px;background:linear-gradient(to right,#5500bb,#0055ff,#00ffcc,#ffdd00,#ff6600,#ff0000,#8b0000)}
+.dp-bar{height:8px;border-radius:4px;background:linear-gradient(to right,#e8cf9a,#bcd79c,#8fcfc0,#5aa9d8,#3d7ec2,#2a5da3,#1a3f7a,#122c58)}
+.cb-labels{display:flex;justify-content:space-between;margin-top:2px;font-size:8px;color:var(--mut);font-family:var(--mono)}
+.cb-title{font-size:8px;color:var(--fnt);margin-top:1px;letter-spacing:.03em}
+
+.note{font-size:9px;color:var(--fnt);line-height:1.5;padding:8px 12px 0;flex-shrink:0}
+.footer{text-align:center;padding:8px 10px 10px;font-size:9px;color:var(--fnt);border-top:1px solid var(--bdr);flex-shrink:0;line-height:1.6;margin-top:8px}
+.footer a{color:var(--accent);text-decoration:none}
+.spinner{display:inline-block;width:10px;height:10px;border:1.5px solid var(--bdr2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-right:5px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.buoy-dot{display:flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid rgba(0,0,0,.5);font-size:9px;font-weight:800;color:#000;font-family:'SF Mono','Cascadia Code',monospace;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.snd{font-size:9px;font-weight:700;color:#dfe9f5;font-family:'SF Mono',monospace;text-shadow:0 0 3px #000,0 0 3px #000;white-space:nowrap}
+.mark-lbl{font-size:10px;font-weight:800;color:#fff;font-family:'SF Mono',monospace;text-shadow:0 0 4px #000,0 0 4px #000;white-space:nowrap}
+.leaflet-control-attribution{background:rgba(8,14,24,.8)!important;color:var(--fnt)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--accent)!important}
+.leaflet-tooltip.depth-tip{background:transparent;border:none;box-shadow:none;color:#cfe2f5;font-family:'SF Mono',monospace;font-size:9px;font-weight:700;padding:0;text-shadow:0 0 3px #000,0 0 3px #000}
+.leaflet-tooltip.depth-tip::before{display:none}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-row">
+    <div>
+      <div class="hdr-label">⛵ Race Night</div>
+      <div class="hdr-title">Currents · Depth · Course</div>
+      <div style="font-size:11px;color:var(--dim);font-weight:600;margin-top:2px">Y-A / G1 / G11 racing area</div>
+    </div>
+    <a class="back-btn" href="index.html">← Dashboard</a>
+  </div>
+  <div class="hdr-meta" id="meta"><span class="spinner"></span>Finding latest model run…</div>
+</div>
+
+<div class="daybar" id="daybar"></div>
+<div class="slots" id="slots"></div>
+
+<div id="map"></div>
+
+<div class="wind">
+  <div class="wcell">
+    <div class="wlab">Wind dir</div>
+    <div class="wval" id="w-dir">—</div>
+    <div class="wsub" id="w-dir-sub">&nbsp;</div>
+  </div>
+  <div class="wcell">
+    <div class="wlab">Speed</div>
+    <div class="wval" id="w-spd">—</div>
+    <div class="wsub" id="w-spd-sub">&nbsp;</div>
+  </div>
+  <div class="wcell">
+    <div class="wlab">Gust</div>
+    <div class="wval" id="w-gst">—</div>
+    <div class="wsub" id="w-gst-sub">&nbsp;</div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="ctl">
+    <span class="ctl-lab">Local bias</span>
+    <div class="seg" id="bias">
+      <button data-v="0">+0</button>
+      <button data-v="4" class="active">+4 kt</button>
+      <button data-v="5">+5 kt</button>
+    </div>
+  </div>
+  <div class="ctl">
+    <span class="ctl-lab">Current opacity<br><span style="font-weight:500;color:var(--fnt);font-size:9px">drag down for depth</span></span>
+    <input type="range" id="op" min="0" max="100" value="60">
+    <span class="ctl-val" id="op-v">60%</span>
+  </div>
+  <div class="ctl">
+    <span class="ctl-lab">Course length</span>
+    <input type="range" id="len" min="0.6" max="1.4" step="0.05" value="1">
+    <span class="ctl-val" id="len-v">1.00 nm</span>
+  </div>
+  <div class="ctl">
+    <span class="ctl-lab">Close-hauled</span>
+    <input type="range" id="twa" min="35" max="50" step="1" value="42">
+    <span class="ctl-val" id="twa-v">42°</span>
+  </div>
+  <div class="toggles">
+    <button class="tg active" id="tg-areas">Depth fill</button>
+    <button class="tg active" id="tg-cont">Contours</button>
+    <button class="tg" id="tg-snd">Soundings</button>
+    <button class="tg active" id="tg-course">Course</button>
+  </div>
+</div>
+
+<div class="legend">
+  <div>
+    <div class="cb-bar"></div>
+    <div class="cb-labels"><span>0</span><span>2</span><span>4 kt</span></div>
+    <div class="cb-title">Surface current (NYHOPS)</div>
+  </div>
+  <div>
+    <div class="dp-bar"></div>
+    <div class="cb-labels"><span>0</span><span>30</span><span>65+ ft</span></div>
+    <div class="cb-title">Charted depth (MLLW)</div>
+  </div>
+</div>
+
+<div class="note" id="note">
+  Course is a <b>projection</b>, not the sailing instructions — the RC sets the real
+  course. Mark is drawn 0.5&nbsp;× course length upwind of a fixed race-area centre
+  (40.6694, −74.0295) that reproduces the usual G1&nbsp;/&nbsp;G11&nbsp;/&nbsp;G9&nbsp;/&nbsp;R32&nbsp;/&nbsp;Y-A
+  placements. Close-hauled angle is an adjustable assumption, not a measured Melges 24 polar.
+</div>
+
+<div class="footer">
+  <a href="https://hudson.dl.stevens-tech.edu/maritimeforecast/maincontrol.shtml" target="_blank">Stevens NYHOPS</a> ·
+  <a href="https://open-meteo.com/" target="_blank">HRRR / Open-Meteo</a> ·
+  <a href="https://encdirect.noaa.gov/" target="_blank">NOAA ENC</a> ·
+  <a href="https://www.openseamap.org" target="_blank">OpenSeaMap</a><br>
+  Personal, experimental project · Not for navigation · Use at your own risk · Data from public sources, verify all data independently · No liability for accuracy, completeness, or timeliness
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── Constants ────────────────────────────────────────────────────────────────
+const BASE_FRAME = 25;                              // T25 = hour 0 of model date
+const MAX_FRAME  = 72;                              // NYHOPS publishes 48 frames
+const BOUNDS     = [[40.632, -74.102], [40.785, -73.943]];
+const BASE_URL   = 'https://hudson.dl.stevens-tech.edu/maritimeforecast/data/FORECAST/';
+
+const CENTER   = [40.6694, -74.0295];  // race-area centre, ~300m N of Yellow Alpha
+const SLOTS    = [17, 18, 19, 20];     // race-evening hours, ET
+const LINE_LEN_M = 100;                // assumed start-line length
+const R_NM     = 3440.065;
+const M2FT     = 3.28084;
+
+// ── Time helpers (timezone-independent: everything derived in ET) ────────────
+function etParts(d = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York', year: 'numeric', month: '2-digit',
+    day: '2-digit', hour: '2-digit', hour12: false
+  }).formatToParts(d).filter(x => x.type !== 'literal').map(x => [x.type, x.value]));
+  return { ymd: `${p.year}-${p.month}-${p.day}`, hour: Number(p.hour) % 24 };
+}
+
+// Add whole days to a YYYY-MM-DD string without leaving UTC noon (DST-safe).
+function addDays(ymd, n) {
+  const d = new Date(`${ymd}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+const compact = ymd => ymd.replace(/-/g, '');
+const daysBetween = (a, b) =>
+  Math.round((Date.parse(`${b}T12:00:00Z`) - Date.parse(`${a}T12:00:00Z`)) / 86400000);
+
+const cardinal = d =>
+  ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW']
+  [Math.round(((d % 360) + 360) % 360 / 22.5) % 16];
+
+// ── Geodesy ──────────────────────────────────────────────────────────────────
+const rad = x => x * Math.PI / 180, deg = x => x * 180 / Math.PI;
+
+// Point at `nm` nautical miles along initial bearing `brg` from [lat,lon].
+function dest([lat, lon], brg, nm) {
+  const d = nm / R_NM, b = rad(brg), la = rad(lat), lo = rad(lon);
+  const la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
+  const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la),
+                              Math.cos(d) - Math.sin(la) * Math.sin(la2));
+  return [deg(la2), deg(lo2)];
+}
+
+// ── NYHOPS image URLs ────────────────────────────────────────────────────────
+// Accepts either YYYY-MM-DD or YYYYMMDD; NYHOPS paths use the compact form.
+function imgUrl(dateStr, frame) {
+  const d = dateStr.includes('-') ? compact(dateStr) : dateStr;
+  return `${BASE_URL}${d.slice(0, 4)}/${d}/T${frame}manhspeedtop.png`;
+}
+
+function probeDate(dateStr, frame) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload  = () => resolve(dateStr);
+    img.onerror = () => reject(new Error('no image'));
+    img.src = imgUrl(dateStr, frame) + '?_=' + Date.now();
+  });
+}
+
+// ── Map ──────────────────────────────────────────────────────────────────────
+const map = L.map('map', {
+  center: CENTER, zoom: 14, minZoom: 11, maxZoom: 16, zoomControl: true
+});
+
+// Panes, bottom to top: depth fill → NYHOPS → contours/soundings → seamarks → course.
+// Contours sit *above* the current overlay so their labels stay readable when the
+// overlay is opaque; the fill sits below so the current field reads as the top layer.
+map.createPane('depthPane').style.zIndex   = 340;
+map.createPane('nyhopsPane').style.zIndex  = 350;
+map.createPane('contourPane').style.zIndex = 360;
+map.createPane('coursePane').style.zIndex  = 450;
+map.getPane('depthPane').style.pointerEvents   = 'none';
+map.getPane('contourPane').style.pointerEvents = 'none';
+map.getPane('coursePane').style.pointerEvents  = 'none';
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19
+}).addTo(map);
+
+L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openseamap.org">OpenSeaMap</a>', maxZoom: 18
+}).addTo(map);
+
+// Buoys — OSM/USCG verified coordinates
+const BUOYS = [
+  {name:'G1',  lat:40.67970, lon:-74.02875, color:'#48bb78'},
+  {name:'G5',  lat:40.64571, lon:-74.04124, color:'#48bb78'},
+  {name:'G7',  lat:40.65467, lon:-74.03187, color:'#48bb78'},
+  {name:'G9',  lat:40.66357, lon:-74.02244, color:'#48bb78'},
+  {name:'G11', lat:40.67216, lon:-74.02401, color:'#48bb78'},
+  {name:'33',  lat:40.68392, lon:-74.04020, color:'#48bb78'},
+  {name:'31',  lat:40.66503, lon:-74.05259, color:'#48bb78'},
+  {name:'Y-A', lat:40.66661, lon:-74.02943, color:'#ecc94b'},
+  {name:'Y-C', lat:40.65095, lon:-74.04014, color:'#ecc94b'},
+  {name:'R26', lat:40.63427, lon:-74.05054, color:'#f56565'},
+  {name:'R28', lat:40.64411, lon:-74.05389, color:'#f56565'},
+  {name:'R30', lat:40.65547, lon:-74.05051, color:'#f56565'},
+  {name:'R32', lat:40.67164, lon:-74.04026, color:'#f56565'},
+];
+
+BUOYS.forEach(b => {
+  const label = b.name.replace(/^[GRY]-?/, '');
+  const size = label.length > 2 ? 26 : 22;
+  L.marker([b.lat, b.lon], {
+    icon: L.divIcon({
+      className: '',
+      html: `<div class="buoy-dot" style="background:${b.color};width:${size}px;height:${size}px">${label}</div>`,
+      iconSize: [size, size], iconAnchor: [size / 2, size / 2]
+    })
+  }).addTo(map);
+});
+
+// ── Bathymetry ───────────────────────────────────────────────────────────────
+// Charted depths (metres, MLLW) baked by scripts/fetch_bathymetry.py from
+// NOAA ENC Direct. Ramp keyed on the shallow bound of each depth area.
+const DEPTH_RAMP = [
+  [0,  '#8a7a52'],   // intertidal / drying
+  [0,  '#e8cf9a'],   // 0–2 m
+  [2,  '#bcd79c'],
+  [3,  '#8fcfc0'],
+  [5,  '#5aa9d8'],
+  [8,  '#3d7ec2'],
+  [10, '#2a5da3'],
+  [15, '#1a3f7a'],
+  [20, '#122c58'],
+];
+
+function depthColor(d1) {
+  if (d1 == null) return '#2a5da3';
+  if (d1 < 0) return DEPTH_RAMP[0][1];
+  let c = DEPTH_RAMP[1][1];
+  for (const [lo, col] of DEPTH_RAMP.slice(1)) if (d1 >= lo) c = col;
+  return c;
+}
+
+// Contours worth labelling — the flats/channel transitions that change tactics.
+// (5 m ≈ 16 ft, 10 m ≈ 33 ft, 15 m ≈ 49 ft.) More than three values turns the
+// map into a wall of numbers.
+const LABEL_CONTOURS = new Set([5, 10, 15]);
+const DRAW_CONTOURS  = new Set([3, 5, 8, 10, 15, 20]);
+
+let layerAreas = null, layerCont = null, layerSnd = null, sndData = null;
+
+async function loadBathymetry() {
+  let data;
+  try {
+    const r = await fetch('bathymetry.json');
+    if (!r.ok) throw new Error(r.status);
+    data = await r.json();
+  } catch {
+    document.getElementById('note').insertAdjacentHTML('afterbegin',
+      '<b style="color:var(--red)">Depth data unavailable</b> — run ' +
+      '<code>python3 scripts/fetch_bathymetry.py</code>.<br>');
+    return;
+  }
+
+  layerAreas = L.geoJSON(data.depth_areas, {
+    pane: 'depthPane', interactive: false,
+    style: f => ({
+      stroke: false, fillColor: depthColor(f.properties.DRVAL1), fillOpacity: 0.45
+    })
+  }).addTo(map);
+
+  layerCont = L.geoJSON(data.contours, {
+    pane: 'contourPane', interactive: false,
+    filter: f => DRAW_CONTOURS.has(f.properties.VALDCO),
+    style: f => {
+      const strong = LABEL_CONTOURS.has(f.properties.VALDCO);
+      return { color: '#cfe2f5', weight: strong ? 1.1 : 0.6,
+               opacity: strong ? 0.5 : 0.28, fill: false };
+    },
+    onEachFeature: (f, lyr) => {
+      const v = f.properties.VALDCO;
+      if (!LABEL_CONTOURS.has(v)) return;
+      if ((f.properties['SHAPE.LEN'] ?? 1) < 0.004 && f.geometry.type === 'LineString'
+          && f.geometry.coordinates.length < 25) return;
+      lyr.bindTooltip(`${Math.round(v * M2FT)}′`, {
+        permanent: true, direction: 'center', className: 'depth-tip', pane: 'contourPane'
+      });
+    }
+  }).addTo(map);
+
+  sndData = data.soundings;
+  updateSoundings();
+  redrawCourse();   // depth layers can land after the first course draw
+}
+
+// Soundings are dense — only render them zoomed in, and only when toggled on.
+function updateSoundings() {
+  const want = show.snd && sndData && map.getZoom() >= 14;
+  if (layerSnd) { map.removeLayer(layerSnd); layerSnd = null; }
+  if (!want) return;
+
+  const b = map.getBounds();
+  layerSnd = L.layerGroup([], { pane: 'contourPane' });
+  for (const f of sndData.features) {
+    const [lon, lat] = f.geometry.coordinates;
+    if (!b.contains([lat, lon])) continue;
+    layerSnd.addLayer(L.marker([lat, lon], {
+      pane: 'contourPane', interactive: false,
+      icon: L.divIcon({ className: '', iconSize: [0, 0],
+        html: `<div class="snd">${(f.properties.Z * M2FT).toFixed(0)}</div>` })
+    }));
+  }
+  layerSnd.addTo(map);
+}
+
+map.on('zoomend moveend', updateSoundings);
+
+// ── Course overlay ───────────────────────────────────────────────────────────
+const courseLayer = L.layerGroup([], { pane: 'coursePane' }).addTo(map);
+
+function redrawCourse() {
+  courseLayer.clearLayers();
+  if (!show.course || wind.dir == null) return;
+
+  const W = wind.dir;                       // degrees the wind is FROM
+  const L_ = state.len, theta = state.twa;
+  const mark    = dest(CENTER, W, L_ / 2);
+  const lineCtr = dest(CENTER, (W + 180) % 360, L_ / 2);
+  const halfNm  = (LINE_LEN_M / 2) / 1852;
+  const pin     = dest(lineCtr, (W + 270) % 360, halfNm);
+  const boat    = dest(lineCtr, (W + 90)  % 360, halfNm);
+
+  // Laylines run back from the mark along the reciprocal of each close-hauled heading.
+  const stbdHdg = (W - theta + 360) % 360;
+  const portHdg = (W + theta) % 360;
+  const stbdEnd = dest(mark, (stbdHdg + 180) % 360, L_ * 0.85);
+  const portEnd = dest(mark, (portHdg + 180) % 360, L_ * 0.85);
+
+  const add = l => courseLayer.addLayer(l);
+  // Every line gets a dark casing first — the NYHOPS current field underneath is
+  // busy enough that unbacked strokes disappear into it.
+  const line = (pts, opts) => {
+    add(L.polyline(pts, { pane:'coursePane', color:'#000', opacity:.5,
+          weight:(opts.weight || 2) + 2.5, interactive:false,
+          dashArray:opts.dashArray, lineCap:'round' }));
+    add(L.polyline(pts, { pane:'coursePane', interactive:false, lineCap:'round', ...opts }));
+  };
+
+  line([stbdEnd, mark], { color:'#48bb78', weight:2, opacity:.9, dashArray:'6,6' });
+  line([portEnd, mark], { color:'#f56565', weight:2, opacity:.9, dashArray:'6,6' });
+  line([lineCtr, mark],  { color:'#fff',    weight:2, opacity:.8, dashArray:'2,7' });
+  line([pin, boat],      { color:'#fff',    weight:4, opacity:1 });
+
+  add(L.circleMarker(mark, { pane:'coursePane', radius:8, color:'#000', weight:3.5,
+        fillColor:'#ed8936', fillOpacity:1, interactive:false }));
+  add(L.circleMarker(mark, { pane:'coursePane', radius:8, color:'#fff', weight:1.5,
+        fill:false, interactive:false }));
+  add(L.circleMarker(pin, { pane:'coursePane', radius:5, color:'#000', weight:2.5,
+        fillColor:'#ed8936', fillOpacity:1, interactive:false }));
+  add(L.circleMarker(CENTER, { pane:'coursePane', radius:3, color:'#4fd1c5', weight:1.5,
+        fill:false, interactive:false }));
+
+  add(L.marker(mark, { pane:'coursePane', interactive:false,
+    icon: L.divIcon({ className:'', iconSize:[0,0],
+      html:`<div class="mark-lbl" style="transform:translate(11px,-17px)">▲ ${Math.round(W)}° · ${L_.toFixed(2)}nm</div>` })
+  }));
+  add(L.marker(lineCtr, { pane:'coursePane', interactive:false,
+    icon: L.divIcon({ className:'', iconSize:[0,0],
+      html:'<div class="mark-lbl" style="transform:translate(-14px,6px)">START</div>' })
+  }));
+}
+
+// ── Wind ─────────────────────────────────────────────────────────────────────
+const wind = { dir: null, spd: null, gust: null, hourly: null };
+
+async function loadWind() {
+  const url = 'https://api.open-meteo.com/v1/forecast'
+    + `?latitude=${CENTER[0]}&longitude=${CENTER[1]}`
+    + '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m'
+    + '&models=gfs_hrrr&wind_speed_unit=kn&timezone=America/New_York&forecast_days=2';
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`Open-Meteo ${r.status}`);
+  wind.hourly = (await r.json()).hourly;
+}
+
+function applyWind() {
+  const set = (id, v, sub) => {
+    document.getElementById(id).textContent = v;
+    document.getElementById(id + '-sub').innerHTML = sub || '&nbsp;';
+  };
+  const h = wind.hourly;
+  if (!h) { set('w-dir', '—'); set('w-spd', '—'); set('w-gst', '—'); return; }
+
+  const stamp = `${state.ymd}T${String(state.hour).padStart(2, '0')}:00`;
+  const i = h.time.indexOf(stamp);
+  if (i < 0) {
+    wind.dir = null;
+    set('w-dir', '—', 'no HRRR'); set('w-spd', '—'); set('w-gst', '—');
+    redrawCourse();
+    return;
+  }
+
+  wind.dir  = h.wind_direction_10m[i];
+  wind.spd  = h.wind_speed_10m[i];
+  wind.gust = h.wind_gusts_10m[i];
+
+  const b = state.bias;
+  set('w-dir', `${Math.round(wind.dir)}°`, cardinal(wind.dir));
+  set('w-spd', `${(wind.spd + b).toFixed(0)} kt`,
+      b ? `HRRR ${wind.spd.toFixed(0)} +${b}` : `HRRR ${wind.spd.toFixed(1)}`);
+  set('w-gst', `${(wind.gust + b).toFixed(0)} kt`,
+      b ? `HRRR ${wind.gust.toFixed(0)} +${b}` : `HRRR ${wind.gust.toFixed(1)}`);
+  redrawCourse();
+}
+
+// ── State + controls ─────────────────────────────────────────────────────────
+const state = { ymd: null, hour: SLOTS[0], bias: 4, len: 1.0, twa: 42, modelDate: null };
+const show  = { areas: true, cont: true, snd: false, course: true };
+let overlay = null;
+
+function showCurrent() {
+  const offset = daysBetween(state.modelDate, state.ymd);
+  const frame = BASE_FRAME + state.hour + 24 * offset;
+  if (overlay) map.removeLayer(overlay);
+  overlay = null;
+  if (frame < BASE_FRAME || frame > MAX_FRAME) return;
+  overlay = L.imageOverlay(imgUrl(state.modelDate, frame), BOUNDS, {
+    opacity: Number(document.getElementById('op').value) / 100,
+    interactive: false, pane: 'nyhopsPane'
+  }).addTo(map);
+}
+
+function render() {
+  document.querySelectorAll('#slots .slot-btn').forEach(b =>
+    b.classList.toggle('active', Number(b.dataset.h) === state.hour));
+  document.querySelectorAll('#daybar .day-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.ymd === state.ymd));
+  showCurrent();
+  applyWind();
+}
+
+function buildControls() {
+  // Day toggle — only offer a day whose evening frames exist in this model run.
+  const daybar = document.getElementById('daybar');
+  [0, 1].forEach(n => {
+    const ymd = addDays(state.ymd, n);
+    const btn = document.createElement('button');
+    btn.className = 'day-btn';
+    btn.dataset.ymd = ymd;
+    btn.textContent = n === 0 ? 'Tonight' : 'Tomorrow';
+    const last = BASE_FRAME + SLOTS[SLOTS.length - 1] + 24 * daysBetween(state.modelDate, ymd);
+    if (last > MAX_FRAME) { btn.disabled = true; btn.title = 'Beyond this NYHOPS run'; }
+    else btn.onclick = () => { state.ymd = ymd; render(); };
+    daybar.appendChild(btn);
+  });
+
+  const slots = document.getElementById('slots');
+  SLOTS.forEach(h => {
+    const btn = document.createElement('button');
+    btn.className = 'slot-btn';
+    btn.dataset.h = h;
+    const mer = a => a < 12 ? 'AM' : 'PM';
+    const m = mer(h) === mer(h + 1) ? mer(h) : `${mer(h)}–${mer(h + 1)}`;
+    btn.innerHTML = `${(h % 12) || 12}–${((h + 1) % 12) || 12}<span class="slot-sub">${m}</span>`;
+    btn.onclick = () => { state.hour = h; render(); };
+    slots.appendChild(btn);
+  });
+
+  document.querySelectorAll('#bias button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#bias button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.bias = Number(b.dataset.v);
+    applyWind();
+  });
+
+  const op = document.getElementById('op');
+  op.oninput = () => {
+    document.getElementById('op-v').textContent = op.value + '%';
+    if (overlay) overlay.setOpacity(Number(op.value) / 100);
+  };
+
+  const len = document.getElementById('len');
+  len.oninput = () => {
+    state.len = Number(len.value);
+    document.getElementById('len-v').textContent = state.len.toFixed(2) + ' nm';
+    redrawCourse();
+  };
+
+  const twa = document.getElementById('twa');
+  twa.oninput = () => {
+    state.twa = Number(twa.value);
+    document.getElementById('twa-v').textContent = state.twa + '°';
+    redrawCourse();
+  };
+
+  const tog = (id, key, fn) => {
+    const el = document.getElementById(id);
+    el.onclick = () => { show[key] = !show[key]; el.classList.toggle('active', show[key]); fn(); };
+  };
+  tog('tg-areas',  'areas',  () => layerAreas && (show.areas ? layerAreas.addTo(map) : map.removeLayer(layerAreas)));
+  tog('tg-cont',   'cont',   () => layerCont  && (show.cont  ? layerCont.addTo(map)  : map.removeLayer(layerCont)));
+  tog('tg-snd',    'snd',    updateSoundings);
+  tog('tg-course', 'course', redrawCourse);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  const et = etParts();
+  state.ymd = et.ymd;
+
+  // Find the newest model run that actually has tonight's evening frames.
+  const yest = addDays(et.ymd, -1);
+  const probe = d => BASE_FRAME + SLOTS[0] + 24 * daysBetween(d, et.ymd);
+  try {
+    state.modelDate = await probeDate(et.ymd, probe(et.ymd))
+      .catch(() => probeDate(yest, probe(yest)));
+  } catch {
+    document.getElementById('meta').textContent =
+      'Could not load NYHOPS data — the model may not have run yet';
+    return;
+  }
+
+  document.getElementById('meta').textContent =
+    'As of ' + new Date().toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/New_York'
+    }) + ' ET · NYHOPS run ' + state.modelDate + ' · Wind: HRRR';
+
+  buildControls();
+  render();
+
+  loadBathymetry();
+  loadWind().then(applyWind).catch(() => {
+    document.getElementById('w-dir-sub').textContent = 'HRRR failed';
+  });
+}
+init();
+</script>
+</body>
+</html>

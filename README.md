@@ -13,6 +13,31 @@ A mobile-first PWA for real-time sailing and current conditions in NYC Harbor �
 ### `index.html` — Wind & Tide Dashboard
 Real-time sailing conditions: wind, tides, barometric pressure, weather, and forecast.
 
+### `race-night.html` — Race Night
+The racing area only (Y-A / G1 / G11), for weeknight beer-can racing. One Leaflet map
+layering three things:
+
+- **NYHOPS surface currents** for the 5, 6, 7 and 8 pm ET slots, tonight or tomorrow,
+  with an opacity slider.
+- **Charted depth** from NOAA ENC — filled depth areas, labelled contours (16′ / 33′ /
+  49′) and optional soundings, all in feet. Baked into `bathymetry.json`; see below.
+  The depth fill sits *under* the current overlay, so drag the opacity slider down to
+  read it. Contours and soundings sit above and stay legible either way.
+- **A projected windward-leeward course** from the HRRR wind forecast for that hour.
+
+The course is drawn from a fixed race-area centre at **40.6694, −74.0295** (~300 m due
+north of Yellow Alpha), with the windward mark half a course-length upwind and the start
+line half a course-length downwind, perpendicular to the wind. That single centre
+reproduces the usual mark placements — G1 in a northerly, G11 in a north-easterly, G9 in
+a south-easterly, R32 in a westerly, and just past Y-A in the common south-westerly — to
+within a few hundred metres in each case. It is a projection from observed patterns, not
+the sailing instructions; the RC sets the real course.
+
+Two knobs are deliberately exposed as assumptions rather than asserted as facts: the
+**local wind bias** (+0 / +4 / +5 kt, default +4, since observed breeze usually runs
+above HRRR here) and the **close-hauled angle** (default 42°, adjust once you know your
+boat's real number).
+
 ### `nyhops.html` — NYHOPS Images
 Five consecutive hourly surface current forecast images for Manhattan Waters from Stevens NYHOPS, starting from the current hour.
 
@@ -94,6 +119,7 @@ Inspired by the B&G Advanced WindPlot display on Zeus/Vulcan chartplotters:
 | Marine zone forecast | [NWS OKX](https://www.weather.gov) — ANZ338 New York Harbor CWF | Text product | Twice daily |
 | Observed radar | [RainViewer](https://www.rainviewer.com) | 10-min frames | Real-time |
 | Nautical chart tiles | [OpenStreetMap](https://www.openstreetmap.org) + [OpenSeaMap](https://www.openseamap.org) | — | Continuous |
+| Charted depth | [NOAA ENC Direct to GIS](https://encdirect.noaa.gov/) — harbour-scale ENC | Vector, MLLW | Manual refresh |
 
 All dashboard APIs are free, require no API key, and support CORS.
 
@@ -168,6 +194,8 @@ weather card labels its CAPE figure as GFS 13km.
 
 ```
 ├── index.html                        # Wind & tide dashboard
+├── race-night.html                   # Racing area: currents + charted depth + projected course
+├── bathymetry.json                   # NOAA ENC depth areas/contours/soundings (generated)
 ├── weather.html                      # Weather forecast (Open-Meteo · NWS ANZ338 · RainViewer radar)
 ├── nyhops.html                       # NYHOPS surface current forecast images
 ├── nyhops-overlay.html               # NYHOPS currents on interactive Leaflet chart
@@ -176,12 +204,31 @@ weather card labels its CAPE figure as GFS 13km.
 ├── manifest.json                     # PWA manifest
 ├── scripts/
 │   ├── fetch_lnm.py                  # PDF download + GitHub Models extraction
+│   ├── fetch_bathymetry.py           # NOAA ENC depths -> bathymetry.json (run by hand)
 │   └── requirements.txt
 └── .github/workflows/
     └── lnm-update.yml                # Runs every Friday noon ET
 ```
 
 No server, no build step, no node_modules. The LNM update is the only automated step (GitHub Actions).
+
+### Refreshing the bathymetry
+
+`bathymetry.json` is generated, committed, and served statically — the page has no
+runtime dependency on NOAA's GIS service. Charts change rarely, so there is no scheduled
+workflow; regenerate it by hand if a survey updates the racing area:
+
+```bash
+pip install -r scripts/requirements.txt
+python3 scripts/fetch_bathymetry.py
+```
+
+It queries three NOAA ENC layers (depth areas, depth contours, soundings) over the race
+box, simplifies the geometry and rounds coordinates to 5 dp, and writes ~290 KB. Depths
+are stored in metres and converted to feet at render time.
+
+Note that NOAA retired the RNC raster chart tile service (`tileservice.charts.noaa.gov`)
+in January 2025 — that endpoint is dead, and ENC Direct is its replacement.
 
 ---
 
