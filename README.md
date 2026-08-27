@@ -17,12 +17,17 @@ Real-time sailing conditions: wind, tides, barometric pressure, weather, and for
 The racing area only (Y-A / G1 / G11), for weeknight beer-can racing. One Leaflet map
 layering three things:
 
-- **NYHOPS surface currents** for the 5, 6, 7 and 8 pm ET slots, tonight or tomorrow,
-  with an opacity slider.
+- **NYHOPS surface currents** for tonight, tomorrow or the next Saturday, with an
+  opacity slider. Weeknights use the 5–8 pm window; Saturdays switch automatically to
+  the 1–4 pm afternoon window. NYHOPS only forecasts 48 h ahead, so the Saturday button
+  is disabled (and says so) until Friday.
 - **Charted depth** from NOAA ENC — filled depth areas, labelled contours (16′ / 33′ /
   49′) and optional soundings, all in feet. Baked into `bathymetry.json`; see below.
   The depth fill sits *under* the current overlay, so drag the opacity slider down to
   read it. Contours and soundings sit above and stay legible either way.
+
+The map takes ~62 vh; the sliders, legend and notes collapse behind a **Controls &
+legend** disclosure so the chart keeps the screen.
 - **A projected windward-leeward course** from the HRRR wind forecast for that hour.
 
 The course is drawn from a fixed race-area centre at **40.6694, −74.0295** (~300 m due
