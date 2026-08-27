@@ -12,7 +12,7 @@
 <style>
 :root{--bg:#080e18;--card:#131f2e;--card2:#0c1520;--bdr:#1a2d42;--bdr2:#2a4060;--txt:#f0f4f8;--dim:#c4d0de;--mut:#8fa3b8;--fnt:#6b8299;--accent:#4fd1c5;--blue:#63b3ed;--orange:#ed8936;--green:#48bb78;--red:#f56565;--yellow:#ecc94b;--mono:'SF Mono','Cascadia Code','JetBrains Mono','Fira Code',monospace}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);max-width:440px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);max-width:440px;margin:0 auto;-webkit-font-smoothing:antialiased}
 .hdr{background:linear-gradient(135deg,#0e1f30,#162d46);padding:16px 14px 12px;border-bottom:1px solid var(--bdr);flex-shrink:0}
 .hdr-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .hdr-label{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
@@ -23,7 +23,9 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .daybar{display:flex;gap:6px;padding:8px 10px 0;flex-shrink:0}
 .day-btn{flex:1;padding:6px 4px;background:var(--card);border:1px solid var(--bdr);border-radius:7px;color:var(--mut);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:.04em}
 .day-btn.active{background:rgba(79,209,197,.15);border-color:var(--accent);color:var(--accent)}
-.day-btn:disabled{opacity:.35;cursor:default}
+.day-btn:disabled{opacity:.4;cursor:default}
+.day-sub{display:block;font-size:8px;font-weight:600;letter-spacing:.05em;color:var(--fnt);margin-top:1px}
+.day-btn.active .day-sub{color:var(--accent)}
 
 .slots{display:flex;gap:5px;padding:8px 10px 6px;flex-shrink:0}
 .slot-btn{flex:1;min-width:0;padding:7px 2px;background:var(--card);border:1px solid var(--bdr);border-radius:7px;color:var(--mut);font-size:13px;font-weight:700;font-family:var(--mono);cursor:pointer;text-align:center;line-height:1.25}
@@ -32,7 +34,11 @@ body{font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
 .slot-sub{display:block;font-size:8px;font-weight:600;letter-spacing:.06em;color:var(--fnt)}
 .slot-btn.active .slot-sub{color:var(--accent)}
 
-#map{flex:1;min-height:300px}
+#map{height:62vh;min-height:360px}
+.drawer-bar{display:flex;gap:6px;padding:8px 10px 0}
+.drawer-btn{flex:1;padding:7px 4px;background:var(--card);border:1px solid var(--bdr);border-radius:8px;color:var(--mut);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:.03em}
+.drawer-btn.open{background:rgba(79,209,197,.12);border-color:var(--accent);color:var(--accent)}
+#drawer[hidden]{display:none}
 
 .wind{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:8px 10px 4px;flex-shrink:0}
 .wcell{background:linear-gradient(145deg,var(--card),var(--card2));border:1px solid var(--bdr);border-radius:9px;padding:7px 8px;text-align:center}
@@ -111,6 +117,11 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
   </div>
 </div>
 
+<div class="drawer-bar">
+  <button class="drawer-btn" id="drawer-tg" aria-expanded="false" aria-controls="drawer">⚙︎ Controls &amp; legend</button>
+</div>
+
+<div id="drawer" hidden>
 <div class="panel">
   <div class="ctl">
     <span class="ctl-lab">Local bias</span>
@@ -161,6 +172,9 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
   course. Mark is drawn 0.5&nbsp;× course length upwind of a fixed race-area centre
   (40.6694, −74.0295) that reproduces the usual G1&nbsp;/&nbsp;G11&nbsp;/&nbsp;G9&nbsp;/&nbsp;R32&nbsp;/&nbsp;Y-A
   placements. Close-hauled angle is an adjustable assumption, not a measured Melges 24 polar.
+  Saturdays use the 1–4&nbsp;pm window, weeknights 5–8&nbsp;pm. NYHOPS forecasts only
+  48&nbsp;h ahead, so Saturday has data from Friday onward.
+</div>
 </div>
 
 <div class="footer">
@@ -180,7 +194,12 @@ const BOUNDS     = [[40.632, -74.102], [40.785, -73.943]];
 const BASE_URL   = 'https://hudson.dl.stevens-tech.edu/maritimeforecast/data/FORECAST/';
 
 const CENTER   = [40.6694, -74.0295];  // race-area centre, ~300m N of Yellow Alpha
-const SLOTS    = [17, 18, 19, 20];     // race-evening hours, ET
+const EVENING  = [17, 18, 19, 20];     // weeknight race hours, ET
+const AFTERNOON = [13, 14, 15, 16];    // Saturday race hours, ET
+
+// Saturday racing runs in the afternoon; every other day is an evening series.
+const isSat    = ymd => new Date(`${ymd}T12:00:00Z`).getUTCDay() === 6;
+const slotsFor = ymd => isSat(ymd) ? AFTERNOON : EVENING;
 const LINE_LEN_M = 100;                // assumed start-line length
 const R_NM     = 3440.065;
 const M2FT     = 3.28084;
@@ -487,7 +506,7 @@ function applyWind() {
 }
 
 // ── State + controls ─────────────────────────────────────────────────────────
-const state = { ymd: null, hour: SLOTS[0], bias: 4, len: 1.0, twa: 42, modelDate: null };
+const state = { ymd: null, hour: null, bias: 4, len: 1.0, twa: 42, modelDate: null };
 const show  = { areas: true, cont: true, snd: false, course: true };
 let overlay = null;
 
@@ -503,7 +522,26 @@ function showCurrent() {
   }).addTo(map);
 }
 
+// Slot buttons are rebuilt per day, since Saturday uses a different window.
+function buildSlots() {
+  const slots = document.getElementById('slots');
+  const hours = slotsFor(state.ymd);
+  if (!hours.includes(state.hour)) state.hour = hours[0];
+  slots.innerHTML = '';
+  const mer = a => a < 12 ? 'AM' : 'PM';
+  hours.forEach(h => {
+    const btn = document.createElement('button');
+    btn.className = 'slot-btn';
+    btn.dataset.h = h;
+    const m = mer(h) === mer(h + 1) ? mer(h) : `${mer(h)}–${mer(h + 1)}`;
+    btn.innerHTML = `${(h % 12) || 12}–${((h + 1) % 12) || 12}<span class="slot-sub">${m}</span>`;
+    btn.onclick = () => { state.hour = h; render(); };
+    slots.appendChild(btn);
+  });
+}
+
 function render() {
+  buildSlots();
   document.querySelectorAll('#slots .slot-btn').forEach(b =>
     b.classList.toggle('active', Number(b.dataset.h) === state.hour));
   document.querySelectorAll('#daybar .day-btn').forEach(b =>
@@ -513,31 +551,48 @@ function render() {
 }
 
 function buildControls() {
-  // Day toggle — only offer a day whose evening frames exist in this model run.
   const daybar = document.getElementById('daybar');
-  [0, 1].forEach(n => {
-    const ymd = addDays(state.ymd, n);
+  const today = state.ymd;
+
+  // Today, tomorrow, and the next Saturday — skipping a duplicate when the
+  // upcoming Saturday is already one of the first two.
+  const days = [
+    { ymd: today,           label: isSat(today) ? 'Today' : 'Tonight' },
+    { ymd: addDays(today, 1), label: isSat(addDays(today, 1)) ? 'Saturday' : 'Tomorrow' },
+  ];
+  let sat = today;
+  for (let i = 0; i < 7 && !isSat(sat); i++) sat = addDays(sat, 1);
+  if (!days.some(d => d.ymd === sat)) days.push({ ymd: sat, label: 'Saturday' });
+
+  days.forEach(d => {
     const btn = document.createElement('button');
     btn.className = 'day-btn';
-    btn.dataset.ymd = ymd;
-    btn.textContent = n === 0 ? 'Tonight' : 'Tomorrow';
-    const last = BASE_FRAME + SLOTS[SLOTS.length - 1] + 24 * daysBetween(state.modelDate, ymd);
-    if (last > MAX_FRAME) { btn.disabled = true; btn.title = 'Beyond this NYHOPS run'; }
-    else btn.onclick = () => { state.ymd = ymd; render(); };
+    btn.dataset.ymd = d.ymd;
+    const sl = slotsFor(d.ymd);
+    const last = BASE_FRAME + sl[sl.length - 1] + 24 * daysBetween(state.modelDate, d.ymd);
+    // NYHOPS publishes 48 frames (T25–T72), so a day more than two out has no
+    // model data yet. Say so on the button face — a title tooltip is invisible
+    // on a phone.
+    if (last > MAX_FRAME) {
+      btn.disabled = true;
+      btn.innerHTML = `${d.label}<span class="day-sub">from Fri</span>`;
+      btn.title = 'NYHOPS only forecasts 48 h ahead';
+    } else {
+      btn.innerHTML = `${d.label}<span class="day-sub">${sl[0] === 13 ? '1–4PM' : '5–8PM'}</span>`;
+      btn.onclick = () => { state.ymd = d.ymd; render(); };
+    }
     daybar.appendChild(btn);
   });
 
-  const slots = document.getElementById('slots');
-  SLOTS.forEach(h => {
-    const btn = document.createElement('button');
-    btn.className = 'slot-btn';
-    btn.dataset.h = h;
-    const mer = a => a < 12 ? 'AM' : 'PM';
-    const m = mer(h) === mer(h + 1) ? mer(h) : `${mer(h)}–${mer(h + 1)}`;
-    btn.innerHTML = `${(h % 12) || 12}–${((h + 1) % 12) || 12}<span class="slot-sub">${m}</span>`;
-    btn.onclick = () => { state.hour = h; render(); };
-    slots.appendChild(btn);
-  });
+  const drawer = document.getElementById('drawer'), dtg = document.getElementById('drawer-tg');
+  dtg.onclick = () => {
+    const open = drawer.hasAttribute('hidden');
+    drawer.toggleAttribute('hidden', !open);
+    dtg.classList.toggle('open', open);
+    dtg.setAttribute('aria-expanded', String(open));
+    dtg.innerHTML = (open ? '✕ Hide controls' : '⚙︎ Controls &amp; legend');
+    map.invalidateSize();
+  };
 
   document.querySelectorAll('#bias button').forEach(b => b.onclick = () => {
     document.querySelectorAll('#bias button').forEach(x => x.classList.remove('active'));
@@ -583,7 +638,7 @@ async function init() {
 
   // Find the newest model run that actually has tonight's evening frames.
   const yest = addDays(et.ymd, -1);
-  const probe = d => BASE_FRAME + SLOTS[0] + 24 * daysBetween(d, et.ymd);
+  const probe = d => BASE_FRAME + slotsFor(et.ymd)[0] + 24 * daysBetween(d, et.ymd);
   try {
     state.modelDate = await probeDate(et.ymd, probe(et.ymd))
       .catch(() => probeDate(yest, probe(yest)));
