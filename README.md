@@ -38,6 +38,11 @@ a south-easterly, R32 in a westerly, and just past Y-A in the common south-weste
 within a few hundred metres in each case. It is a projection from observed patterns, not
 the sailing instructions; the RC sets the real course.
 
+Course length runs 0.2–0.8 nm (default 0.5) — the local courses are typically 0.6–0.7 nm
+and drop toward 0.3 nm in light air or adverse tide.
+
+A **Float Plan** link in the header points to `float-plan.vercel.app` for the skippers.
+
 Two knobs are deliberately exposed as assumptions rather than asserted as facts: the
 **local wind bias** (+0 / +4 / +5 kt, default +4, since observed breeze usually runs
 above HRRR here) and the **close-hauled angle** (default 42°, adjust once you know your
