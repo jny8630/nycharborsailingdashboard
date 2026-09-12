@@ -102,8 +102,6 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
 <div class="daybar" id="daybar"></div>
 <div class="slots" id="slots"></div>
 
-<div id="map"></div>
-
 <div class="wind">
   <div class="wcell">
     <div class="wlab">Wind dir</div>
@@ -121,12 +119,11 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
     <div class="wsub" id="w-gst-sub">&nbsp;</div>
   </div>
 </div>
-
 <div class="drawer-bar">
-  <button class="drawer-btn" id="drawer-tg" aria-expanded="false" aria-controls="drawer">⚙︎ Controls &amp; legend</button>
+  <button class="drawer-btn open" id="drawer-tg" aria-expanded="true" aria-controls="drawer">✕ Hide controls</button>
 </div>
 
-<div id="drawer" hidden>
+<div id="drawer">
 <div class="panel">
   <div class="ctl">
     <span class="ctl-lab">Local bias</span>
@@ -140,6 +137,11 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
     <span class="ctl-lab">Current opacity<br><span style="font-weight:500;color:var(--fnt);font-size:9px">drag down for depth</span></span>
     <input type="range" id="op" min="0" max="100" value="60">
     <span class="ctl-val" id="op-v">60%</span>
+  </div>
+  <div class="ctl">
+    <span class="ctl-lab">Centre E/W</span>
+    <input type="range" id="shift" min="-250" max="250" step="25" value="-125">
+    <span class="ctl-val" id="shift-v">125 m W</span>
   </div>
   <div class="ctl">
     <span class="ctl-lab">Course length</span>
@@ -172,15 +174,22 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:18px}
   </div>
 </div>
 
+</div>
+
+<div id="map"></div>
+
 <div class="note" id="note">
   Course is a <b>projection</b>, not the sailing instructions — the RC sets the real
   course. Mark is drawn 0.5&nbsp;× course length upwind of a fixed race-area centre
   (40.6694, −74.0295) that reproduces the usual G1&nbsp;/&nbsp;G11&nbsp;/&nbsp;G9&nbsp;/&nbsp;R32&nbsp;/&nbsp;Y-A
   placements. Close-hauled angle is an adjustable assumption, not a measured Melges 24 polar.
+  <b>Centre E/W</b> nudges the whole course across the harbour: weeknights default
+  125&nbsp;m west to match observed racing, Saturdays to the buoy-derived centre.
   Saturdays use the 1–4&nbsp;pm window, weeknights 5–8&nbsp;pm. NYHOPS forecasts only
   48&nbsp;h ahead, so Saturday has data from Friday onward.
 </div>
-</div>
+
+
 
 <div class="footer">
   <a href="https://hudson.dl.stevens-tech.edu/maritimeforecast/maincontrol.shtml" target="_blank">Stevens NYHOPS</a> ·
@@ -421,8 +430,9 @@ function redrawCourse() {
 
   const W = wind.dir;                       // degrees the wind is FROM
   const L_ = state.len, theta = state.twa;
-  const mark    = dest(CENTER, W, L_ / 2);
-  const lineCtr = dest(CENTER, (W + 180) % 360, L_ / 2);
+  const C       = raceCentre();
+  const mark    = dest(C, W, L_ / 2);
+  const lineCtr = dest(C, (W + 180) % 360, L_ / 2);
   const halfNm  = (LINE_LEN_M / 2) / 1852;
   const pin     = dest(lineCtr, (W + 270) % 360, halfNm);
   const boat    = dest(lineCtr, (W + 90)  % 360, halfNm);
@@ -454,7 +464,7 @@ function redrawCourse() {
         fill:false, interactive:false }));
   add(L.circleMarker(pin, { pane:'coursePane', radius:5, color:'#000', weight:2.5,
         fillColor:'#ed8936', fillOpacity:1, interactive:false }));
-  add(L.circleMarker(CENTER, { pane:'coursePane', radius:3, color:'#4fd1c5', weight:1.5,
+  add(L.circleMarker(C, { pane:'coursePane', radius:3, color:'#4fd1c5', weight:1.5,
         fill:false, interactive:false }));
 
   add(L.marker(mark, { pane:'coursePane', interactive:false,
@@ -511,7 +521,18 @@ function applyWind() {
 }
 
 // ── State + controls ─────────────────────────────────────────────────────────
-const state = { ymd: null, hour: null, bias: 4, len: 0.5, twa: 42, modelDate: null };
+const state = { ymd: null, hour: null, bias: 4, len: 0.5, twa: 42, shift: -125, modelDate: null };
+let shiftTouched = false;   // once nudged by hand, stop re-defaulting on day change
+
+// Observed weeknight courses sit west of the buoy-derived centre; Saturdays
+// reportedly do not. Used as the default until the slider is touched.
+const defaultShift = ymd => isSat(ymd) ? 0 : -125;
+
+// Base centre, offset east/west by state.shift metres.
+function raceCentre() {
+  if (!state.shift) return CENTER;
+  return dest(CENTER, state.shift < 0 ? 270 : 90, Math.abs(state.shift) / 1852);
+}
 const show  = { areas: true, cont: true, snd: false, course: true };
 let overlay = null;
 
@@ -546,6 +567,15 @@ function buildSlots() {
 }
 
 function render() {
+  if (!shiftTouched) {
+    state.shift = defaultShift(state.ymd);
+    const sl = document.getElementById('shift');
+    if (sl) {
+      sl.value = String(state.shift);
+      document.getElementById('shift-v').textContent =
+        state.shift === 0 ? 'centred' : `${Math.abs(state.shift)} m ${state.shift < 0 ? 'W' : 'E'}`;
+    }
+  }
   buildSlots();
   document.querySelectorAll('#slots .slot-btn').forEach(b =>
     b.classList.toggle('active', Number(b.dataset.h) === state.hour));
@@ -590,13 +620,21 @@ function buildControls() {
   });
 
   const drawer = document.getElementById('drawer'), dtg = document.getElementById('drawer-tg');
-  dtg.onclick = () => {
-    const open = drawer.hasAttribute('hidden');
+  const setDrawer = open => {
     drawer.toggleAttribute('hidden', !open);
     dtg.classList.toggle('open', open);
     dtg.setAttribute('aria-expanded', String(open));
-    dtg.innerHTML = (open ? '✕ Hide controls' : '⚙︎ Controls &amp; legend');
+    dtg.innerHTML = open ? '✕ Hide controls' : '⚙︎ Controls &amp; legend';
     map.invalidateSize();
+  };
+  // Open by default, but remember a collapse so it stays out of the way.
+  let wantOpen = true;
+  try { wantOpen = localStorage.getItem('rn-drawer') !== 'closed'; } catch {}
+  setDrawer(wantOpen);
+  dtg.onclick = () => {
+    const open = drawer.hasAttribute('hidden');
+    setDrawer(open);
+    try { localStorage.setItem('rn-drawer', open ? 'open' : 'closed'); } catch {}
   };
 
   document.querySelectorAll('#bias button').forEach(b => b.onclick = () => {
@@ -611,6 +649,20 @@ function buildControls() {
     document.getElementById('op-v').textContent = op.value + '%';
     if (overlay) overlay.setOpacity(Number(op.value) / 100);
   };
+
+  const shift = document.getElementById('shift');
+  const shiftLabel = () => {
+    const v = state.shift;
+    document.getElementById('shift-v').textContent =
+      v === 0 ? 'centred' : `${Math.abs(v)} m ${v < 0 ? 'W' : 'E'}`;
+  };
+  shift.oninput = () => {
+    state.shift = Number(shift.value);
+    shiftTouched = true;
+    shiftLabel();
+    redrawCourse();
+  };
+  shiftLabel();
 
   const len = document.getElementById('len');
   len.oninput = () => {
