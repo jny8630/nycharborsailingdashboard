@@ -38,6 +38,13 @@ a south-easterly, R32 in a westerly, and just past Y-A in the common south-weste
 within a few hundred metres in each case. It is a projection from observed patterns, not
 the sailing instructions; the RC sets the real course.
 
+**Centre E/W** shifts the whole course across the harbour (±250 m). Weeknights default
+to 125 m west, matching observed racing; Saturdays default to the buoy-derived centre.
+Once the slider is touched it stops re-defaulting on day change.
+
+The settings sit above the chart and start open (a collapse is remembered in
+`localStorage`).
+
 Course length runs 0.2–0.8 nm (default 0.5) — the local courses are typically 0.6–0.7 nm
 and drop toward 0.3 nm in light air or adverse tide.
 
