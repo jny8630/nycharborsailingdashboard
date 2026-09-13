@@ -48,7 +48,7 @@ The settings sit above the chart and start open (a collapse is remembered in
 Course length runs 0.2–0.8 nm (default 0.5) — the local courses are typically 0.6–0.7 nm
 and drop toward 0.3 nm in light air or adverse tide.
 
-A **Float Plan** link in the header points to `float-plan.vercel.app` for the skippers.
+
 
 Two knobs are deliberately exposed as assumptions rather than asserted as facts: the
 **local wind bias** (+0 / +4 / +5 kt, default +4, since observed breeze usually runs
@@ -228,6 +228,15 @@ weather card labels its CAPE figure as GFS 13km.
 ```
 
 No server, no build step, no node_modules. The LNM update is the only automated step (GitHub Actions).
+
+### Wind fetch retries
+`index.html`, `wind-tactics.html` and `harbor-context.html` each retry a failed NOAA/NWS/
+Open-Meteo fetch once, after a ~900ms delay, before giving up. This exists because the
+Robbins Reef station itself checks out healthy (no gaps over a week of 6-minute samples),
+so a blank wind panel was most likely a single dropped request on patchy harbour cellular
+with no second attempt — not a station outage. `wind-tactics.html`'s 10-minute
+auto-refresh also now shows a visible warning on failure instead of only logging to the
+console, which is invisible on a phone.
 
 ### Refreshing the bathymetry
 
