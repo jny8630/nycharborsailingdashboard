@@ -154,13 +154,22 @@ let robWindHistory = null;
 
 // ── FETCHERS ─────────────────────────────────────────────────
 
+// One retry after a short delay — a dropped request on patchy harbour
+// cellular otherwise fails permanently until the next 10-minute refresh.
+async function fetchRetry(url, opts, tries=2) {
+  for (let i=0;i<tries;i++) {
+    try { return await fetch(url, opts); }
+    catch(e) { if (i===tries-1) throw e; await new Promise(res=>setTimeout(res,900)); }
+  }
+}
+
 async function fetchCOOPSStation(station) {
   const base = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
   const common = `station=${station.id}&units=english&time_zone=lst_ldt&format=json&date=latest`;
 
   const [windRes, pressRes] = await Promise.allSettled([
-    fetch(`${base}?${common}&product=wind`).then(r => r.json()),
-    fetch(`${base}?${common}&product=air_pressure`).then(r => r.json()),
+    fetchRetry(`${base}?${common}&product=wind`).then(r => r.json()),
+    fetchRetry(`${base}?${common}&product=air_pressure`).then(r => r.json()),
   ]);
 
   let wind = null, pressure = null;
@@ -179,7 +188,7 @@ async function fetchCOOPSStation(station) {
 }
 
 async function fetchNWSStation(station) {
-  const r = await fetch(`https://api.weather.gov/stations/${station.id}/observations/latest`, {
+  const r = await fetchRetry(`https://api.weather.gov/stations/${station.id}/observations/latest`, {
     headers:{'User-Agent':'(NYC Harbor Sailing Dashboard, jens.nachtigal@gmail.com)','Accept':'application/geo+json'}
   });
   if (!r.ok) throw new Error(`NWS ${r.status} for ${station.id}`);
@@ -212,7 +221,7 @@ async function fetchStationData(station) {
 // 850 hPa (~1500 m) flow — the "gradient" reference above the boundary layer
 async function fetchGradient() {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=windspeed_850hPa,winddirection_850hPa&wind_speed_unit=kn&timezone=auto&timeformat=unixtime&past_hours=12&forecast_hours=12`;
-  const r = await fetch(url); if (!r.ok) throw new Error(`OM ${r.status}`);
+  const r = await fetchRetry(url); if (!r.ok) throw new Error(`OM ${r.status}`);
   const d = await r.json(); if (!d.hourly?.time?.length) throw new Error('No OM data');
   return {times: d.hourly.time.map(t => new Date(t*1000)), spds: d.hourly.windspeed_850hPa, dirs: d.hourly.winddirection_850hPa};
 }
@@ -224,7 +233,7 @@ async function fetchGradient() {
 // outside Eastern silently gets a window shifted by their UTC offset.
 async function fetchRobWindHistory() {
   const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?range=4&station=${ROB}&product=wind&units=english&time_zone=lst_ldt&format=json`;
-  const r = await fetch(url); if (!r.ok) throw new Error(`NOAA ${r.status}`);
+  const r = await fetchRetry(url); if (!r.ok) throw new Error(`NOAA ${r.status}`);
   const d = await r.json(); if (!d.data?.length) throw new Error('No NOAA wind data');
   return d.data.map(w => ({speed:parseFloat(w.s), gusts:parseFloat(w.g), dir:parseFloat(w.d)}))
                .filter(w => !isNaN(w.speed) && !isNaN(w.dir));
