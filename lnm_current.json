@@ -1,12 +1,12 @@
 {
-  "week": 39,
+  "week": 40,
   "year": 2026,
-  "generated_utc": "2026-10-02T20:14:08Z",
-  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01392026.pdf",
+  "generated_utc": "2026-10-09T20:23:53Z",
+  "pdf_url": "https://www.navcen.uscg.gov/sites/default/files/pdf/lnms/lnm01402026.pdf",
   "model": "text-parser",
   "skipped": [
     {
-      "week": 40,
+      "week": 41,
       "year": 2026,
       "reason": "not_posted"
     }
@@ -21,87 +21,108 @@
     },
     {
       "chart": "13275",
-      "summary": "Raritan River Cutoff Channel - Arthur Bridges From July 27, 2026 to October 31, 2028, contractors will be conducting steel repairs and painting of the Outerbridge Crossing over Lat:.0. This work will be conducted from up to eight 20-foot-wide work platforms suspended no more than 2 feet 10 inches from the low structural steel of the bridge. Work platforms will be first deployed on August 3, 2026,\u2026",
+      "summary": "2026-10-01 To: 2027-01-01 Location: 40-38-09..030W Bridge Name: Goethals Lat::00 a.m. and 4:00 p.m., a bridge traveler will be operated under the Goethals Bridge over Arthur Kill Channel at mile 11.5 to perform bridge inspection. Mariners requiring full vertical clearance can contact the Lon:\ncontractor via marine radio VHF-FM Ch.. The traveler platform will be moved out of the navigable -channel\u2026",
       "status": "ACTIVE",
       "since": "2026-10-01",
       "location": "Raritan River Cutoff Channel - Arthur Bridges"
     },
     {
-      "chart": "13276",
-      "summary": "2026-03-06 To: 2027-03-06 Location: 40-44-09.:.444W Shoaling has been reported of 3.0 feet at mean low low water in the vicinity of position 40-44-9.115N, 072-52- .447W. Mariners are advised to transit the area with extreme caution. Lon:\n-: 2026-09-28 To: Lat:: 42-32-17..796W Marine construction operations will be conducted in Salem Harbor, MA, in . AGM Marine Lon:. will remove the Lobster Rock\u2026",
-      "status": "ACTIVE",
-      "since": "2026-03-06",
-      "location": "Beach Channel"
-    },
-    {
       "chart": null,
-      "summary": "2024-05-13 To: 2026-12-31 Location: Bridge Name: Lat:\u2013\u00b0 fender system to the Bronx and Queens Towers of the Throgs Neck Bridge across East River at mile 15.8 is in progress. HoursLon:\nof operation are from 7 a.m. to 5:30 p.m. daily. Crane and material barges will be operating along the perimeter of the Bronx -and Queens Towers. Any questions regarding this project can contact Steve Mejia via\u2026",
+      "summary": "2026-08-24 To: 2026-10-17 Location: 40-42-49..960W Bridge Name: Lat::00 am to 4:00 pm Monday through Friday, a bridge traveler will be operated under Williamsburg Bridge across East River at mile 2.3, in Brooklyn, NY to perform a bridge Lon:\ninspection. Safety boat CT8893BM will be on scene during inspection operations. Mariners requiring full vertical clearance -can contact the contractor via\u2026",
       "status": "ACTIVE",
-      "since": "2024-05-13",
+      "since": "2026-08-24",
       "location": "Main Channel - East River Main Bridges"
     },
     {
       "chart": null,
-      "summary": "2026-09-30 To: 2026-10-03 Location: 40-48-50..160W Bridge Name: Lat::00 am to 2:00 pm, a barge with manlift will beutilized to inspect Madison Ave. Bridge across Harlem River at mile 2.3, in New York, NY. Mariners requiring full horizontal Lon:. Mariners are advised -to exercise caution and reduce wake when transiting the area. : 2026-09-29 To: 2026-12-31 Location: 40.727531, -73.92891 Bridge\u2026",
+      "summary": "2026-07-20 Lat::. The project, managed by Grace Industries LLC, will take place at coordinates -from July 20, 2026, through December 31, 2026. Operations are scheduled Monday through Saturday, 6:00 AM to 6:00 PM, with cranes and material barges present at the site. Mariners in the area are advised to use slow speed (\u201cslowbell\u201d) near the\ncrane operations and may contact the operation via marine\u2026",
       "status": "ACTIVE",
-      "since": "2026-09-30",
-      "location": "Main Channel - East River Main Bridges"
-    },
-    {
-      "chart": null,
-      "summary": "2026-09-08 Lat:: 2027-06-30 Location: 40-48-05..992W Mariners are advised that Trevcon Construction Company LLC will :. Operations are scheduled daily from 0500 to 1800 in the -vicinity of 48\u203206\u2033N, 53\u203223\u2033W. Applicable chart number is US5NYCFH. Equipment on scene will include a crane barge, material barge, and diving equipment. Mariners transiting the area are requested to exercise caution,\u2026",
-      "status": "ACTIVE",
-      "since": "2026-09-08",
+      "since": "2026-07-20",
       "location": "Main Channel - East River"
     },
     {
       "chart": null,
-      "summary": "2026-02-13 To: 2027-01-01 Location: 40-49-23..552W Bridge Name: Structure Lat::00 a.m. and 3:30 p.m. on weekdays, bridge maintenance will be performed om the deck, parapet, sidewalk and curb on Structure W115.36 Interstate 95 highway Southbound Lon:\nBridge New Jersey Turnpike over the Hackensack River, mile 11.8 in Ridgefield, Bergen County, New Jersey. This work will be completed -in 5\u2026",
+      "summary": "2026-07-23 To: 2026-12-01 Location: 40-35-09..320W Bridge Name: Belt Pkwy Lat:\u2019 manlift will be utilized to inspect the Belt Parkway across Hendrix Creek at mile 0. Mariners requiring full vertical and horizontal clearance can contact the contractor via marine Lon:. Mariners are advised to exercise caution and reduce wake -when transiting the area. : 2024-09-12 To: 2039-10-27 Location: . Mariners\u2026",
       "status": "ACTIVE",
-      "since": "2026-02-13",
-      "location": "Newark Bay - Hackensack Bridges"
+      "since": "2026-07-23",
+      "location": "Gerritsen Inlet"
     },
     {
       "chart": null,
-      "summary": "\u00a7 165.T01-0336 Safety Zone; Hudson River, Manhattan, NY (a) Location.: All waters of the Hudson River from surface to bottom, encompassed by a line connecting the following points beginning at\n45\u203220.32\u2033 N, 00\u203223.84\u2033 W; thence to 45\u203223.34\u2033 N, 00\u203230.60\u2033 W; thence to 45\u203224.03\u2033 N, 00\u203240.85\u2033 W; thence to\n45\u203218.89\u2033 N, 00\u203248.18\u2033 W; thence to 45\u203213.80\u2033 N, 00\u2032thence to 45\u203208.03\u2033 N, 00\u203246.44\u2033 W; thence\u2026",
+      "summary": "2024-05-01 To: 2029-12-31 Location: Bridge Name: George Lat:\u2013 Construction to the rehabilitation at the George Washington Bridge across the Hudson River at mile 11.0 will commence on May 1, 2024. Lon:\nTemporary work platform will be installed under the entire length of the bridge. The temporary work platform will reduce the vertical -clearance by 3ft 9in plus 2ft sag max. below the low steel.\u2026",
+      "status": "TEMPORARY",
+      "since": "2024-05-01",
+      "location": "Main Channel - Hudson Bridges"
+    },
+    {
+      "chart": null,
+      "summary": "2025-06-16 To: Lat:: Reicon Group, LLC will be conducting pile repairs at Pier 94 from June 16, 2025, to :00am to 3:30pm. Equipment on scene will be the RTC 330, monitoring VHF-FM CH Lon:. -: 2025-11-03 To: Lat:: 40-42-06..364W PKF-Mark III, Inc will be conducting marine construction operations on the .000N, 074-02-02.370W, from November 3, 2025, to October 31, 2026, Lon:\nBridges) Monday through\u2026",
       "status": "ACTIVE",
-      "since": "2026-09-07",
+      "since": "2025-06-16",
       "location": "Main Channel - Hudson"
     },
     {
       "chart": null,
-      "summary": "2026-10-01 To: Lat:: 40-42-43..728W Trevcon Construction Co. LLC will conduct marine construction operations at :. Work will include removal of existing structures, installation of O-pile wall, installation of steel pipe pile, jet -grouting, dredging, precast installation, and installation of a concrete deck. Operations are scheduled from 5:00 a.m. to 7:00 p.m., with certain operations occurring\u2026",
-      "status": "ACTIVE",
-      "since": "2026-10-01",
+      "summary": "2026-01-06 To:.: 40-45-20.32N 074-00-23.84W; 40-45-18.89N, 074-00-48.18W; 40-45-13.80N 074-00-48.64W;\n40-45-12.40N. 074-00-28.47W. The USCG has established a Safety Zone, 33 CFR 165.T01-0336 Safety Zone; Hudson River, Manhattan,\nNY. Mariners transiting west of the safety zone should proceed at a speed to minimize potential wake or surge damage to the vessels\nworking the construction area. There\u2026",
+      "status": "TEMPORARY",
+      "since": "2026-01-06",
       "location": "Main Channel - Hudson"
     },
     {
-      "chart": "13221",
-      "summary": "Bridge across Reynolds Channel at mile 8.2. Work hours are 7:00 a.m. to 4:00 p.m. Monday through Friday. During work hours, a 20-foot by 40-foot work barge will be deployed in the navigable channel. Mariners requiring full Lon:. -Mariners are advised to exercise caution when transiting this area. :\nMeadowbrook Parkway Bridge across False Channel at mile 0.7. Work hours are 7:00 a.m. to 4:00 p.m.\u2026",
+      "chart": null,
+      "summary": "Main Channel\nNobska Point Lighted Bell Buoy 26 15555 MISSING FD\nNobska Point Light 15560 LT EXT FD\nWatch Hill Lighted Bell Buoy 2 20025 LT EXT FD\nNapatree Point Ledge Lighted Bell Buoy 6 20045 LT EXT FD\nNapatree Point Ledge Lighted Bell Buoy 6 20045 LT EXT FD\nEast Clump Buoy 19 20100 SINKING FD\nSeaflower Reef Light 20155 LT EXT FD\nGowanus Flats Lighted Buoy 32 34990 OFF STATION FD\nPrivate\u2026",
       "status": "ACTIVE",
-      "since": "2024-09-12",
-      "location": "Jones"
+      "since": "2026-10-05",
+      "location": "Main Channel"
     },
     {
       "chart": "13275",
-      "summary": "2026-04-29 To: 2026-10-18 New York, NY \u2013 UPPER BAY \u2013:00 p.m. to 9:00 p.m., on Saturdays between the hours of 12:00 p.m. to 5:00 p.m., and on Sunday October 18, 2026\nbetween the hours of 12:00 p.m. to 5:00 p.m. Approximately 13 sailboats, 24-26 feet in length, with multiple motorized\nsupport vessels will participate. Interested mariners may contact the Executive Director on marine band radio\u2026",
+      "summary": "2026-05-26 To: 2026-10-14 Location:\u2013 UPPER BAY \u2013:30 pm until 8:00 pm. Approximately 15 sailing vessels will maneuver on\nvarious courses on the Upper Bay, between Ellis Island and Governors Island. Interested mariners may contact the race\ncoordinator on VHF-FM Channel 68 during the scheduled regattas for further information.: 2026-05-27 To: 2026-10-15 Location:\u2013 UPPER BAY \u2013: Mariners are advised\u2026",
       "status": "ACTIVE",
-      "since": "2026-04-29",
+      "since": "2026-05-26",
       "location": "Ambrose Channel - Main Marine Events"
     },
     {
       "chart": null,
-      "summary": "2026-08-04 To: 2026-10-31 Location: 40-40-50..172W Lat:. The work will support NY and NJ marine terminal maintenance dredging under Lon:\nConstruction (Excluding Bridges) Port Authority work orders and is scheduled to occur from August 3, 2026, through October 31, 2026. Operations are planned for Berths -\u00b0. Work hours are expected to be 6:00 a.m. to 6:00 p.m., Monday through Saturday, with Sunday\u2026",
+      "summary": "2026-09-03 To: 2027-08-01 Location: 40.7382, -72.8687 Bridge Name: Smith Point Bridge Suffolk Lat:.1, between Mastic Beach and Smith Point, NY. The 120\u2019 x 40\u2019 crane barge \u201cTom Denis\u201d is adjacent to the first cofferdam south of the channel. A 20\u2019 x 50\u2019 Lon:\nPoseidon sectional barge is onsite and will be moored on the southern end of the north trestle initially. 2ea 20\u2019 x 8\u2019 Aluminum work -skiffs\u2026",
       "status": "ACTIVE",
-      "since": "2026-08-04",
-      "location": "Newark Bay - Port Newark"
+      "since": "2026-09-03",
+      "location": "Nantasket Roads Southern Approach"
     },
     {
       "chart": null,
-      "summary": "To: 2030-01- Lat:\nRaritan 18T23:59:59.000Z Location: 40.49632, -74.28037 Bridge Name: Raritan River Railroad Bridge Raritan River Cutoff Channel - Raritan : To: Location: 40.49632, -74.28037 Lon:\nBridge Name: Raritan River Railroad Bridge Construction and demolition operations to replace the Raritan River Railroad Bridge -commenced on April 1, 2026, and will continue through January 18, 2030.\u2026",
-      "status": "TEMPORARY",
+      "summary": "Newark Bay\nKill Van Kull - Newark Bridges Construction will commence on June 1, 2026, to replace NJ Turnpike Authority\u2019s Newark Bay Bridge over Newark Bay at mile 3.8 Lat:. From June 1, 2026, to April 1, 2027, contractors will be constructing a work trestle from the Bayonne shore of Newark Bay to the navigable channel. This work will not impede the navigable channel. Work hours will be 6:00 a.m.\u2026",
+      "status": "ACTIVE",
+      "since": "2026-07-25",
+      "location": "Newark Bay"
+    },
+    {
+      "chart": null,
+      "summary": "2026-09-29 To: 2027-09-30 Location: 40.812364, -72.634139 Bridge Name: Turkey Bridge Lat:.2, between Westhampton Beach and Quogue, NY. Contractor, Posillico, will be conducting this work beginning October 12, 2026 Lon:\nthrough September 20, 2027, between 7am and 3:30pm. Contractors will be utilizing barges that will reduce the horizontal -clearance to 37\u2019. Mariners requiring full horizontal\u2026",
+      "status": "ACTIVE",
+      "since": "2026-09-29",
+      "location": "Providence River Approach"
+    },
+    {
+      "chart": null,
+      "summary": "NARRATIVE: THE RARITAN YACHT CLUB WILL HOLD REGATTAS IN THE RARITAN BAY FROM MAY 6, 2026\nRaritan AND CONTINUING UNTIL JANUARY 7, 2026. THESE REGATTAS WILL INCLUDE APPROXIMATELY 30 SAILBOATS 15-45 FEET IN LENGTH. 2.. VARIOUS MOTORIZED VESSELS WILL BE ASSISTING WITH THE EVENT. INTERESTED MARINERS MAY CONTACT THE PRINCIPAL RACE\nOFFICER ON CHANNEL 9 OR 71 VHF-FM OR VIA TELEPHONE AT 203-509-1469. 3.\u2026",
+      "status": "ACTIVE",
       "since": "2026-03-10",
-      "location": "Raritan River Cutoff Channel - Bridges Raritan River Cutoff "
+      "location": "Swash Channel - Marine Events"
+    },
+    {
+      "chart": null,
+      "summary": "\u2013 HENDRIX CREEK - Bridge Maintenance \u2013 From July 10, 2026 to July 25, 2027, NYSDOT Lat:.1. During this time work platforms will be installed decreasing the vertical clearance to 20\u2019-7\u201d. Mariners with any questions or concerns may contact Antonio Lon:\nDonato at (646) 703-2644. -: 2026-09-01 To: 2027-01-01 Location: 40.59395, -73.58721 Bridge Name: Loop Pkwy BridgeLat:\nFrom September 15, 2026 to\u2026",
+      "status": "ACTIVE",
+      "since": "2026-09-01",
+      "location": "Raritan River Cutoff Channel"
+    },
+    {
+      "chart": null,
+      "summary": "2026-09-22 To:. Operations\nConstruction (Excluding Bridges) will occur 24 hours per day, 7 days per week.. Dredged material will be transported approximately 5 nautical miles for placement at the Sandy\nHook Sea Bright Offshore Borrow Area. Mariners are requested to transit the area with caution, proceed at minimum safe speed to\nreduce wake, and avoid interfering with dredging, towing, and\u2026",
+      "status": "ACTIVE",
+      "since": "2026-09-22",
+      "location": "Sandy Hook Channel"
     },
     {
       "chart": null,
